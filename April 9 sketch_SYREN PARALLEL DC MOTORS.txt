@@ -1,0 +1,31 @@
+#include <SyRenSimplified.h>		// Header file from the SyRen website
+									// Not included in Arduino library
+
+SyRenSimplified ST; 
+
+void setup()
+{
+  SyRenTXPinSerial.begin(38400);	// This is the baud rate you chose with the DIP switches.  
+  
+  ST.motor(1, 0);	// Parameters (pin, speed)
+}
+
+void loop()
+{
+  delay(100);
+  
+  for(int speed = 0; speed < 100; speed++)
+  {
+    ST.motor(1, speed);
+    delay(100);
+    ST.motor(1,-20);
+  }
+  
+  
+  for(int speed = 100; speed > 0; speed--)
+  {
+    ST.motor(1, speed);
+    delay(100);
+    ST.motor(1, 20);
+  }
+}

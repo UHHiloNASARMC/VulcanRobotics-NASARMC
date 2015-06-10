@@ -1,0 +1,91 @@
+int PWMA = 13;
+int PWMB = 12;
+int PWMA_2 = 2;
+int PWMB_2 = 3;
+
+int AIN1 = 24;
+int BIN1 = 25;
+int AIN1_2 = 26;
+int BIN1_2 = 27;
+
+int AIN2 = 40;
+int BIN2 = 41;
+int AIN2_2 = 38;
+int BIN2_2 = 39;
+
+int speed = 0;
+int STBY = 32;
+
+void setup() 
+{
+  pinMode(PWMA, OUTPUT);
+  pinMode(PWMB, OUTPUT);
+  pinMode(PWMA_2, OUTPUT);
+  pinMode(PWMB_2, OUTPUT);
+  
+  pinMode(AIN1, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(AIN1_2, OUTPUT);
+  pinMode(BIN1_2, OUTPUT);
+  
+  pinMode(AIN2, OUTPUT);
+  pinMode(BIN2, OUTPUT);
+  pinMode(AIN2_2, OUTPUT);
+  pinMode(BIN2_2, OUTPUT);
+  
+  pinMode(STBY, OUTPUT);
+}
+
+void loop() 
+{
+  digitalWrite(STBY, HIGH);
+  
+  // Testing acceleration and decceleration
+  // CASE: Should have wegs move in one direction
+  // ACTUAL: Robot turned left
+  for (speed == 0; speed < 255; speed++)
+  {
+    digitalWrite(AIN1, HIGH);
+    digitalWrite(AIN2, LOW);
+    digitalWrite(BIN1, HIGH);
+    digitalWrite(BIN2, LOW);
+    
+    digitalWrite(AIN1_2, HIGH);
+    digitalWrite(AIN2_2, LOW);
+    digitalWrite(BIN1_2, HIGH);
+    digitalWrite(BIN2_2, LOW);
+    
+    analogWrite(PWMA, speed);
+    analogWrite(PWMB, speed);
+    
+    analogWrite(PWMA_2, speed);
+    analogWrite(PWMB_2, speed);
+    delay(10);
+  }
+  for (speed == 255;speed > 0; speed--)
+ { 
+   digitalWrite(AIN1, HIGH);
+   digitalWrite(AIN2, LOW);
+   digitalWrite(BIN1, HIGH);
+   digitalWrite(BIN2, LOW);
+   
+   digitalWrite(AIN1_2, HIGH);
+    digitalWrite(AIN2_2, LOW);
+    digitalWrite(BIN1_2, HIGH);
+    digitalWrite(BIN2_2, LOW);
+   
+   analogWrite(PWMA, speed);
+   analogWrite(PWMB, speed);
+   
+    analogWrite(PWMA_2, speed);
+    analogWrite(PWMB_2, speed);
+   delay(10);
+ }
+ 
+ 
+}
+
+void stop()
+{
+  digitalWrite(STBY, LOW);
+}

@@ -1,0 +1,35 @@
+#include <SyRenSimplified.h>
+
+SyRenSimplified ST; 
+
+void setup()
+{
+  SyRenTXPinSerial.begin(38400); // This is the baud rate you chose with the DIP switches.  
+  ST.motor(1, 0);   
+ }
+
+void loop()
+{
+  //ST.motor(1,0);  
+
+  //delay(100);
+
+  for(int i = 0; i < 6000; i++)
+  {
+    ST.motor(1,125);  //-127 FULL reverse.  0 is stop.  +127 is FULL forward
+  }
+  
+  //delay(2000);
+  
+  //ST.motor(1,0);
+  
+  //delay(100);
+  
+  for(int i = 0; i < 6000; i++)
+  {
+    ST.motor(1,-125);
+  }
+  
+  //delay(2000);
+
+}

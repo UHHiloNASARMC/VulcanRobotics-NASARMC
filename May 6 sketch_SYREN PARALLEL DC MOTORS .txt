@@ -1,0 +1,52 @@
+#include <SyRenSimplified.h>		// Header file from the SyRen website
+									// Not included in Arduino library
+
+SyRenSimplified ST; 
+
+void setup()
+{
+  SyRenTXPinSerial.begin(38400);	// This is the baud rate you chose with the DIP switches.  
+  
+  //Parameters (pin, speed)
+  ST.motor(1, 0);	// pin 1 (TX0) -> first SyRen motor driver powers left side
+  ST.motor(18,0);	// pin 18 (TX1) -> second SyRen motor driver powers right side
+}
+
+void loop()
+{
+  delay(100);
+  
+//Accelerate, one direction
+  for(int speed = 0; speed < 100; speed++)
+  {
+    ST.motor(1, speed);
+	ST.motor(18, speed);
+    delay(100);
+    ST.motor(1,-20);
+	ST.motor(18,-20);
+  }
+  
+//Decelerate, one direction  
+  for(int speed = 100; speed > 0; speed--)
+  {
+    ST.motor(1, speed);
+	ST.motor(18, speed);
+    delay(100);
+    ST.motor(1, 20);
+	ST.motor(18, 20);
+  }
+  
+//Turn right
+	ST.motor(1, 120);		//Sets left side moving forward
+	ST.motor(18, -120);		//Sets right side moving backwards
+	delay(100);
+	ST.motor(1, -20);		//Opposite vectors
+	ST.motor(18, 20);		//Opposite vectors
+	
+//Turn left
+	ST.motor(1, -120);		//Sets left side moving backwards
+	ST.motor(18, 120);		//Sets right side moving forward
+	delay(100);
+	ST.motor(1, 20);		//Opposite vectors	
+	ST.motor(18, -20);		//Opposite vectors
+}

@@ -1,0 +1,56 @@
+#include<SoftwareSerial.h>
+
+int left = 1;
+int right = 14;
+int zedd = 0;
+SoftwareSerial RS(0, right);
+SoftwareSerial LS(0, left);
+
+//SoftwareSerial RS(1);
+
+void setup()
+{
+  //Serial.begin(38400);	// This is the baud rate you chose with the DIP switches.  
+  RS.begin(38400);
+  LS.begin(38400);
+  
+}
+
+void loop()
+{
+  for(int index = 0; index < 10; index++)
+  {
+    RS.write(127);
+    LS.write(127);
+    delay(100);
+    Serial.println("Moving forward");
+  }
+  
+  for(int index = 0; index < 10; index++)
+  {
+    RS.write(-127);
+    LS.write(-127);
+    delay(100);
+    Serial.println("Moving backward");
+  }
+  
+  for(int index = 0; index < 10; index++)
+  {
+    RS.write(-127);
+    LS.write(127);
+    delay(100);
+    Serial.println("Turning right");
+  }
+  
+  for(int index = 0; index < 10; index++)
+  {
+    RS.write(127);
+    LS.write(-127);
+    delay(100);
+    Serial.println("Turning left");
+  }
+  
+  RS.write(zedd);
+  LS.write(zedd);
+  delay(1000);
+}

@@ -1,0 +1,97 @@
+int PWMA = 13;		// Declares PWMA first motor driver to pin 13
+int PWMB = 12;		// Declares PWMB first motor driver to pin 12
+int PWMA_2 = 2;		// Declares PWMA second motor driver to pin 2
+int PWMB_2 = 3;		// Declares PWMB second motor driver to pin 3
+
+int AIN1 = 24;		// Declares AIN1 first motor driver to pin 24
+int BIN1 = 25;		// Declares BIN1 first motor driver to pin 25
+int AIN1_2 = 26;	// Declares AIN1 second motor driver to pin 26
+int BIN1_2 = 27;	// Declares BIN1 second motor driver to pin 27
+
+int AIN2 = 40;		// Declares AIN2 first motor driver to pin 40
+int BIN2 = 41;		// Declares BIN2 first motor driver to pin 41
+int AIN2_2 = 38;	// Declares AIN2 second motor driver to pin 38
+int BIN2_2 = 39;	// Declares BIN2 second motor driver to pin 39
+
+int speed = 0;		// Sets speed to 0
+int STBY = 32;		// Standby in pin 32
+
+void setup() 		// Sets all pins to output a digital value
+{
+  pinMode(PWMA, OUTPUT);
+  pinMode(PWMB, OUTPUT);
+  pinMode(PWMA_2, OUTPUT);
+  pinMode(PWMB_2, OUTPUT);
+  
+  pinMode(AIN1, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(AIN1_2, OUTPUT);
+  pinMode(BIN1_2, OUTPUT);
+  
+  pinMode(AIN2, OUTPUT);
+  pinMode(BIN2, OUTPUT);
+  pinMode(AIN2_2, OUTPUT);
+  pinMode(BIN2_2, OUTPUT);
+  
+  pinMode(STBY, OUTPUT);
+}
+
+void loop() 
+{
+  digitalWrite(STBY, HIGH);
+  
+  // for-loop increases speed from 0 to 255
+  // Result: Motors accelerate
+  for (speed == 0; speed < 255; speed++)
+  {
+    // Back Motors
+    digitalWrite(AIN1, HIGH);		// HIGH: sets value to ON
+    digitalWrite(AIN2, LOW);		// LOW: sets value to OFF
+    digitalWrite(BIN1, HIGH);		// HIGH: sets value to ON
+    digitalWrite(BIN2, LOW);		// LOW: sets value to OFF
+    
+    // Font Motors
+    digitalWrite(AIN1_2, LOW);		// LOW: sets value to OFF
+    digitalWrite(AIN2_2, HIGH);		// HIGH: sets value to ON
+    digitalWrite(BIN1_2, LOW);		// LOW: sets value to OFF
+    digitalWrite(BIN2_2, HIGH);		// HIGH: sets value to ON
+    
+    analogWrite(PWMA, speed);		// Sets PWMA first motor to whatever value speed is at the time the for-loop is initiated
+    analogWrite(PWMB, speed);		// Sets PWMB second motor to whatever value speed is at the time the for-loop is initiated
+    
+    analogWrite(PWMA_2, speed);		// Sets PWMA second motor to whatever value speed is at the time the for-loop is initiated
+    analogWrite(PWMB_2, speed);		// Sets PWMB second motor to whatever value speed is at the time the for-loop is initiated
+    delay(10);						// Delay in milliseconds(10 milliseconds)
+  }
+  
+  // for-loop decreases speed from 255 to 0
+  // Result: motors deccelerate
+  for (speed == 255;speed > 0; speed--)
+ { 
+   // Back Motors
+   digitalWrite(AIN1, HIGH);		// HIGH: sets value to ON
+   digitalWrite(AIN2, LOW);			// LOW: sets value to OFF
+   digitalWrite(BIN1, HIGH);		// HIGH: sets value to ON
+   digitalWrite(BIN2, LOW);			// LOW: sets value to OFF
+   
+   // Front Motors
+   digitalWrite(AIN1_2, LOW);		// LOW: sets value to OFF
+   digitalWrite(AIN2_2, HIGH);		// HIGH: sets value to ON
+   digitalWrite(BIN1_2, LOW);		// LOW: sets value to OFF
+   digitalWrite(BIN2_2, HIGH);		// HIGH: sets value to ON
+   
+   analogWrite(PWMA, speed);		// Sets PWMA first motor to whatever value speed is at the time the for-loop is initiated
+   analogWrite(PWMB, speed);		// Sets PWMB second motor to whatever value speed is at the time the for-loop is initiated
+   
+   analogWrite(PWMA_2, speed);		// Sets PWMA second motor to whatever value speed is at the time the for-loop is initiated
+   analogWrite(PWMB_2, speed);		// Sets PWMB second motor to whatever value speed is at the time the for-loop is initiated
+   delay(10);						// Delay in milliseconds(10 milliseconds)			
+ }
+ 
+ 
+}
+
+void stop()
+{
+  digitalWrite(STBY, LOW);			// Puts DC motors in standby
+}
