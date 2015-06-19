@@ -14,14 +14,16 @@ SyRenSimplified SR; // We'll name the SyRen object SR.
                     //   Arduino VIN    ->  SyRen 5V (OPTIONAL, if you want the SyRen to power the Arduino)
                     //
                     // If you want to use a pin other than TX->1, see the SoftwareSerial example.
+int motorPin = 8;
+
                                         
 void setup()
 {
   SyRenTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
-  
+  pinMode(motorPin, OUTPUT);
   Serial.begin(9600);
-  while(!serial);
-  Serial.println("W -forward, A -left, S -backward, D -right")
+  while(!Serial);
+  Serial.println("W -forward, A -left, S -backward, D -right");
 }
 void loop()
 {
@@ -40,24 +42,33 @@ void loop()
 	int direction = Serial.read();
 	if (direction == 'w')
 	{
-		SR.motor(127);		//Move forward
+		//SR.motor(255);		//Move forward
+                Serial.println("Forward");
+                analogWrite(motorPin, 255);
 	}
 	
 	else if (direction == 'a')
 	{
-	
+	        Serial.println("Left");
 	}
 	
 	else if (direction == 's')
 	{
-		SR.motor(-127);		//Move backward
+		//SR.motor(-255);		//Move backward
+                Serial.println("Backward");
+                analogWrite(motorPin, 0);
 	}
 	
 	else if (direction == 'd')
 	{
-	
+	        Serial.println("Right");
 	}
-  
-  
-  
+        
+        else if (direction == 'x')
+        {
+                //SR.motor(0);
+                Serial.println("STOP");
+                analogWrite(motorPin, 0);
+        }
+  }
 }
