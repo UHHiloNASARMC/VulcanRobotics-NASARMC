@@ -19,30 +19,23 @@ int motorPin = 1;
                                         
 void setup()
 {
-  SyRenTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
+  SyRenTXPinSerial.begin(38400); // This is the baud rate you chose with the DIP switches.
   pinMode(motorPin, OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(38400);
   while(!Serial);
   Serial.println("W -forward, A -left, S -backward, D -right");
+  SR.motor(motorPin,0);
 }
 void loop()
 {
-  // SR.motor(127);  // Go forward at full power.
-  // delay(2000);    // Wait 2 seconds.
-  // SR.motor(0);    // Stop.
-  // delay(2000);    // Wait 2 seconds.
-  // SR.motor(-127); // Reverse at full power.
-  // delay(2000);    // Wait 2 seconds.
-  // SR.motor(0);    // Stop.
-  // delay(2000);
-  
-  
   if (Serial.available())
   {
+    SR.motor(motorPin,0);
 	int direction = Serial.read();
 	if (direction == 'w')
 	{
-		SR.motor(motorPin,127);		//Move forward
+		SR.motor(motorPin,25);		//Move forward
+                delay(1000);                    //delay keeps motor moving in correct direction
 		Serial.println("Forward");
 	}
 	
@@ -53,7 +46,8 @@ void loop()
 	
 	else if (direction == 's')
 	{
-		SR.motor(motorPin,-127);		//Move backward
+		SR.motor(motorPin,-25);		//Move backward
+                delay(1000);
 		Serial.println("Backward");
 	}
 	
@@ -64,8 +58,9 @@ void loop()
         
         else if (direction == 'x')
         {
-			SR.motor(motorPin,0);
-			Serial.println("STOP");
+	        SR.motor(motorPin,0);
+	        Serial.println("STOP");
         }
   }
+  delay(100);
 }
