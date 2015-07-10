@@ -63,49 +63,69 @@ void loop()
     //Forward movement
     if(direction == 'w')
     {
-      digitalWrite(STBY, HIGH);
-      digitalWrite(BIN1, HIGH);
-      digitalWrite(BIN2, LOW);
-      digitalWrite(AIN1, HIGH);
-      digitalWrite(AIN2, LOW);
-      analogWrite(PWMA, Speed);
-      analogWrite(PWMB, Speed);
+		stop();
+		for(Speed == 0; Speed < 255; Speed++)
+		{
+		  digitalWrite(STBY, HIGH);
+		  digitalWrite(BIN1, HIGH);
+		  digitalWrite(BIN2, LOW);
+		  digitalWrite(AIN1, HIGH);
+		  digitalWrite(AIN2, LOW);
+		  analogWrite(PWMA, Speed);
+		  analogWrite(PWMB, Speed);
+		  delay(10);
+		}
     }
     
     //Backward movement
     if(direction == 's')
     {
-      digitalWrite(STBY, HIGH);
-      digitalWrite(BIN1, LOW);
-      digitalWrite(BIN2, HIGH);
-      digitalWrite(AIN1, LOW);
-      digitalWrite(AIN2, HIGH);
-      analogWrite(PWMA, Speed);
-      analogWrite(PWMB, Speed);
+		stop();
+		for(Speed == 0; Speed < 255; Speed++)
+		{
+		  digitalWrite(STBY, HIGH);
+		  digitalWrite(BIN1, LOW);
+		  digitalWrite(BIN2, HIGH);
+		  digitalWrite(AIN1, LOW);
+		  digitalWrite(AIN2, HIGH);
+		  analogWrite(PWMA, Speed);
+		  analogWrite(PWMB, Speed);
+		  delay(10);
+		}
     }
     
     //Turn left
     if(direction == 'a')
     {
-      digitalWrite(STBY, HIGH);
-      digitalWrite(BIN1, LOW);
-      digitalWrite(BIN2, HIGH);
-      digitalWrite(AIN1, HIGH);
-      digitalWrite(AIN2, LOW);
-      analogWrite(PWMA, Speed);
-      analogWrite(PWMB, Speed);
+		stop();
+		for(Speed == 0; Speed < 255; Speed++)
+		{
+		  digitalWrite(STBY, HIGH);
+		  digitalWrite(BIN1, LOW);
+		  digitalWrite(BIN2, HIGH);
+		  digitalWrite(AIN1, HIGH);
+		  digitalWrite(AIN2, LOW);
+		  analogWrite(PWMA, Speed);
+		  analogWrite(PWMB, Speed);
+		  delay(10);
+		}
     }
     
     //Turn right
     if(direction == 'd')
     {
-      digitalWrite(STBY, HIGH);
-      digitalWrite(BIN1, HIGH);
-      digitalWrite(BIN2, LOW);
-      digitalWrite(AIN1, LOW);
-      digitalWrite(AIN2, HIGH);
-      analogWrite(PWMA, Speed);
-      analogWrite(PWMB, Speed);
+		stop();
+		for(Speed == 0; Speed < 255; Speed++)
+		{
+			digitalWrite(STBY, HIGH);
+			digitalWrite(BIN1, HIGH);
+			digitalWrite(BIN2, LOW);
+			digitalWrite(AIN1, LOW);
+			digitalWrite(AIN2, HIGH);
+			analogWrite(PWMA, Speed);
+			analogWrite(PWMB, Speed);
+			delay(10);
+	  }
     }
     
     //STOP
@@ -117,6 +137,10 @@ void loop()
 }
 void stop(){
 //enable standby  
-  analogWrite(PWMA, 0);
-  analogWrite(PWMB, 0);
+	for(Speed == 255; Speed > 0; Speed--)
+	{
+	 analogWrite(PWMA, Speed);
+	 analogWrite(PWMB, Speed);
+	 delay(10);
+	}
 }
