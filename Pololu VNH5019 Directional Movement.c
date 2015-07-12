@@ -49,7 +49,7 @@ void setup()
   
   Serial.begin(115200);
   while(!Serial);
-  Serial.println("W -forward, A -left, S -backward, D -right");
+  Serial.println("W -forward, A -left, S -backward, D -right, X -STOP");
 }
 
 void loop()
@@ -57,7 +57,6 @@ void loop()
   
   if(Serial.available())
   {
-    //int speed = Serial.parseInt();
     int direction = Serial.read();
     
     //Forward movement
@@ -67,12 +66,23 @@ void loop()
 		for(Speed == 0; Speed < 255; Speed++)
 		{
 		  digitalWrite(STBY, HIGH);
-		  digitalWrite(BIN1, HIGH);
-		  digitalWrite(BIN2, LOW);
+		  
+		  //Front motors
 		  digitalWrite(AIN1, HIGH);
 		  digitalWrite(AIN2, LOW);
+		  digitalWrite(BIN1, HIGH);
+		  digitalWrite(BIN2, LOW);
+		  
+		  //Back motors
+		  digitalWrite(CIN1, HIGH);
+		  digitalWrite(CIN2, LOW);
+		  digitalWrite(DIN1, HIGH);
+		  digitalWrite(DIN2, LOW);
+		  
 		  analogWrite(PWMA, Speed);
 		  analogWrite(PWMB, Speed);
+		  analogWrite(PWMC, Speed);
+		  analogWrite(PWMD, Speed);
 		  delay(10);
 		}
     }
@@ -84,12 +94,23 @@ void loop()
 		for(Speed == 0; Speed < 255; Speed++)
 		{
 		  digitalWrite(STBY, HIGH);
-		  digitalWrite(BIN1, LOW);
-		  digitalWrite(BIN2, HIGH);
+		  
+		  //Front motors
 		  digitalWrite(AIN1, LOW);
 		  digitalWrite(AIN2, HIGH);
+		  digitalWrite(BIN1, LOW);
+		  digitalWrite(BIN2, HIGH);
+		  
+		  //Back motors
+		  digitalWrite(CIN1, LOW);
+		  digitalWrite(CIN2, HIGH);
+		  digitalWrite(DIN1, LOW);
+		  digitalWrite(DIN2, HIGH);
+		  
 		  analogWrite(PWMA, Speed);
 		  analogWrite(PWMB, Speed);
+		  analogWrite(PWMC, Speed);
+		  analogWrite(PWMD, Speed);
 		  delay(10);
 		}
     }
@@ -101,12 +122,23 @@ void loop()
 		for(Speed == 0; Speed < 255; Speed++)
 		{
 		  digitalWrite(STBY, HIGH);
-		  digitalWrite(BIN1, LOW);
-		  digitalWrite(BIN2, HIGH);
+		  
+		  //Front motors
 		  digitalWrite(AIN1, HIGH);
 		  digitalWrite(AIN2, LOW);
+		  digitalWrite(BIN1, LOW);
+		  digitalWrite(BIN2, HIGH);
+		  
+		  //Back motors
+		  digitalWrite(CIN1, HIGH);
+		  digitalWrite(CIN2, LOW);
+		  digitalWrite(DIN1, LOW);
+		  digitalWrite(DIN2, HIGH);
+		  
 		  analogWrite(PWMA, Speed);
 		  analogWrite(PWMB, Speed);
+		  analogWrite(PWMC, Speed);
+		  analogWrite(PWMD, Speed);
 		  delay(10);
 		}
     }
@@ -117,15 +149,26 @@ void loop()
 		stop();
 		for(Speed == 0; Speed < 255; Speed++)
 		{
-			digitalWrite(STBY, HIGH);
-			digitalWrite(BIN1, HIGH);
-			digitalWrite(BIN2, LOW);
-			digitalWrite(AIN1, LOW);
-			digitalWrite(AIN2, HIGH);
-			analogWrite(PWMA, Speed);
-			analogWrite(PWMB, Speed);
-			delay(10);
-	  }
+		  digitalWrite(STBY, HIGH);
+			
+		  //Front motors
+		  digitalWrite(AIN1, LOW);
+		  digitalWrite(AIN2, HIGH);
+		  digitalWrite(BIN1, HIGH);
+		  digitalWrite(BIN2, LOW);
+			
+		  //Back motors
+		  digitalWrite(CIN1, LOW);
+		  digitalWrite(CIN2, HIGH);
+		  digitalWrite(DIN1, HIGH);
+		  digitalWrite(DIN2, LOW);
+			
+		  analogWrite(PWMA, Speed);
+		  analogWrite(PWMB, Speed);
+		  analogWrite(PWMC, Speed);
+		  analogWrite(PWMD, Speed);
+		  delay(10);
+        }
     }
     
     //STOP
@@ -141,6 +184,8 @@ void stop(){
 	{
 	 analogWrite(PWMA, Speed);
 	 analogWrite(PWMB, Speed);
+	 analogWrite(PWMC, Speed);
+	 analogWrite(PWMD, Speed);
 	 delay(10);
 	}
 }
