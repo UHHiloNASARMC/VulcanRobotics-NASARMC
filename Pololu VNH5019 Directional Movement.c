@@ -57,137 +57,139 @@ void setup()
 void loop()
 {
   
-  if(Serial.available())
-  {
-    int direction = Serial.read();
+	  if(Serial.available())
+	  {
+		int direction = Serial.read();
     
-    //Move Forward
-    if(direction == 'w')
-    {
-		stop();
-		for(Speed == 0; Speed < maxSpeed; Speed++)
+		//Move Forward
+		if(direction == 'w')
 		{
-		  digitalWrite(STBY, HIGH);
-		  
-		  //Front Left
-		  digitalWrite(AIN1, HIGH);
-		  digitalWrite(AIN2, LOW);
-                  //Front Right
-		  digitalWrite(BIN1, HIGH);
-		  digitalWrite(BIN2, LOW);
-		  
-		  //Back Left
-		  digitalWrite(CIN1, HIGH);
-		  digitalWrite(CIN2, LOW);
-                  //Back Right
-		  digitalWrite(DIN1, HIGH);
-		  digitalWrite(DIN2, LOW);
-		  
-		  analogWrite(PWMA, Speed);
-		  analogWrite(PWMB, Speed);
-		  analogWrite(PWMC, Speed);
-		  analogWrite(PWMD, Speed);
-		  delay(10);
+			stop();
+			for(Speed == 0; Speed < maxSpeed; Speed++)
+			{
+			  digitalWrite(STBY, HIGH);
+			  
+			  //Front Left
+			  digitalWrite(AIN1, HIGH);
+			  digitalWrite(AIN2, LOW);
+					  //Front Right
+			  digitalWrite(BIN1, HIGH);
+			  digitalWrite(BIN2, LOW);
+			  
+			  //Back Left
+			  digitalWrite(CIN1, HIGH);
+			  digitalWrite(CIN2, LOW);
+					  //Back Right
+			  digitalWrite(DIN1, HIGH);
+			  digitalWrite(DIN2, LOW);
+			  
+			  analogWrite(PWMA, Speed);
+			  analogWrite(PWMB, Speed);
+			  analogWrite(PWMC, Speed);
+			  analogWrite(PWMD, Speed);
+			  delay(10);
+			}
 		}
-    }
-    
-    //Move backward
-    if(direction == 's')
-    {
-		stop();
-		for(Speed == 0; Speed < maxSpeed; Speed++)
+		
+		//Move backward
+		if(direction == 's')
 		{
-		  digitalWrite(STBY, HIGH);
-		  
-		  //Front Left
-		  digitalWrite(AIN1, LOW);
-		  digitalWrite(AIN2, HIGH);
-                  //Front Right
-		  digitalWrite(BIN1, LOW);
-		  digitalWrite(BIN2, HIGH);
-		  
-		  //Back Left
-		  digitalWrite(CIN1, LOW);
-		  digitalWrite(CIN2, HIGH);
-                  //Back Right
-		  digitalWrite(DIN1, LOW);
-		  digitalWrite(DIN2, HIGH);
-		  
-		  analogWrite(PWMA, Speed);
-		  analogWrite(PWMB, Speed);
-		  analogWrite(PWMC, Speed);
-		  analogWrite(PWMD, Speed);
-		  delay(10);
+			stop();
+			for(Speed == 0; Speed < maxSpeed; Speed++)
+			{
+			  digitalWrite(STBY, HIGH);
+			  
+			  //Front Left
+			  digitalWrite(AIN1, LOW);
+			  digitalWrite(AIN2, HIGH);
+					  //Front Right
+			  digitalWrite(BIN1, LOW);
+			  digitalWrite(BIN2, HIGH);
+			  
+			  //Back Left
+			  digitalWrite(CIN1, LOW);
+			  digitalWrite(CIN2, HIGH);
+					  //Back Right
+			  digitalWrite(DIN1, LOW);
+			  digitalWrite(DIN2, HIGH);
+			  
+			  analogWrite(PWMA, Speed);
+			  analogWrite(PWMB, Speed);
+			  analogWrite(PWMC, Speed);
+			  analogWrite(PWMD, Speed);
+			  delay(10);
+			}
 		}
-    }
-    
-    //Turn left
-    if(direction == 'a')
-    {
-		stop();
-		for(Speed == 0; Speed < maxTurnSpeed; Speed++)
+		
+		//Turn left
+		if(direction == 'a')
 		{
-		  digitalWrite(STBY, HIGH);
-		  
-		  //Front Left
-		  digitalWrite(AIN1, LOW);
-		  digitalWrite(AIN2, HIGH);
-                  //Front Right
-		  digitalWrite(BIN1, HIGH);
-		  digitalWrite(BIN2, LOW);
-		  
-		  //Back Left
-		  digitalWrite(CIN1, LOW);
-		  digitalWrite(CIN2, HIGH);
-                  //Back Right
-		  digitalWrite(DIN1, HIGH);
-		  digitalWrite(DIN2, LOW);
-		  
-		  analogWrite(PWMA, Speed);
-		  analogWrite(PWMB, Speed);
-		  analogWrite(PWMC, Speed);
-		  analogWrite(PWMD, Speed);
-		  delay(10);
+			stop();
+			for(Speed == 0; Speed < maxTurnSpeed; Speed++)
+			{
+			  digitalWrite(STBY, HIGH);
+			  
+			  //Front Left
+			  digitalWrite(AIN1, LOW);
+			  digitalWrite(AIN2, HIGH);
+					  //Front Right
+			  digitalWrite(BIN1, HIGH);
+			  digitalWrite(BIN2, LOW);
+			  
+			  //Back Left
+			  digitalWrite(CIN1, LOW);
+			  digitalWrite(CIN2, HIGH);
+					  //Back Right
+			  digitalWrite(DIN1, HIGH);
+			  digitalWrite(DIN2, LOW);
+			  
+			  analogWrite(PWMA, Speed);
+			  analogWrite(PWMB, Speed);
+			  analogWrite(PWMC, Speed);
+			  analogWrite(PWMD, Speed);
+			  delay(10);
+			}
 		}
-    }
-    
-    //Turn right
-    if(direction == 'd')
-    {
-		stop();
-		for(Speed == 0; Speed < maxTurnSpeed; Speed++)
+		
+		//Turn right
+		if(direction == 'd')
 		{
-		  digitalWrite(STBY, HIGH);
-			
-		  //Front Left
-		  digitalWrite(AIN1, HIGH);
-		  digitalWrite(AIN2, LOW);
-                  //Front Right
-		  digitalWrite(BIN1, LOW);
-		  digitalWrite(BIN2, HIGH);
-			
-		  //Back Left
-		  digitalWrite(CIN1, HIGH);
-		  digitalWrite(CIN2, LOW);
-                  //Back Right
-		  digitalWrite(DIN1, LOW);
-		  digitalWrite(DIN2, HIGH);
-			
-		  analogWrite(PWMA, Speed);
-		  analogWrite(PWMB, Speed);
-		  analogWrite(PWMC, Speed);
-		  analogWrite(PWMD, Speed);
-		  delay(10);
-        }
-    }
+			stop();
+			for(Speed == 0; Speed < maxTurnSpeed; Speed++)
+			{
+			  digitalWrite(STBY, HIGH);
+				
+			  //Front Left
+			  digitalWrite(AIN1, HIGH);
+			  digitalWrite(AIN2, LOW);
+			  //Front Right
+			  digitalWrite(BIN1, LOW);
+			  digitalWrite(BIN2, HIGH);
+				
+			  //Back Left
+			  digitalWrite(CIN1, HIGH);
+			  digitalWrite(CIN2, LOW);
+			  //Back Right
+			  digitalWrite(DIN1, LOW);
+			  digitalWrite(DIN2, HIGH);
+				
+			  analogWrite(PWMA, Speed);
+			  analogWrite(PWMB, Speed);
+			  analogWrite(PWMC, Speed);
+			  analogWrite(PWMD, Speed);
+			  delay(10);
+			}
+		}
     
-    //STOP
-    if (direction == 'x')
-    {
-      stop();
-    }
-  }
+		//STOP
+		if (direction == 'x')
+		{
+		  stop();
+		}
+	}
 }
+
+
 void stop(){
 //enable standby  
 	for(Speed == maxSpeed; Speed > 0; Speed--)
@@ -199,3 +201,6 @@ void stop(){
 	 delay(10);
 	}
 }
+	
+	
+	
