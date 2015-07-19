@@ -1,0 +1,83 @@
+/*
+  Adapted form Arduino Starter Kit example
+ Project 9  - Motorized Pinwheel
+ 
+ Driving a PWM modulated bidirectional motor
+ 
+ Created 10 February 2015
+ by Elliot H. Sanders
+ 
+ This example code is part of the public domain 
+ */
+int STBY = 10; //standby
+int Speed = 0; //PWM input 0 to 255
+
+//Motor A
+//motor A connected between A01 and A02
+int PWMA = 3; //Speed control 
+int AIN1 = 11; //Direction
+int AIN2 = 10; //Direction
+int PWMB = 6; // Speed Control - Daryl
+int BIN1 = 9; // Direction - Daryl
+int BIN2 = 5; // Direction - Daryl
+
+void setup()
+{
+  pinMode(STBY, OUTPUT);
+  // initialize the motor pins
+  pinMode(PWMA, OUTPUT);
+  pinMode(AIN1, OUTPUT);
+  pinMode(AIN2, OUTPUT);
+  pinMode(PWMB, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(BIN2, OUTPUT);
+}
+
+void loop()
+{
+  digitalWrite(STBY, HIGH); //disable standby
+  for(Speed >=0; Speed < 255; Speed++)
+   { 
+    digitalWrite(AIN1, HIGH);//go forward at increasing rate
+    digitalWrite(AIN2, LOW);
+    digitalWrite(BIN1, HIGH);
+    digitalWrite(BIN2, LOW); 
+    analogWrite(PWMA, Speed);
+    analogWrite(PWMB, Speed);
+    delay(10);
+   }
+  for(Speed <=255; Speed > 0; Speed--)
+   { 
+    digitalWrite(AIN1, HIGH);//go forward at increasing rate
+    digitalWrite(AIN2, LOW);
+    digitalWrite(BIN1, HIGH);
+    digitalWrite(BIN2, LOW); 
+    analogWrite(PWMA, Speed);
+    analogWrite(PWMB, Speed);
+    delay(10);
+   }
+  for(Speed >=0; Speed < 255; Speed++)
+   { 
+    digitalWrite(AIN1, LOW);//go forward at increasing rate
+    digitalWrite(AIN2, HIGH);
+    digitalWrite(BIN1, LOW);
+    digitalWrite(BIN2, HIGH);
+    analogWrite(PWMA, Speed);
+    analogWrite(PWMB, Speed);
+    delay(10);
+   }
+  for(Speed <= 255; Speed > 0; Speed--)
+   {
+    digitalWrite(AIN1, LOW);//go forward at increasing rate
+    digitalWrite(AIN2, HIGH);
+    digitalWrite(BIN1, LOW);
+    digitalWrite(BIN2, HIGH); 
+    analogWrite(PWMA, Speed);
+    analogWrite(PWMB, Speed);
+    delay(10);
+   }
+}
+void stop(){
+//enable standby  
+  digitalWrite(STBY, LOW); 
+}

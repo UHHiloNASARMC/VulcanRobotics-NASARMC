@@ -1,0 +1,36 @@
+//This code will take the output of the ENV-RGB and show you what it sees by applying that RGB color to
+//the background of a 400X400 window. This code is to be compiled using the processing IDE. It can be
+//downloaded here: http://processing.org/download/. This code was written in processing V1.5.1
+//connect the ENV-RGB to a usb to serial converter.
+//You may have to modify this code to get it operational on your system.
+//Atlas Scientific does not offer support for this sample code.
+
+import processing.serial.*;		// enable the serial port
+Serial myPort;					// set the serial port to "myPort"
+
+int redValue = 0;				// red value
+int greenValue = 0;				// green value
+int blueValue = 0;				// blue value
+
+void setup()					// set the screen size
+{								// show what ports are on the computer
+ size(800, 600);				// size of screen
+ println(Serial.list());		// prints to computer
+ myPort = new Serial(this, Serial.list()[0],38400);
+ }
+void draw() {background(redValue, greenValue, blueValue);}	// set the background color with color values in RGB
+
+void serialEvent(Serial myPort) {							// get the ASCII string
+ String inString = myPort.readStringUntil('\r');			// read the string until <CR>
+ if(inString != null) {										// if we see a string, split the string on the commas and convert the resulting substrings into an integer array	
+ inString = trim(inString);
+ int[] colors = int(split(inString, ","));
+
+ if(colors.length >=3){			// if the array has at least three elements, you know you got the whole thing. Put the numbers in the color variables							
+ redValue = colors[0];			// set R
+ greenValue = colors[1];		// set G
+ blueValue = colors[2];			// set B
+ println(inString);				// pring out what we have
+ }
+ }
+ }

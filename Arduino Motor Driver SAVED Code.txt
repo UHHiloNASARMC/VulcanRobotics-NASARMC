@@ -1,0 +1,21 @@
+int s1; // Add port number
+
+void setup() 
+{
+  pinMode(s1, OUTPUT)
+}
+
+void loop() 
+{
+  // For loop speeds up dc motor using analogWrite
+  for (speed == 0; speed <= 255; speed++)
+  {
+    analogWrite(s1, speed);
+  }
+  
+  // For loop slows down dc motor using analogWrite
+  for (speed == 255; speed >= 0; speed--)
+  {
+    analogWrite(s1, speed);
+  }
+}
