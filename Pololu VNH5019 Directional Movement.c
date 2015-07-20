@@ -69,17 +69,17 @@ void loop()
 			{
 			  digitalWrite(STBY, HIGH);
 			  
-			  //Front Left
+			  //Back Left
 			  digitalWrite(AIN1, HIGH);
 			  digitalWrite(AIN2, LOW);
-					  //Front Right
+			  //Front Left
 			  digitalWrite(BIN1, HIGH);
 			  digitalWrite(BIN2, LOW);
 			  
-			  //Back Left
+			  //Front Right
 			  digitalWrite(CIN1, HIGH);
 			  digitalWrite(CIN2, LOW);
-					  //Back Right
+			  //Back Right
 			  digitalWrite(DIN1, HIGH);
 			  digitalWrite(DIN2, LOW);
 			  

@@ -1,39 +1,28 @@
-/*
-  Adapted form Arduino Starter Kit example
- Project 9  - Motorized Pinwheel
- 
- Driving a PWM modulated bidirectional motor
- 
- Created 10 February 2015
- Modified for 4 motors July 1, 2015
- by Elliot H. Sanders
- 
- This example code is part of the public domain 
- */
-int STBY = 10;  //Standby
+#include <Servo.h>
+
+
+const int STBY = 10;  //Standby
+const int button = 2;  //Button pin
+int buttonState = 0;
+Servo arm;
+Servo armBrake;
 
 int armSpeed;	//Current arm speed
-int maxArmSpeed = 255;	//Max arm speed
+int forwardArmSpeed = 2000;	//Move arm in positive direction
+int reverseArmSpeed = 1000;	//Move arm in negative direction
 
-//Motor ARM
-int PWM1 = 8;	//Speed
-int PWM2 = 9;   //Speed
-int DIR1 = 33;	//Direction
-int DIR2 = 32;	//Direction
 
 void setup()
 {
   pinMode(STBY, OUTPUT);
-  
-  //Motor ARM
-  pinMode(PWM1, OUTPUT);
-  pinMode(PWM2, OUTPUT);
-  pinMode(DIR1, OUTPUT);
-  pinMode(DIR2, OUTPUT);
-  
-  Serial.begin(115200);
+  pinMode(button, INPUT);
+  arm.attach(9);
+  armBrake.attach(8);
+  arm.writeMicroseconds(1500);
+  arm.writeMicroseconds(1500);
+  Serial.begin(9600);
   while(!Serial);
-  Serial.println("Z - up, C - down, v - stop");
+  Serial.println("Z - up, C - down, V - stop");
 }
 
 void loop()
@@ -42,57 +31,55 @@ void loop()
   if(Serial.available())
   {
     int direction = Serial.read();
+    buttonState = digitalRead(button);
+    if(buttonState == 0)
+    {
     
-
-
-        //Move ARM up
-        if(direction == 'z')
+	    //Move ARM up
+	    if(direction == 'z')
+	    {
+	    	armStop();
+                armBrake.writeMicroseconds(2000);
+                Serial.println("UP");
+	    	arm.writeMicroseconds(2000);
+		delay(3000);
+		armStop();
+	    }
+			
+	     //Move ARM down
+	     if(direction == 'c')
+	     {
+	         armStop();
+                 armBrake.writeMicroseconds(1000);
+                 Serial.println("DOWN");
+	         arm.writeMicroseconds(1000);
+		 delay(100);
+		 armStop();
+	     }
+	
+        //ARM STOP
+        if(direction == 'v')
         {
-                armStop();
-                for(armSpeed == 0; armSpeed < maxArmSpeed; armSpeed++)
-                {
-                        digitalWrite(STBY, HIGH);
-
-                        digitalWrite(DIR1, HIGH);
-                        digitalWrite(DIR2, HIGH);
-                        analogWrite(PWM1, armSpeed);
-                        delay(10);
-                }
+  	  armStop();
+          Serial.println("STOP");
         }
-	
-	//Move ARM down
-	if(direction == 'c')
-	{
-		armStop();
-		for(armSpeed == 0; armSpeed < maxArmSpeed; armSpeed++)
-		{
-			digitalWrite(STBY, HIGH);
-	
-			digitalWrite(DIR1, LOW);
-			digitalWrite(DIR2, HIGH);
-			analogWrite(PWM1, armSpeed);
-			delay(10);
-		}
-	}
-
-	//STOP ARM
-	if(direction == 'v')
-	{
-		armStop();
-	}
+    }
+    
+    else
+    {
+      armStop();
+    }
+    
   }
 }
 
 
 void armStop()
 {
-	for(armSpeed == maxArmSpeed; armSpeed > 0; armSpeed--)
-	{
-		analogWrite(PWM1, armSpeed);
-                digitalWrite(DIR2, LOW);
-		delay(10);
-	}
+	arm.writeMicroseconds(1500);
+        armBrake.writeMicroseconds(1500);
 }
 	
 	
 	
+
