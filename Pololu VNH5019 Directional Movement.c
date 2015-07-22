@@ -77,11 +77,11 @@ void loop()
 				digitalWrite(BIN2, LOW);
 
 				//Front Right
-				digitalWrite(CIN1, HIGH);
-				digitalWrite(CIN2, LOW);
+				digitalWrite(CIN1, LOW);
+				digitalWrite(CIN2, HIGH);
 				//Back Right
-				digitalWrite(DIN1, HIGH);
-				digitalWrite(DIN2, LOW);
+				digitalWrite(DIN1, LOW);
+				digitalWrite(DIN2, HIGH);
 
 				analogWrite(PWMA, Speed);
 				analogWrite(PWMB, Speed);
@@ -107,11 +107,11 @@ void loop()
 				digitalWrite(BIN2, HIGH);
 
 				//Front Right
-				digitalWrite(CIN1, LOW);
-				digitalWrite(CIN2, HIGH);
+				digitalWrite(CIN1, HIGH);
+				digitalWrite(CIN2, LOW);
 				//Back Right
-				digitalWrite(DIN1, LOW);
-				digitalWrite(DIN2, HIGH);
+				digitalWrite(DIN1, HIGH);
+				digitalWrite(DIN2, LOW);
 
 				analogWrite(PWMA, Speed);
 				analogWrite(PWMB, Speed);
@@ -137,11 +137,11 @@ void loop()
 				digitalWrite(BIN2, HIGH);
 
 				//Front Right
-				digitalWrite(CIN1, HIGH);
-				digitalWrite(CIN2, LOW);
+				digitalWrite(CIN1, LOW);
+				digitalWrite(CIN2, HIGH);
 				//Back Right
-				digitalWrite(DIN1, HIGH);
-				digitalWrite(DIN2, LOW);
+				digitalWrite(DIN1, LOW);
+				digitalWrite(DIN2, HIGH);
 
 				analogWrite(PWMA, Speed);
 				analogWrite(PWMB, Speed);
@@ -160,11 +160,11 @@ void loop()
 				digitalWrite(STBY, HIGH);
 
 				//Back Left
-				digitalWrite(AIN1, HIGH);
-				digitalWrite(AIN2, LOW);
+				digitalWrite(AIN1, LOW);
+				digitalWrite(AIN2, HIGH);
 				//Front Left
-				digitalWrite(BIN1, HIGH);
-				digitalWrite(BIN2, LOW);
+				digitalWrite(BIN1, LOW);
+				digitalWrite(BIN2, HIGH);
 
 				//Front Right
 				digitalWrite(CIN1, LOW);
