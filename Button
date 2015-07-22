@@ -1,0 +1,23 @@
+int button = 2;
+int buttonState = 0;
+
+void setup()
+{
+  pinMode(button, INPUT);
+  Serial.begin(115200);
+}
+
+void loop()
+{
+  buttonState = digitalRead(button);
+  
+  switch(buttonState)
+  {
+    case HIGH:
+    Serial.println("HIGH");
+    delay(500);
+    case LOW:
+    Serial.println("LOW");
+    delay(500);
+  }
+}
