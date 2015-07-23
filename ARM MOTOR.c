@@ -18,7 +18,7 @@ void setup()
   arm.writeMicroseconds(1500);
   Serial.begin(9600);
   while(!Serial);
-  Serial.println("Z - up, C - down, V - stop");
+  Serial.println("u - up halfway, i - up 3/4 way, o - up small, n - down, V - stop");
 }
 
 void loop()
@@ -29,8 +29,8 @@ void loop()
     int direction = Serial.read();
     //buttonState = digitalRead(button);
     
-	//Move ARM up
-	if(direction == 'z')
+	//Move ARM up halfway
+	if(direction == 'u')
 	{
 		armStop();
 		armBrake.writeMicroseconds(2000);
@@ -41,7 +41,7 @@ void loop()
 	}
 		
 	 //Move ARM down
-	 if(direction == 'c')
+	 if(direction == 'n')
 	 {
 		armStop();
 		armBrake.writeMicroseconds(1000);
@@ -50,6 +50,28 @@ void loop()
 		delay(100);
 		armStop();
 	 }
+	 
+	 //Move ARM up 3/4 way
+	if(direction == 'i')
+	{
+		armStop();
+		armBrake.writeMicroseconds(2000);
+		Serial.println("UP");
+		arm.writeMicroseconds(2000);
+		delay(4000);
+		armStop();
+	}
+	
+	//Move ARM up in small increments
+	if(direction == 'o')
+	{
+		armStop();
+		armBrake.writeMicroseconds(2000);
+		Serial.println("UP");
+		arm.writeMicroseconds(2000);
+		delay(500);
+		armStop();
+	}
 
 	//ARM STOP
 	if(direction == 'v')
@@ -70,7 +92,7 @@ void loop()
 void armStop()
 {
 	arm.writeMicroseconds(1500);
-    armBrake.writeMicroseconds(1500);
+    	armBrake.writeMicroseconds(1500);
 }
 	
 	
