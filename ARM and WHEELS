@@ -1,0 +1,291 @@
+//ARM and WHEEL.c
+//includes code for both the ARM and the WHEELS
+
+#include <Servo.h>
+
+const int STBY = 10;
+Servo arm;
+Servo armBrake;
+
+int Speed;  //Current speed
+const int maxSpeed = 80;  //Adjust forward and backward speed
+const int maxTurnSpeed = 127;  //Adjust left and right turn speed
+
+//Motor A, BOARD 1, Front Left
+int PWMA = 2; //Speed control 
+int AIN1 = 52; //Direction
+int AIN2 = 53; //Direction
+//Motor B, BOARD 1, Front Right
+int PWMB = 3; // Speed Control 
+int BIN1 = 50; // Direction 
+int BIN2 = 51; // Direction 
+//Motor C, BOARD 2, Back Left
+int PWMC = 4; //Speed control 
+int CIN1 = 22; //Direction
+int CIN2 = 23; //Direction
+//Motor D, BOARD 2, Back Right
+int PWMD = 5; // Speed Control 
+int DIN1 = 24; // Direction 
+int DIN2 = 25; // Direction
+
+
+void setup()
+{
+	pinMode(STBY, OUTPUT);
+	// initialize the motor pins
+	pinMode(PWMA, OUTPUT);
+	pinMode(AIN1, OUTPUT);
+	pinMode(AIN2, OUTPUT);
+	pinMode(PWMB, OUTPUT);
+	pinMode(BIN1, OUTPUT);
+	pinMode(BIN2, OUTPUT);
+	pinMode(PWMC, OUTPUT);
+	pinMode(CIN1, OUTPUT);
+	pinMode(CIN2, OUTPUT);
+	pinMode(PWMD, OUTPUT);
+	pinMode(DIN1, OUTPUT);
+	pinMode(DIN2, OUTPUT);
+
+
+	arm.attach(9);
+  	armBrake.attach(8);
+  	arm.writeMicroseconds(1500);
+  	armBrake.writeMicroseconds(1500);
+	
+
+	Serial.begin(115200);
+	while(!Serial);
+	Serial.println("W -forward, A -left, S -backward, D -right, X -STOP");
+}
+
+
+void loop()
+{
+	if(Serial.available())
+	{
+		int input = Serial.read();
+//ARM******************************************************************
+		//Move up halfway		
+		if(input == 'u')
+		{
+			armStop();
+			Serial.println("UP HALF");
+			armBrake.writeMicroseconds(2000);
+			arm.writeMicroseconds(2000);
+			delay(4000);
+			armStop();
+		}
+
+		//Move up 3/4 way
+		if(input == 'i')
+		{
+			armStop();
+			Serial.println("UP 3/4 WAY");
+			armBrake.writeMicroseconds(2000);
+			arm.writeMicroseconds(2000);
+			delay(4000);
+			armStop();
+		}
+
+		//Move up increment
+		if(input == 'o')
+		{
+			armStop();
+			Serial.println("UP INCREMENT");
+			armBrake.writeMicroseconds(2000);
+			arm.writeMicroseconds(2000);
+			delay(100);
+			armStop();
+		}
+
+		if(input == 'n')
+		{
+			armStop();
+			Serial.println("DOWN");
+			armBrake.writeMicroseconds(1000);
+			arm.writeMicroseconds(1000);
+			delay(100);
+			armStop();
+		}
+
+		if(input == 'v')
+		{
+			armStop();
+		}
+//*********************************************************************
+
+
+//WHEEL****************************************************************
+		//Move Forward
+		if(input == 'w')
+		{
+			wheelStop();
+			Serial.println("Forward");
+			for(Speed == 0; Speed < maxSpeed; Speed++)
+			{
+				digitalWrite(STBY, HIGH);
+
+				//Back Left
+				digitalWrite(AIN1, HIGH);
+				digitalWrite(AIN2, LOW);
+				//Front Left
+				digitalWrite(BIN1, HIGH);
+				digitalWrite(BIN2, LOW);
+
+				//Front Right
+				digitalWrite(CIN1, LOW);
+				digitalWrite(CIN2, HIGH);
+				//Back Right
+				digitalWrite(DIN1, LOW);
+				digitalWrite(DIN2, HIGH);
+
+				analogWrite(PWMA, Speed);
+				analogWrite(PWMB, Speed);
+				analogWrite(PWMC, Speed);
+				analogWrite(PWMD, Speed);
+				delay(10);
+			}
+
+			delay(5000);	//AUTO SHUTDOWN
+			wheelStop();
+		}
+
+		//Move backward
+		if(input == 's')
+		{
+			wheelStop();
+			Serial.println("BACKWARD");
+			for(Speed == 0; Speed < maxSpeed; Speed++)
+			{
+				digitalWrite(STBY, HIGH);
+
+				//Back Left
+				digitalWrite(AIN1, LOW);
+				digitalWrite(AIN2, HIGH);
+				//Front Left
+				digitalWrite(BIN1, LOW);
+				digitalWrite(BIN2, HIGH);
+
+				//Front Right
+				digitalWrite(CIN1, HIGH);
+				digitalWrite(CIN2, LOW);
+				//Back Right
+				digitalWrite(DIN1, HIGH);
+				digitalWrite(DIN2, LOW);
+
+				analogWrite(PWMA, Speed);
+				analogWrite(PWMB, Speed);
+				analogWrite(PWMC, Speed);
+				analogWrite(PWMD, Speed);
+				delay(10);
+			}
+
+			delay(5000);	//AUTO SHUTDOWN
+			wheelStop();
+		}
+
+		//Turn left
+		if(input == 'a')
+		{
+			wheelStop();
+			Serial.println("LEFT");
+			for(Speed == 0; Speed < maxTurnSpeed; Speed++)
+			{
+				digitalWrite(STBY, HIGH);
+
+				//Back Left
+				digitalWrite(AIN1, LOW);
+				digitalWrite(AIN2, HIGH);
+				//Front Left
+				digitalWrite(BIN1, LOW);
+				digitalWrite(BIN2, HIGH);
+
+				//Front Right
+				digitalWrite(CIN1, LOW);
+				digitalWrite(CIN2, HIGH);
+				//Back Right
+				digitalWrite(DIN1, LOW);
+				digitalWrite(DIN2, HIGH);
+
+				analogWrite(PWMA, Speed);
+				analogWrite(PWMB, Speed);
+				analogWrite(PWMC, Speed);
+				analogWrite(PWMD, Speed);
+				delay(10);
+			}
+
+			delay(5000);	//AUTO SHUTDOWN
+			wheelStop();
+		}
+
+		//Turn right
+		if(input == 'd')
+		{
+			wheelStop();
+			Serial.println("RIGHT");
+			for(Speed == 0; Speed < maxTurnSpeed; Speed++)
+			{
+				digitalWrite(STBY, HIGH);
+
+				//Back Left
+				digitalWrite(AIN1, LOW);
+				digitalWrite(AIN2, HIGH);
+				//Front Left
+				digitalWrite(BIN1, LOW);
+				digitalWrite(BIN2, HIGH);
+
+				//Front Right
+				digitalWrite(CIN1, LOW);
+				digitalWrite(CIN2, HIGH);
+				//Back Right
+				digitalWrite(DIN1, LOW);
+				digitalWrite(DIN2, HIGH);
+
+				analogWrite(PWMA, Speed);
+				analogWrite(PWMB, Speed);
+				analogWrite(PWMC, Speed);
+				analogWrite(PWMD, Speed);
+				delay(10);
+			}
+			
+			delay(5000);	//AUTO SHUTDOWN
+			wheelStop();
+		}
+
+		//STOP
+		if (input == 'x')
+		{
+			wheelStop();
+		}
+	}
+//*********************************************************************
+}
+
+
+
+
+void wheelStop()
+{
+	Serial.println("WHEELS STOP");
+	for(Speed == maxSpeed; Speed > 0; Speed--)
+	{
+		analogWrite(PWMA, Speed);
+		analogWrite(PWMB, Speed);
+		analogWrite(PWMC, Speed);
+		analogWrite(PWMD, Speed);
+		delay(10);
+	}
+}
+
+void armStop()
+{
+	Serial.println("ARM STOP");
+	arm.writeMicroseconds(1500);
+	armBrake.writeMicroseconds(1500);
+}
+
+
+
+
+
+
