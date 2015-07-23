@@ -15,7 +15,7 @@ void setup()
   arm.attach(9);
   armBrake.attach(8);
   arm.writeMicroseconds(1500);
-  arm.writeMicroseconds(1500);
+  armBrake.writeMicroseconds(1500);
   Serial.begin(9600);
   while(!Serial);
   Serial.println("u - up halfway, i - up 3/4 way, o - up small, n - down, V - stop");
@@ -36,7 +36,7 @@ void loop()
 		armBrake.writeMicroseconds(2000);
 		Serial.println("UP");
 		arm.writeMicroseconds(2000);
-		delay(3000);
+		delay(4000);
 		armStop();
 	}
 		
@@ -94,7 +94,3 @@ void armStop()
 	arm.writeMicroseconds(1500);
     	armBrake.writeMicroseconds(1500);
 }
-	
-	
-	
-
