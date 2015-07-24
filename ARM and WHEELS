@@ -3,13 +3,13 @@
 
 #include <Servo.h>
 
-const int STBY = 10;
-Servo arm;
-Servo armBrake;
+const int STBY = 10;	//HIGH disables STANDBY, not used much
+Servo arm;	//Wheelchair motor
+Servo armBrake; 	//Wheelchair brake
 
-int Speed;  //Current speed
-const int maxSpeed = 80;  //Adjust forward and backward speed
-const int maxTurnSpeed = 127;  //Adjust left and right turn speed
+int Speed;  //Current speed of wheels
+const int maxSpeed = 80;  //Max wheel speed of front and back direction
+const int maxTurnSpeed = 127;  //Max wheel speed of left and right direction
 
 //Motor A, BOARD 1, Front Left
 int PWMA = 2; //Speed control 
@@ -47,83 +47,95 @@ void setup()
 	pinMode(DIN2, OUTPUT);
 
 
-	arm.attach(9);
-  	armBrake.attach(8);
-  	arm.writeMicroseconds(1500);
-  	armBrake.writeMicroseconds(1500);
+	arm.attach(9);	//Wheelchair motor attached to pin 09
+  	armBrake.attach(8);	//Wheelchair brake attached to pin 08
+  	arm.writeMicroseconds(1500);	//Neutral speed of wheelchair motor
+  	armBrake.writeMicroseconds(1500);	//Neutral speed of wheelchair brake
 	
 
-	Serial.begin(115200);
+	Serial.begin(115200);	//Baud rate; make sure it matches baud rate in serial monitor (CTRL + SHIFT + M)
+	
+	//Display controls
 	while(!Serial);
-	Serial.println("W -forward, A -left, S -backward, D -right, X -STOP");
+	Serial.println("WHEEL CONTROL: W -forward, A -left, S -backward, D -right, X -STOP");
+	Serial.println("\nARM CONTROL: U -up from dig to dump, I -up ... increment, N -down from dump to halfway, V -STOP");
+	Serial.println();
 }
 
 
 void loop()
-{
+{	
 	if(Serial.available())
 	{
 		int input = Serial.read();
 //ARM******************************************************************
-		//Move up halfway		
-		if(input == 'u')
+		//Move up from dig to dump
+		if(input == 'u')	//Set to "u"
 		{
-			armStop();
-			Serial.println("UP HALF");
-			armBrake.writeMicroseconds(2000);
-			arm.writeMicroseconds(2000);
-			delay(4000);
-			armStop();
+			digitalWrite(STBY, HIGH);			//Disable standby, no effect
+			Serial.println("UP FROM DIG TO DUMP");
+			armBrake.writeMicroseconds(1650);	//Speed control (change the value to control speed (1500-2000))
+			delay(250);        					//Delay between brake and motor
+			arm.writeMicroseconds(1650);		//Speed control (change the value to control speed (1500-2000))
+			delay(3600);						//Runtime for motor running (change the value to control motor's runtime))
+			armStop();							//Stop arm motor and brake
 		}
 
-		//Move up 3/4 way
+
+
+
+		//Move up increment, no delay between brake and motor
 		if(input == 'i')
 		{
-			armStop();
-			Serial.println("UP 3/4 WAY");
-			armBrake.writeMicroseconds(2000);
-			arm.writeMicroseconds(2000);
-			delay(4000);
-			armStop();
+			Serial.println("UP INCREMENT");
+			armBrake.writeMicroseconds(1650);	//Speed control (change the value to control speed (1500-2000))
+			arm.writeMicroseconds(1650);		//Speed control (change the value to control speed (1500-2000))
+			delay(500);							//Runtime for motor running (change the value to control motor's runtime))
+			armStop();							//Stop arm motor and brake	
 		}
 
-		//Move up increment
+		//Move up from dig to halfway
 		if(input == 'o')
 		{
-			armStop();
-			Serial.println("UP INCREMENT");
-			armBrake.writeMicroseconds(2000);
-			arm.writeMicroseconds(2000);
-			delay(100);
-			armStop();
+			Serial.println("UP FROM DIG TO HALFWAY");
+			armBrake.writeMicroseconds(1650);	//Speed control (change the value to control speed (1500-2000))
+			arm.writeMicroseconds(1650);		//Speed control (change the value to control speed (1500-2000))
+			delay(750);							//Runtime for motor running (change the value to control motor's runtime))
+			armStop();							//Stop arm motor and brake
 		}
 
+        //Move down from dump to halfway
 		if(input == 'n')
 		{
-			armStop();
-			Serial.println("DOWN");
-			armBrake.writeMicroseconds(1000);
-			arm.writeMicroseconds(1000);
-			delay(100);
-			armStop();
+			Serial.println("DOWN FROM DUMP TO HALFWAY");
+			armBrake.writeMicroseconds(1400);	//Speed control (change the value to control speed (1500-2000))	
+			arm.writeMicroseconds(1400);		//Speed control (change the value to control speed (1500-2000))
+			delay(2100);						//Runtime for motor running (change the value to control motor's runtime))
+			armStop();							//Stop arm motor and brake	
 		}
+		
+		
+//ATTN: Move down increment
+//ATTN: Move down from halfway to ground, pulse the brakes
+//ATTN: DOWN TO DIG, move wheels forward to adjust bucket
 
+		//Stop arm motor and brake, doesn't have an effect during operation, safety button IF SHIT HITS THE FAN
 		if(input == 'v')
 		{
-			armStop();
+			armStop();		//Stop arm motor and brake
 		}
 //*********************************************************************
 
 
 //WHEEL****************************************************************
-		//Move Forward
+		//Move Forward until user enters 'v'
 		if(input == 'w')
 		{
-			wheelStop();
-			Serial.println("Forward");
-			for(Speed == 0; Speed < maxSpeed; Speed++)
+			wheelStop();									//Stop wheels automatically
+			Serial.println("FORWARD, enter 'v' to stop");
+			for(Speed == 0; Speed < maxSpeed; Speed++)		//Slowly accelerate from 0 to maxSpeed
 			{
-				digitalWrite(STBY, HIGH);
+				digitalWrite(STBY, HIGH);					//disables standby	
 
 				//Back Left
 				digitalWrite(AIN1, HIGH);
@@ -139,23 +151,21 @@ void loop()
 				digitalWrite(DIN1, LOW);
 				digitalWrite(DIN2, HIGH);
 
+				//Controls speed via PWM, "Speed" corresponds to the "for loop" at top
 				analogWrite(PWMA, Speed);
 				analogWrite(PWMB, Speed);
 				analogWrite(PWMC, Speed);
 				analogWrite(PWMD, Speed);
 				delay(10);
 			}
-
-			delay(5000);	//AUTO SHUTDOWN
-			wheelStop();
 		}
 
-		//Move backward
+		//Move backward until user enters 'v'
 		if(input == 's')
 		{
-			wheelStop();
-			Serial.println("BACKWARD");
-			for(Speed == 0; Speed < maxSpeed; Speed++)
+			wheelStop();									//Stop wheels automatically
+			Serial.println("BACKWARD, enter 'v' to stop");
+			for(Speed == 0; Speed < maxSpeed; Speed++)		//Slowly accelerates from 0 to max speed	
 			{
 				digitalWrite(STBY, HIGH);
 
@@ -179,16 +189,13 @@ void loop()
 				analogWrite(PWMD, Speed);
 				delay(10);
 			}
-
-			delay(5000);	//AUTO SHUTDOWN
-			wheelStop();
 		}
 
 		//Turn left
 		if(input == 'a')
 		{
 			wheelStop();
-			Serial.println("LEFT");
+			Serial.println("LEFT, enter 'v' to stop");
 			for(Speed == 0; Speed < maxTurnSpeed; Speed++)
 			{
 				digitalWrite(STBY, HIGH);
@@ -213,16 +220,13 @@ void loop()
 				analogWrite(PWMD, Speed);
 				delay(10);
 			}
-
-			delay(5000);	//AUTO SHUTDOWN
-			wheelStop();
 		}
 
 		//Turn right
 		if(input == 'd')
 		{
 			wheelStop();
-			Serial.println("RIGHT");
+			Serial.println("RIGHT, enter 'v' to stop");
 			for(Speed == 0; Speed < maxTurnSpeed; Speed++)
 			{
 				digitalWrite(STBY, HIGH);
@@ -247,9 +251,6 @@ void loop()
 				analogWrite(PWMD, Speed);
 				delay(10);
 			}
-			
-			delay(5000);	//AUTO SHUTDOWN
-			wheelStop();
 		}
 
 		//STOP
@@ -262,8 +263,7 @@ void loop()
 }
 
 
-
-
+//This is the wheelStop() function, slowly deccelerates Speed from maxSpeed to 0
 void wheelStop()
 {
 	Serial.println("WHEELS STOP");
@@ -277,11 +277,13 @@ void wheelStop()
 	}
 }
 
+
+//This is the armStop() function, stops arm, sets brake and motor to 1500 (neutral)
 void armStop()
 {
 	Serial.println("ARM STOP");
-	arm.writeMicroseconds(1500);
 	armBrake.writeMicroseconds(1500);
+	arm.writeMicroseconds(1500);
 }
 
 
