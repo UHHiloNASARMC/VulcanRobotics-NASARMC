@@ -1,0 +1,27 @@
+Running from computer:
+	1) Connect to Raspberry Pi via SSH
+	2) Open Arduino IDE and upload code from ARM and WHEELS file to Arduino Mega 2560
+	3) Open Serial Monitor
+	4) Make sure BAUD RATE is at 115200
+	5a) WHEEL CONTROL:
+		W - forward
+		A - left
+		S - backwards
+		D - right
+		X - STOP FORWARD/BACKWARD MOVEMENTS
+		Z - STOP LEFT/RIGHT TURNS
+	5b) ARM CONTROL:
+		Up controls:
+			I - up increment 1650
+			U - up increment 2000
+		Down controls:
+			M - down increment FAST
+			N - down increment SLOW
+		Stop:
+			V - STOP (SAFETY SWITCH)
+		
+Running via SSH to the Raspberry PI
+	ASUS Client - 132.160.56.240 (wlan0)
+	Raspberry Pi Server - 132.160.56.245 (wlan0)
+	Router - 132.160.56.1
+	Netmask - 255.255.255.0

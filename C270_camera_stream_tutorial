@@ -1,0 +1,12 @@
+1) Start motion
+	$ sudo service motion start $
+
+2) Open Mozilla Firefox and enter:
+	132.160.56.245:8081
+	(Pi IP addr:video port)
+
+NOTES:
+	-To access motion config file:
+		$ sudo nano /etc/motion/motion.conf $
+	
+	-Video stream is 480x320 @3fps, very slow and laggy
