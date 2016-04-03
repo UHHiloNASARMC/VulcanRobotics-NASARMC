@@ -113,10 +113,8 @@ void loop()
 		}
 		
 		//Stop arm motor and brake, doesn't have an effect during operation, safety button IF SHIT HITS THE FAN
-		if(input == 'v')
-		{
-			armStop();		//Stop arm motor and brake
-		}
+		if(input == 'v') armStop();		//Stop arm motor and brake
+
 //*********************************************************************
 		
 //WHEEL****************************************************************
@@ -238,23 +236,13 @@ void loop()
 		}
 
 		//STOPS WHEELS, enter 'x'
-		if (input == 'x')
-		{
-			wheelStop();
-		}
+		if (input == 'x') wheelStop();
 
 		//STOPS TURN WHEELS, enter 'z'
-		if(input == 'z')
-		{
-			wheelTurnStop();
-		}
+		if(input == 'z') wheelTurnStop();
 	}
 	//*********************************************************************
 }
-
-
-
-
 
 //This is the wheelStop() function, slowly deccelerates Speed from maxSpeed to 0
 void wheelStop()
@@ -270,8 +258,6 @@ void wheelStop()
 	}
 }
 
-
-
 //This is the wheelTurnStop() function, slowly deccelerates Speed from maxTurnSpeed to 0
 void wheelTurnStop()
 {
@@ -285,10 +271,6 @@ void wheelTurnStop()
 		delay(10);
 	}
 }
-
-
-
-
 
 //This is the armStop() function, stops arm, sets brake and motor to 1500 (neutral)
 void armStop()
