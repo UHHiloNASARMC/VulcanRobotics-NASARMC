@@ -279,3 +279,56 @@ void armStop()
 	armBrake.writeMicroseconds(1500);
 	arm.writeMicroseconds(1500);
 }
+
+
+
+
+
+/**
+ * NEW CODE
+**/
+
+#include<servo.h>
+Servo leftWheels;
+Servo rightWheels;
+
+void setup() {
+	leftWheels.attach(8);
+	rightWheels.attach(9);
+	leftWheels.writeMicroseconds(1500);
+	rightWheels.writeMicroseconds(1500);
+
+	Serial.begin(115200);
+}
+
+void loop() {
+	if(Serial.available()) {
+		int input = Serial.read();
+		
+		if(input == 'w') {
+			leftWheels.writeMicroseconds(1650);
+			rightWheels.writeMicroseconds(1650);
+			delay(1000);
+		}
+
+		if(input == 'a') {
+			leftWheels.writeMicroseconds(1350);
+			rightWheels.writeMicroseconds(1350);
+			delay(1000);
+		}
+
+		if(input == 's') {
+			leftWheels.writeMicroseconds(1350);
+			rightWheels.writeMicroseconds(1650);
+			delay(1000);
+		}
+
+		if(input == 'd') {
+			leftWheels.writeMicroseconds(1650);
+			rightWheels.writeMicroseconds(1350);
+			delay(1000);
+		}
+}
+
+
+
