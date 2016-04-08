@@ -12,24 +12,24 @@ const int maxSpeed = 80;  		//Max wheel speed of front and back direction
 const int maxTurnSpeed = 127;	//Max wheel speed of left and right direction
 
 //Motor A, BOARD 1, Front Left
-int PWMA = 2;					//Speed control 
-int AIN1 = 52;					//Direction
-int AIN2 = 53;					//Direction
+int PWMA = 2;					//Speed control, connect to pin 2
+int AIN1 = 52;					//Direction, connect to pin 52
+int AIN2 = 53;					//Direction, connect to pin 53
 
 //Motor B, BOARD 1, Front Right
-int PWMB = 3; 					//Speed Control 
-int BIN1 = 50; 					//Direction 
-int BIN2 = 51; 					//Direction 
+int PWMB = 3; 					//Speed Control, connect to pin 3
+int BIN1 = 50; 					//Direction, connect to pin 50
+int BIN2 = 51; 					//Direction, connect to pin 51
 
 //Motor C, BOARD 2, Back Left
-int PWMC = 4;					//Speed control 
-int CIN1 = 22;					//Direction
-int CIN2 = 23;					//Direction
+int PWMC = 4;					//Speed control, connect to pin 4
+int CIN1 = 22;					//Direction, connect to pin 22
+int CIN2 = 23;					//Direction, connect to pin 23
 
 //Motor D, BOARD 2, Back Right
-int PWMD = 5;					//Speed Control
-int DIN1 = 24;					//Direction
-int DIN2 = 25; 					//Direction
+int PWMD = 5;					//Speed Control, connect to pin 5
+int DIN1 = 24;					//Direction, connect to pin 24
+int DIN2 = 25; 					//Direction, connect to pin 25
 
 void setup()
 {
