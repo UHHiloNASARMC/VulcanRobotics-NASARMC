@@ -13,9 +13,9 @@ Servo rightWheels;
 Servo arm;
 
 void setup() {
-	int PWMA = 2;					//Speed control, connect to pin 2
-	int AIN1 = 52;					//Direction, connect to pin 52
-	int AIN2 = 53;					//Direction, connect to pin 53
+	int PWMA = 2;
+	int AIN1 = 52;
+	int AIN2 = 53;
 
 	leftWheels.attach(8);
 	rightWheels.attach(9);
