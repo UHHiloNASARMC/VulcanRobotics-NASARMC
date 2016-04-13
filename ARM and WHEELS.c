@@ -78,6 +78,9 @@ void loop() {
 			AIN2=LOW;
 		}
 
+		/**
+		 * arm up
+		**/
 		if(input == 'n') {
 			arm.writeMicroseconds(1350);
 			AIN1=HIGH;
