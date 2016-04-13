@@ -291,10 +291,16 @@ void armStop()
 #include<servo.h>
 Servo leftWheels;
 Servo rightWheels;
+Servo arm;
 
 void setup() {
+	int PWMA = 2;					//Speed control, connect to pin 2
+	int AIN1 = 52;					//Direction, connect to pin 52
+	int AIN2 = 53;					//Direction, connect to pin 53
+
 	leftWheels.attach(8);
 	rightWheels.attach(9);
+	arm.attach(10);
 	leftWheels.writeMicroseconds(1500);
 	rightWheels.writeMicroseconds(1500);
 
@@ -305,28 +311,61 @@ void loop() {
 	if(Serial.available()) {
 		int input = Serial.read();
 		
+		/**
+		 * Move forward
+		**/
 		if(input == 'w') {
 			leftWheels.writeMicroseconds(1650);
 			rightWheels.writeMicroseconds(1650);
 			delay(1000);
 		}
 
+		/**
+		 * Turn left
+		**/
 		if(input == 'a') {
 			leftWheels.writeMicroseconds(1350);
 			rightWheels.writeMicroseconds(1350);
 			delay(1000);
 		}
 
+		/**
+		 * Move backwards
+		**/
 		if(input == 's') {
 			leftWheels.writeMicroseconds(1350);
 			rightWheels.writeMicroseconds(1650);
 			delay(1000);
 		}
 
+		/**
+		 * Turn right
+		**/
 		if(input == 'd') {
 			leftWheels.writeMicroseconds(1650);
 			rightWheels.writeMicroseconds(1350);
 			delay(1000);
+		}
+
+		/**
+		 * arm up
+		**/
+		if(input == 'i') {
+			arm.writeMicroseconds(1650);
+			AIN1=HIGH;
+			AIN2=HIGH;
+			delay(500);
+			AIN1=LOW;
+			AIN2=LOW;
+		}
+
+		if(input == 'n') {
+			arm.writeMicroseconds(1350);
+			AIN1=HIGH;
+			AIN2=HIGH;
+			delay(500);
+			AIN1=LOW;
+			AIN2=LOW;
 		}
 }
 
