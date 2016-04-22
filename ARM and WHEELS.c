@@ -39,6 +39,8 @@ void loop() {
       leftWheels.writeMicroseconds(1350);
       rightWheels.writeMicroseconds(1650);
       delay(1000);
+      leftWheels.writeMicroseconds(1500);
+      rightWheels.writeMicroseconds(1500);
     }
 
     /**
@@ -48,6 +50,8 @@ void loop() {
       leftWheels.writeMicroseconds(1650);
       rightWheels.writeMicroseconds(1650);
       delay(1000);
+      leftWheels.writeMicroseconds(1500);
+      rightWheels.writeMicroseconds(1500);
     }
 
     /**
@@ -57,6 +61,8 @@ void loop() {
       leftWheels.writeMicroseconds(1650);
       rightWheels.writeMicroseconds(1350);
       delay(1000);
+      leftWheels.writeMicroseconds(1500);
+      rightWheels.writeMicroseconds(1500);
     }
 
     /**
@@ -66,18 +72,23 @@ void loop() {
       leftWheels.writeMicroseconds(1350);
       rightWheels.writeMicroseconds(1350);
       delay(1000);
+      leftWheels.writeMicroseconds(1500);
+      rightWheels.writeMicroseconds(1500);
     }
 
     /**
      * arm up
     **/
     if(input == 'i') {
-      arm.writeMicroseconds(1750);
-      AIN1=LOW;
-      AIN2=HIGH;
-      delay(500);
-      AIN1=LOW;
-      AIN2=LOW;
+      arm.writeMicroseconds(1650);
+      digitalWrite(AIN1, HIGH);
+      digitalWrite(AIN2, LOW);
+      analogWrite(PWMA, 255);
+      
+      delay(100);
+      digitalWrite(AIN1, LOW);
+      digitalWrite(AIN2, LOW);
+      analogWrite(PWMA, 0);
       arm.writeMicroseconds(1500);
     }
 
@@ -86,11 +97,12 @@ void loop() {
     **/
     if(input == 'n') {
       arm.writeMicroseconds(1350);
-      AIN1=HIGH;
-      AIN2=HIGH;
-      delay(500);
-      AIN1=LOW;
-      AIN2=LOW;
+      digitalWrite(AIN1, HIGH);
+      digitalWrite(AIN2, LOW);
+      delay(50);
+      digitalWrite(AIN1, LOW);
+      digitalWrite(AIN2, LOW);
+      analogWrite(PWMA, 0);
       arm.writeMicroseconds(1500);
     }
 
