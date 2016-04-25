@@ -36,23 +36,8 @@ void loop() {
      * Move forward
     **/
     if(input == 'w') {
-			input = Serial.read();
-
-			if(input == '1') {	
-      	leftWheels.writeMicroseconds(1350);
-      	rightWheels.writeMicroseconds(1650);
-			}
-			
-			if(input == '2') {	
-      	leftWheels.writeMicroseconds(1250);
-      	rightWheels.writeMicroseconds(1750);
-			}
-
-			if(input == '3') {	
-      	leftWheels.writeMicroseconds(1000);
-      	rightWheels.writeMicroseconds(2000);
-			}
-
+    	leftWheels.writeMicroseconds(1350);
+    	rightWheels.writeMicroseconds(1650);
       delay(500);
       leftWheels.writeMicroseconds(1500);
       rightWheels.writeMicroseconds(1500);
@@ -73,21 +58,8 @@ void loop() {
      * Move backwards
     **/
     if(input == 's') {
-			if(input == '1') {
-      	leftWheels.writeMicroseconds(1650);
-      	rightWheels.writeMicroseconds(1350);
-			}
-
-			if(input == '2') {	
-      	leftWheels.writeMicroseconds(1750);
-      	rightWheels.writeMicroseconds(1250);
-			}
-
-			if(input == '3') {	
-      	leftWheels.writeMicroseconds(2000);
-      	rightWheels.writeMicroseconds(1000);
-			}
-
+  		leftWheels.writeMicroseconds(1650);
+			rightWheels.writeMicroseconds(1350);
       delay(500);
       leftWheels.writeMicroseconds(1500);
       rightWheels.writeMicroseconds(1500);
