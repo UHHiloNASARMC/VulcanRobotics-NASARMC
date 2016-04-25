@@ -7,7 +7,7 @@
 **/
 
 
-#include<Servo.h>
+#include <Servo.h>
 Servo leftWheels;
 Servo rightWheels;
 Servo arm;
@@ -36,9 +36,24 @@ void loop() {
      * Move forward
     **/
     if(input == 'w') {
-      leftWheels.writeMicroseconds(1350);
-      rightWheels.writeMicroseconds(1650);
-      delay(1000);
+			input = Serial.read();
+
+			if(input == '1') {	
+      	leftWheels.writeMicroseconds(1350);
+      	rightWheels.writeMicroseconds(1650);
+			}
+			
+			if(input == '2') {	
+      	leftWheels.writeMicroseconds(1250);
+      	rightWheels.writeMicroseconds(1750);
+			}
+
+			if(input == '3') {	
+      	leftWheels.writeMicroseconds(1000);
+      	rightWheels.writeMicroseconds(2000);
+			}
+
+      delay(500);
       leftWheels.writeMicroseconds(1500);
       rightWheels.writeMicroseconds(1500);
     }
@@ -49,7 +64,7 @@ void loop() {
     if(input == 'a') {
       leftWheels.writeMicroseconds(1650);
       rightWheels.writeMicroseconds(1650);
-      delay(1000);
+      delay(500);
       leftWheels.writeMicroseconds(1500);
       rightWheels.writeMicroseconds(1500);
     }
@@ -58,9 +73,22 @@ void loop() {
      * Move backwards
     **/
     if(input == 's') {
-      leftWheels.writeMicroseconds(1650);
-      rightWheels.writeMicroseconds(1350);
-      delay(1000);
+			if(input == '1') {
+      	leftWheels.writeMicroseconds(1650);
+      	rightWheels.writeMicroseconds(1350);
+			}
+
+			if(input == '2') {	
+      	leftWheels.writeMicroseconds(1750);
+      	rightWheels.writeMicroseconds(1250);
+			}
+
+			if(input == '3') {	
+      	leftWheels.writeMicroseconds(2000);
+      	rightWheels.writeMicroseconds(1000);
+			}
+
+      delay(500);
       leftWheels.writeMicroseconds(1500);
       rightWheels.writeMicroseconds(1500);
     }
@@ -71,7 +99,7 @@ void loop() {
     if(input == 'd') {
       leftWheels.writeMicroseconds(1350);
       rightWheels.writeMicroseconds(1350);
-      delay(1000);
+      delay(500);
       leftWheels.writeMicroseconds(1500);
       rightWheels.writeMicroseconds(1500);
     }
@@ -99,6 +127,8 @@ void loop() {
       arm.writeMicroseconds(1350);
       digitalWrite(AIN1, HIGH);
       digitalWrite(AIN2, LOW);
+			analogWrite(PWMA, 255);
+
       delay(50);
       digitalWrite(AIN1, LOW);
       digitalWrite(AIN2, LOW);
