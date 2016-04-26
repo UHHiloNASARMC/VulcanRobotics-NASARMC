@@ -37,12 +37,22 @@ void loop() {
      * Move forward
     **/
     if(input == 'w') {
-    	leftWheels.writeMicroseconds(1350);
-    	rightWheels.writeMicroseconds(1650);
+    	leftWheels.writeMicroseconds(speedWheels[0]);
+    	rightWheels.writeMicroseconds(speedWheels[1]);
       delay(500);
-      leftWheels.writeMicroseconds(1500);
-      rightWheels.writeMicroseconds(1500);
+			kill();
     }
+		
+		/**
+     * Move backwards
+    **/
+    if(input == 's') {
+  		leftWheels.writeMicroseconds(speedWheels[0]);
+			rightWheels.writeMicroseconds(speedWheels[1]);
+      delay(500);
+			kill();
+    }
+
 
     /**
      * Turn left
@@ -50,17 +60,6 @@ void loop() {
     if(input == 'a') {
       leftWheels.writeMicroseconds(1650);
       rightWheels.writeMicroseconds(1650);
-      delay(500);
-      leftWheels.writeMicroseconds(1500);
-      rightWheels.writeMicroseconds(1500);
-    }
-
-    /**
-     * Move backwards
-    **/
-    if(input == 's') {
-  		leftWheels.writeMicroseconds(1650);
-			rightWheels.writeMicroseconds(1350);
       delay(500);
       leftWheels.writeMicroseconds(1500);
       rightWheels.writeMicroseconds(1500);
@@ -117,20 +116,21 @@ void loop() {
 }
 
 void speedUp(int &L, int &R, int i) {
-	int levelLeft[3] = {1600, 1800, 2000}
-	int levelRight[3] = {1400, 1200, 1000}
+	int levelLeft[3] = {1600, 1800, 2000};
+	int levelRight[3] = {1400, 1200, 1000};
 	L = levelLeft[i];
 	R = levelRight[i];
 }
 
 void speedDown(int &L, int &R) {
-	int levelLeft[3] = {1400, 1200, 1000}
-	int levelRight[3] = {1600, 1800, 2000}
+	int levelLeft[3] = {1400, 1200, 1000};
+	int levelRight[3] = {1600, 1800, 2000};
 	L = levelLeft[i];
 	R = levelRight[i];
 }
 
 void kill() {
-	
+	speedWheels[0] = 1500;
+	speedWheels[1] = 1500;
 }
 
