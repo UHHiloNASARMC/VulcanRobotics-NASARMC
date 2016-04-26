@@ -14,6 +14,7 @@ Servo arm;
 int PWMA = 13;
 int AIN1 = 49;
 int AIN2 = 48;
+int speedWheels[2] = {1500, 1500};
 
 void setup() {
   pinMode(PWMA, OUTPUT);
@@ -115,5 +116,21 @@ void loop() {
   }
 }
 
+void speedUp(int &L, int &R, int i) {
+	int levelLeft[3] = {1600, 1800, 2000}
+	int levelRight[3] = {1400, 1200, 1000}
+	L = levelLeft[i];
+	R = levelRight[i];
+}
 
+void speedDown(int &L, int &R) {
+	int levelLeft[3] = {1400, 1200, 1000}
+	int levelRight[3] = {1600, 1800, 2000}
+	L = levelLeft[i];
+	R = levelRight[i];
+}
+
+void kill() {
+	
+}
 
