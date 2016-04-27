@@ -38,20 +38,24 @@ void loop() {
      * Move forward
     **/
     if(input == 'w') {
-    	leftWheels.writeMicroseconds(speedWheels[0]);
-    	rightWheels.writeMicroseconds(speedWheels[1]);
+    	leftWheels.writeMicroseconds(1350);
+    	rightWheels.writeMicroseconds(1650);
       delay(500);
-			kill();
+			//kill();
+    	leftWheels.writeMicroseconds(1500);
+    	rightWheels.writeMicroseconds(1500);
     }
 		
 		/**
      * Move backwards
     **/
     if(input == 's') {
-  		leftWheels.writeMicroseconds(speedWheels[0]);
-			rightWheels.writeMicroseconds(speedWheels[1]);
+  		leftWheels.writeMicroseconds(1650);
+			rightWheels.writeMicroseconds(1350);
       delay(500);
-			kill();
+			//kill();
+    	leftWheels.writeMicroseconds(1500);
+    	rightWheels.writeMicroseconds(1500);
     }
 
 
@@ -62,7 +66,9 @@ void loop() {
       leftWheels.writeMicroseconds(1650);
       rightWheels.writeMicroseconds(1650);
       delay(500);
-			kill();
+			//kill();
+	   	leftWheels.writeMicroseconds(1500);
+    	rightWheels.writeMicroseconds(1500);
     }
 
     /**
@@ -72,7 +78,9 @@ void loop() {
       leftWheels.writeMicroseconds(1350);
       rightWheels.writeMicroseconds(1350);
       delay(500);
-			kill();
+			//kill();
+	   	leftWheels.writeMicroseconds(1500);
+    	rightWheels.writeMicroseconds(1500);
     }
 
     /**
