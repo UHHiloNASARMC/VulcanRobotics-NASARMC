@@ -14,6 +14,8 @@ Servo arm;
 int PWMA = 13;
 int AIN1 = 49;
 int AIN2 = 48;
+
+// speed of wheels stored in an array, left side = speedWheels[0], right side = speedWheels[1]
 int speedWheels[2] = {1500, 1500};
 
 void setup() {
@@ -25,7 +27,6 @@ void setup() {
   arm.attach(8);
   leftWheels.writeMicroseconds(1500);
   rightWheels.writeMicroseconds(1500);
-
   Serial.begin(115200);
 }
 
@@ -61,8 +62,7 @@ void loop() {
       leftWheels.writeMicroseconds(1650);
       rightWheels.writeMicroseconds(1650);
       delay(500);
-      leftWheels.writeMicroseconds(1500);
-      rightWheels.writeMicroseconds(1500);
+			kill();
     }
 
     /**
@@ -72,8 +72,7 @@ void loop() {
       leftWheels.writeMicroseconds(1350);
       rightWheels.writeMicroseconds(1350);
       delay(500);
-      leftWheels.writeMicroseconds(1500);
-      rightWheels.writeMicroseconds(1500);
+			kill();
     }
 
     /**
@@ -115,18 +114,24 @@ void loop() {
   }
 }
 
-void speedUp(int &L, int &R, int i) {
+/**
+ * Speeds up FB movement
+**/
+void speedUp(int i) {
 	int levelLeft[3] = {1600, 1800, 2000};
 	int levelRight[3] = {1400, 1200, 1000};
-	L = levelLeft[i];
-	R = levelRight[i];
+	speedWheels[0] = levelLeft[i];
+	speedWheels[1] = levelRight[i];
 }
 
-void speedDown(int &L, int &R) {
+/**
+ * Speeds down FB movement
+**/
+void speedDown(int i) {
 	int levelLeft[3] = {1400, 1200, 1000};
 	int levelRight[3] = {1600, 1800, 2000};
-	L = levelLeft[i];
-	R = levelRight[i];
+	speedWheels[0] = levelLeft[i];
+	speedWheels[1] = levelRight[i];
 }
 
 void kill() {
