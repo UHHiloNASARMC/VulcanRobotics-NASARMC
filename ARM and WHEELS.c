@@ -14,8 +14,9 @@ Servo arm;
 int PWMA = 13;
 int AIN1 = 49;
 int AIN2 = 48;
-int speedWheels[2] = {1500, 1500};
-int i, j = 0;
+int levelLeft[3] = {1600, 1800, 2000};
+int levelRight[3] = {1400, 1200, 1000};
+int i = 0;
 
 void setup() {
   pinMode(PWMA, OUTPUT);
@@ -37,10 +38,10 @@ void loop() {
      * Move forward
     **/
     if(input == 'w') {
-    	leftWheels.writeMicroseconds(1350);
-    	rightWheels.writeMicroseconds(1650);
+    	leftWheels.writeMicroseconds(levelLeft[i]);
+    	rightWheels.writeMicroseconds(levelRight[i]);
       delay(500);
-			//kill();
+			kill();
     	leftWheels.writeMicroseconds(1500);
     	rightWheels.writeMicroseconds(1500);
     }
@@ -49,10 +50,10 @@ void loop() {
      * Move backwards
     **/
     if(input == 's') {
-  		leftWheels.writeMicroseconds(1650);
-			rightWheels.writeMicroseconds(1350);
+  		leftWheels.writeMicroseconds(levelRight[i]);
+			rightWheels.writeMicroseconds(levelLeft[i]);
       delay(500);
-			//kill();
+			kill();
     	leftWheels.writeMicroseconds(1500);
     	rightWheels.writeMicroseconds(1500);
     }
@@ -65,7 +66,7 @@ void loop() {
       leftWheels.writeMicroseconds(1650);
       rightWheels.writeMicroseconds(1650);
       delay(500);
-			//kill();
+			kill();
 	   	leftWheels.writeMicroseconds(1500);
     	rightWheels.writeMicroseconds(1500);
     }
@@ -77,7 +78,7 @@ void loop() {
       leftWheels.writeMicroseconds(1350);
       rightWheels.writeMicroseconds(1350);
       delay(500);
-			//kill();
+			kill();
 	   	leftWheels.writeMicroseconds(1500);
     	rightWheels.writeMicroseconds(1500);
     }
@@ -90,7 +91,6 @@ void loop() {
       digitalWrite(AIN1, HIGH);
       digitalWrite(AIN2, LOW);
       analogWrite(PWMA, 255);
-      
       delay(100);
       digitalWrite(AIN1, LOW);
       digitalWrite(AIN2, LOW);
@@ -106,7 +106,6 @@ void loop() {
       digitalWrite(AIN1, HIGH);
       digitalWrite(AIN2, LOW);
 			analogWrite(PWMA, 255);
-
       delay(50);
       digitalWrite(AIN1, LOW);
       digitalWrite(AIN2, LOW);
@@ -114,16 +113,24 @@ void loop() {
       arm.writeMicroseconds(1500);
     }
 
+		/**
+		 * kill
+		**/
     if(input == 'x') {
       leftWheels.writeMicroseconds(1500);
       rightWheels.writeMicroseconds(1500);
     }
-
+		/**
+		 * decrease speed
+		**/
 		if(input == 'q') {
 			if (i <= 2) speedDown(i);
 			else i = 0;
 		}
 		
+		/**
+		 * increase speed
+		**/
 		if(input == 'e') {
 			if (j <= 2) speedUp(j);
 			else j = 0;		
@@ -131,28 +138,31 @@ void loop() {
   }
 }
 
-/**
- * Speeds up FB movement
-**/
-void speedUp(int i) {
-	int levelLeft[3] = {1600, 1800, 2000};
-	int levelRight[3] = {1400, 1200, 1000};
-	speedWheels[0] = levelLeft[i];
-	speedWheels[1] = levelRight[i];
+void speedUp() {
+	if(i < 3) i = i+1;
+	else {
+		Serial.println("Max speed reached");		
+		return;
+	}
 }
 
-/**
- * Speeds down FB movement
-**/
-void speedDown(int i) {
-	int levelLeft[3] = {1400, 1200, 1000};
-	int levelRight[3] = {1600, 1800, 2000};
-	speedWheels[0] = levelLeft[i];
-	speedWheels[1] = levelRight[i];
+void speedDown() {
+	if(i < 3) i = i-1;
+	else {
+		Serial.println("Min speed reached");	
+		return;
+	}
 }
 
 void kill() {
-	speedWheels[0] = 1500;
-	speedWheels[1] = 1500;
+	leftWheels.writeMicroseconds(1500);
+	rightWheels.writeMicroseconds(1500);
+}
+
+void reportSpeed() {
+	Serial.print("Current speed left: ");
+	Serial.println(levelLeft[i]);
+	Serial.print("Current speed right: ");
+	Serial.println(levelRight[i]);
 }
 
