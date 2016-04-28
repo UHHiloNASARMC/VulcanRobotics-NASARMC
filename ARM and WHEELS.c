@@ -14,9 +14,8 @@ Servo arm;
 int PWMA = 13;
 int AIN1 = 49;
 int AIN2 = 48;
-
-// speed of wheels stored in an array, left side = speedWheels[0], right side = speedWheels[1]
 int speedWheels[2] = {1500, 1500};
+int i, j = 0;
 
 void setup() {
   pinMode(PWMA, OUTPUT);
@@ -119,6 +118,16 @@ void loop() {
       leftWheels.writeMicroseconds(1500);
       rightWheels.writeMicroseconds(1500);
     }
+
+		if(input == 'q') {
+			if (i <= 2) speedDown(i);
+			else i = 0;
+		}
+		
+		if(input == 'e') {
+			if (j <= 2) speedUp(j);
+			else j = 0;		
+		}
   }
 }
 
