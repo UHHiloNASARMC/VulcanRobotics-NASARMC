@@ -124,16 +124,14 @@ void loop() {
 		 * decrease speed
 		**/
 		if(input == 'q') {
-			if (i <= 2) speedDown(i);
-			else i = 0;
+			speedDown();
 		}
 		
 		/**
 		 * increase speed
 		**/
 		if(input == 'e') {
-			if (j <= 2) speedUp(j);
-			else j = 0;		
+			speedUp();		
 		}
   }
 }
