@@ -14,8 +14,8 @@ Servo arm;
 int PWMA = 13;
 int AIN1 = 49;
 int AIN2 = 48;
-int levelLeft[3] = {1600, 1800, 2000};
-int levelRight[3] = {1400, 1200, 1000};
+int levelLeft[3] = {1600, 1800, 1850};
+int levelRight[3] = {1400, 1200, 1150};
 int i = 0;
 
 void setup() {
@@ -38,8 +38,8 @@ void loop() {
      * Move forward
     **/
     if(input == 'w') {
-    	leftWheels.writeMicroseconds(levelLeft[i]);
-    	rightWheels.writeMicroseconds(levelRight[i]);
+    	leftWheels.writeMicroseconds(levelRight[i]);
+    	rightWheels.writeMicroseconds(levelLeft[i]);
       delay(500);
 			kill();
     	leftWheels.writeMicroseconds(1500);
@@ -50,8 +50,8 @@ void loop() {
      * Move backwards
     **/
     if(input == 's') {
-  		leftWheels.writeMicroseconds(levelRight[i]);
-			rightWheels.writeMicroseconds(levelLeft[i]);
+  		leftWheels.writeMicroseconds(levelLeft[i]);
+			rightWheels.writeMicroseconds(levelRight[i]);
       delay(500);
 			kill();
     	leftWheels.writeMicroseconds(1500);
@@ -63,8 +63,8 @@ void loop() {
      * Turn left
     **/
     if(input == 'a') {
-      leftWheels.writeMicroseconds(1650);
-      rightWheels.writeMicroseconds(1650);
+      leftWheels.writeMicroseconds(levelLeft[i]);
+      rightWheels.writeMicroseconds(levelLeft[i]);
       delay(500);
 			kill();
 	   	leftWheels.writeMicroseconds(1500);
@@ -75,8 +75,8 @@ void loop() {
      * Turn right
     **/
     if(input == 'd') {
-      leftWheels.writeMicroseconds(1350);
-      rightWheels.writeMicroseconds(1350);
+      leftWheels.writeMicroseconds(levelRight[i]);
+      rightWheels.writeMicroseconds(levelRight[i]);
       delay(500);
 			kill();
 	   	leftWheels.writeMicroseconds(1500);
@@ -87,16 +87,49 @@ void loop() {
      * arm up
     **/
     if(input == 'i') {
-      arm.writeMicroseconds(1650);
+      arm.writeMicroseconds(1900);
+			
+			//brake
+			delay(30);      
       digitalWrite(AIN1, HIGH);
       digitalWrite(AIN2, LOW);
-      analogWrite(PWMA, 255);
+			analogWrite(PWMA, 255);
+
       delay(100);
+
       digitalWrite(AIN1, LOW);
       digitalWrite(AIN2, LOW);
       analogWrite(PWMA, 0);
+			delay(50);
       arm.writeMicroseconds(1500);
     }
+
+		if(input == 'p') {
+			arm.writeMicroseconds(1950);
+			
+			delay(30);
+			digitalWrite(AIN1, HIGH);
+			digitalWrite(AIN2, LOW);
+			analogWrite(PWMA, 255);
+
+			delay(100);
+
+			digitalWrite(AIN1, LOW);
+      digitalWrite(AIN2, LOW);
+      analogWrite(PWMA, 0);
+			delay(30);
+      arm.writeMicroseconds(1500);								
+		}
+
+		if(input == 'b') {
+			digitalWrite(AIN1, HIGH);
+			digitalWrite(AIN2, LOW);
+			analogWrite(PWMA, 255);
+			delay(100);
+			digitalWrite(AIN1, LOW);
+			digitalWrite(AIN2, LOW);
+			analogWrite(PWMA, 0);
+		}
 
     /**
      * arm down
@@ -137,7 +170,7 @@ void loop() {
 }
 
 void speedUp() {
-	if(i < 3) i = i+1;
+	if(i <= 2) i = i+1;
 	else {
 		Serial.println("Max speed reached");		
 		return;
@@ -145,7 +178,7 @@ void speedUp() {
 }
 
 void speedDown() {
-	if(i < 3) i = i-1;
+	if(i >= 0) i = i-1;
 	else {
 		Serial.println("Min speed reached");	
 		return;
