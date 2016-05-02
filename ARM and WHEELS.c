@@ -16,13 +16,9 @@ int AIN1 = 49;
 int AIN2 = 48;
 int levelLeft[3] = {1600, 1700, 1800};
 int levelRight[3] = {1400, 1300, 1200};
-/**
-* Keeps track of speed
-**/
-int i = 0;
-int timeInterval = 0;
-int input;
-bool checkAvail;
+int i = 0; // Keeps track of the speed array index
+int timeInterval = 0; // Kills machine after a certain time of zero user input
+int input; // Stores the user's input
 
 void setup() {
   pinMode(PWMA, OUTPUT);
@@ -41,124 +37,76 @@ void loop() {
 		input = Serial.read();
 		do {
 		if(input == 'w') forward();
-		else if(input == 's') backward();
-		else if(input == 'a') left();
-		else if(input == 'd') right();
-		} while(checkInput() == true);
+		if(input == 's') backward();
+		if(input == 'a') left();
+		if(input == 'd') right();
+		if(input == 'x') break;
+		if(input == 'q') {speedDown(); break;}
+		if(input == 'e') {speedUp(); break;}
+		timeInterval++;
+		} while(checkInput() == true || timeInterval < 6);
+		kill();
 	}
 }
 
-void speedUp() {
-	if(i < 2) {
-		i = i+1;
-		reportSpeed();
-	}
+void speedUp() {if(i < 2) {i=i+1; reportSpeed();} else {Serial.println("Max speed reached"); reportSpeed(); return;}}
 
-	else {
-		Serial.println("Max speed reached");
-		reportSpeed();
-		return;
-	}
-}
-
-void speedDown() {
-	if(i > 0) {
-		i = i-1;
-		reportSpeed();	
-	}
-	else {
-		Serial.println("Min speed reached");
-		reportSpeed();
-		return;
-	}
-}
+void speedDown() {if(i > 0) {i=i-1; reportSpeed();} else {Serial.println("Min speed reached"); reportSpeed(); return;}}
 
 void kill() {
 	Serial.println("Killed");
 	leftWheels.writeMicroseconds(1500);
 	rightWheels.writeMicroseconds(1500);
+	arm.writeMicroseconds(1500);
+	analogWrite(PWMA, 0);
 	timeInterval = 0;
 }
 
 void reportSpeed() {
-	Serial.println("Current speed left: ");
-	Serial.println(i);
+	Serial.print("Current speed left: ");
 	Serial.println(levelLeft[i]);
-	Serial.println("Current speed right: ");
+	Serial.print("Current speed right: ");
 	Serial.println(levelRight[i]);
 }
 
-/**
- * Since the following functions are similar, consider passing speed + direction as parameters
-**/
 void forward() {
-	while(timeInterval != 6) {
-		leftWheels.writeMicroseconds(levelRight[i]);
-		rightWheels.writeMicroseconds(levelLeft[i]);
-		Serial.println("Moving forward");
-		timeInterval = timeInterval + 1;	
-		if(checkInput() == true) {
-			kill();
-			return;
-		}
-		delay(500);
-	}
-	kill();
+	leftWheels.writeMicroseconds(levelRight[i]);
+	rightWheels.writeMicroseconds(levelLeft[i]);
+	Serial.println("Moving forward");
+	delay(500);
 }
 
 void backward() {
-	while(timeInterval != 6) {
-		leftWheels.writeMicroseconds(levelLeft[i]);
-		rightWheels.writeMicroseconds(levelRight[i]);
-		Serial.println("Moving backwards");
-		timeInterval = timeInterval + 1;
-		if(checkInput() == true) {
-			kill();
-			return;
-		}
-		delay(500);
-	}
-	kill();
+	leftWheels.writeMicroseconds(levelLeft[i]);
+	rightWheels.writeMicroseconds(levelRight[i]);
+	Serial.println("Moving backwards");
+	delay(500);
 }
 
 void left() {
-	while(timeInterval != 6) {
-		leftWheels.writeMicroseconds(levelLeft[i]);
-		rightWheels.writeMicroseconds(levelLeft[i]);
-		Serial.println("Turning left");
-		timeInterval = timeInterval + 1;
-		if(checkInput() == true) {
-			kill();
-			return;
-		}	
-		delay(500);
-	}
-	kill();
+	leftWheels.writeMicroseconds(levelLeft[i]);
+	rightWheels.writeMicroseconds(levelLeft[i]);
+	Serial.println("Turning left");
+	delay(500);
 }
 
 void right() {
-	while(timeInterval != 6) {
-  	leftWheels.writeMicroseconds(levelRight[i]);
-  	rightWheels.writeMicroseconds(levelRight[i]);
-		Serial.println("Turning right");
-		timeInterval = timeInterval + 1;
-		if(checkInput() == true) {
-			kill();
-			return;
-		} 
-		delay(500);
-	}
-	kill();
+	leftWheels.writeMicroseconds(levelRight[i]);
+	rightWheels.writeMicroseconds(levelRight[i]);
+	Serial.println("Turning right");
+	delay(500);
 }
 
+/**
+ * Reads in new value while previous value is still in action
+**/
 bool checkInput() {
 	if(Serial.available()) {
 		input = Serial.read();
+		timeInterval = 0;
 		Serial.println("check made");
-		if(input == '\n') {return false; checkAvail = false;}
-		else {checkAvail = true; return true;}
+		return true;
 	}
-	else return false;
 }
 
 
