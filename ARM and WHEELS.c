@@ -45,10 +45,14 @@ void loop() {
     **/
     if(input == 'w') {
 			//Serial.println("Moving forward");
-			while(timeInterval != 3) {			
-				forward();
-				Serial.println("Moving forward");
-				timeInterval = timeInterval + 1;
+			while(timeInterval != 200) {
+					forward();
+					Serial.println("Moving forward");
+					timeInterval = timeInterval + 1;
+					if(Serial.available()){
+					input = Serial.read();
+					if(input != 'w') {Serial.println("Exited"); break;}	
+				}
 			}
 			kill();
 		}
@@ -250,13 +254,6 @@ void right() {
 	kill();
  	leftWheels.writeMicroseconds(1500);
 	rightWheels.writeMicroseconds(1500);
-}
-
-void serialEvent() {
-	while(Serial.available()) {
-		int newInput = Serial.read();
-		input = newInput;
-	}
 }
 
 
