@@ -111,6 +111,7 @@ void armUp() {
 		else if(input == 'q') {speedDown(); break;}
 		else if(input == 'e') {speedUp(); break;}
 		else if(input == 'x') break;
+		else if(input == 'n') armDown();
 		else {
 			arm.writeMicroseconds(1650);
 			analogWrite(armBrake, 255);
@@ -131,6 +132,7 @@ void armDown() {
 		else if(input == 'q') {speedDown(); break;}
 		else if(input == 'e') {speedUp(); break;}
 		else if(input == 'x') break;
+		else if(input == 'i') armUp();
 		else {
 			arm.writeMicroseconds(1350);
 			analogWrite(armBrake, 255);
