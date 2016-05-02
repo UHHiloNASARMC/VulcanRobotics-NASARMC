@@ -32,7 +32,6 @@ void setup() {
   leftWheels.writeMicroseconds(1500);
   rightWheels.writeMicroseconds(1500);
   Serial.begin(57600);
-	Keyboard.begin();
 }
 
 void loop() {
@@ -44,9 +43,13 @@ void loop() {
      * Move forward
     **/
     if(input == 'w') {
+			//Serial.println("Moving forward");
 			while(timeInterval != 3) {			
 				forward();
+				Serial.println("Moving forward");
 				timeInterval = timeInterval + 1;
+				int fun = Serial.read();
+				if(fun != 'w') break;
 			}
 			kill();
 		}
@@ -124,7 +127,9 @@ void loop() {
       arm.writeMicroseconds(1500);								
 		}
 
-		//toggle brake (Testing)
+		/**
+		 * toggle brake (Testing)
+		**/
 		if(input == 'b') {
 			digitalWrite(AIN1, HIGH);
 			digitalWrite(AIN2, LOW);
@@ -161,6 +166,7 @@ void loop() {
 		 * decrease speed
 		**/
 		if(input == 'q') {
+			Serial.println("Speed decreased");
 			speedDown();
 		}
 		
@@ -168,6 +174,7 @@ void loop() {
 		 * increase speed
 		**/
 		if(input == 'e') {
+			Serial.println("Speed increased");
 			speedUp();		
 		}
   }
@@ -197,6 +204,7 @@ void speedDown() {
 }
 
 void kill() {
+	Serial.println("Killed");
 	leftWheels.writeMicroseconds(1500);
 	rightWheels.writeMicroseconds(1500);
 	timeInterval = 0;
