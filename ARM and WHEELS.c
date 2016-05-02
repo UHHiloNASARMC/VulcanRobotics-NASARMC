@@ -14,8 +14,8 @@ Servo arm;
 int PWMA = 13;
 int AIN1 = 49;
 int AIN2 = 48;
-int levelLeft[3] = {1650, 1800, 1825};
-int levelRight[3] = {1450, 1200, 1125};
+int levelLeft[3] = {1600, 1700, 1800};
+int levelRight[3] = {1400, 1300, 1200};
 /**
 * Keeps track of speed
 **/
@@ -206,24 +206,26 @@ void loop() {
 }
 
 void speedUp() {
-	if(i <= 2) {
+	if(i < 2) {
 		i = i+1;
 		reportSpeed();
 	}
 
 	else {
-		Serial.println("Max speed reached");		
+		Serial.println("Max speed reached");
+		reportSpeed();
 		return;
 	}
 }
 
 void speedDown() {
-	if(i >= 0) {
+	if(i > 0) {
 		i = i-1;
 		reportSpeed();	
 	}
 	else {
-		Serial.println("Min speed reached");	
+		Serial.println("Min speed reached");
+		reportSpeed();
 		return;
 	}
 }
@@ -237,6 +239,7 @@ void kill() {
 
 void reportSpeed() {
 	Serial.println("Current speed left: ");
+	Serial.println(i);
 	Serial.println(levelLeft[i]);
 	Serial.println("Current speed right: ");
 	Serial.println(levelRight[i]);
