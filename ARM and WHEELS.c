@@ -16,7 +16,11 @@ int AIN1 = 49;
 int AIN2 = 48;
 int levelLeft[3] = {1650, 1800, 1825};
 int levelRight[3] = {1450, 1200, 1125};
+/**
+* Keeps track of speed
+**/
 int i = 0;
+int timeInterval = 0;
 
 void setup() {
   pinMode(PWMA, OUTPUT);
@@ -28,48 +32,46 @@ void setup() {
   leftWheels.writeMicroseconds(1500);
   rightWheels.writeMicroseconds(1500);
   Serial.begin(57600);
+	Keyboard.begin();
 }
 
 void loop() {
   if(Serial.available()) {
-		//Serial.println("Enter a command: ");
+		timeInterval = 0;
     int input = Serial.read();
     
     /**
      * Move forward
     **/
     if(input == 'w') {
-			forward();
-    }
+			while(timeInterval != 3) {			
+				forward();
+				timeInterval = timeInterval + 1;
+			}
+			kill();
+		}
 		
 		/**
      * Move backwards
     **/
-    if(input == 's') {
-  		backward();
-    }
+    if(input == 's') backward();
 
 
     /**
      * Turn left
     **/
-    if(input == 'a') {
-			left();
-    }
+    if(input == 'a') left();
 
     /**
      * Turn right
     **/
-    if(input == 'd') {
-			right();
-    }
+    if(input == 'd') right();
 
 
 	 /**
      * Move forward + turn left
     **/
     if(input == 'A') {
-			//Serial.println("Moving forward...");
     	leftWheels.writeMicroseconds(levelRight[i]+150);
     	rightWheels.writeMicroseconds(levelLeft[i]);
       delay(500);
@@ -83,7 +85,6 @@ void loop() {
      * Move forward + turn left
     **/
     if(input == 'D') {
-			//Serial.println("Moving forward...");
     	leftWheels.writeMicroseconds(levelRight[i]);
     	rightWheels.writeMicroseconds(levelLeft[i]-150);
       delay(500);
@@ -97,15 +98,11 @@ void loop() {
     **/
     if(input == 'i') {
       arm.writeMicroseconds(1650);
-			
-			//brake
-			delay(30);      
+			//delay(30);      
       digitalWrite(AIN1, HIGH);
       digitalWrite(AIN2, LOW);
 			analogWrite(PWMA, 255);
-
       delay(200);
-
       digitalWrite(AIN1, LOW);
       digitalWrite(AIN2, LOW);
       analogWrite(PWMA, 0);
@@ -115,14 +112,11 @@ void loop() {
 
 		if(input == 'p') {
 			arm.writeMicroseconds(1750);
-			
-			delay(30);
+			//delay(30);
 			digitalWrite(AIN1, HIGH);
 			digitalWrite(AIN2, LOW);
 			analogWrite(PWMA, 255);
-
 			delay(200);
-
 			digitalWrite(AIN1, LOW);
       digitalWrite(AIN2, LOW);
       analogWrite(PWMA, 0);
@@ -130,7 +124,7 @@ void loop() {
       arm.writeMicroseconds(1500);								
 		}
 
-		//toggle brake
+		//toggle brake (Testing)
 		if(input == 'b') {
 			digitalWrite(AIN1, HIGH);
 			digitalWrite(AIN2, LOW);
@@ -149,7 +143,7 @@ void loop() {
       digitalWrite(AIN1, HIGH);
       digitalWrite(AIN2, LOW);
 			analogWrite(PWMA, 255);
-      delay(50);
+      delay(100);
       digitalWrite(AIN1, LOW);
       digitalWrite(AIN2, LOW);
       analogWrite(PWMA, 0);
@@ -205,7 +199,7 @@ void speedDown() {
 void kill() {
 	leftWheels.writeMicroseconds(1500);
 	rightWheels.writeMicroseconds(1500);
-	//Serial.println("Killed");
+	timeInterval = 0;
 }
 
 void reportSpeed() {
@@ -219,9 +213,6 @@ void forward() {
 	leftWheels.writeMicroseconds(levelRight[i]);
 	rightWheels.writeMicroseconds(levelLeft[i]);
   delay(500);
-	kill();
-	leftWheels.writeMicroseconds(1500);
-	rightWheels.writeMicroseconds(1500);
 }
 
 void backward() {
