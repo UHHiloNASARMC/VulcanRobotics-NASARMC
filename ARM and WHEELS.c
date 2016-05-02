@@ -39,25 +39,14 @@ void loop() {
      * Move forward
     **/
     if(input == 'w') {
-			//Serial.println("Moving forward...");
-    	leftWheels.writeMicroseconds(levelRight[i]);
-    	rightWheels.writeMicroseconds(levelLeft[i]);
-      delay(500);
-			kill();
-    	leftWheels.writeMicroseconds(1500);
-    	rightWheels.writeMicroseconds(1500);
+			forward();
     }
 		
 		/**
      * Move backwards
     **/
     if(input == 's') {
-  		leftWheels.writeMicroseconds(levelLeft[i]);
-			rightWheels.writeMicroseconds(levelRight[i]);
-      delay(500);
-			kill();
-    	leftWheels.writeMicroseconds(1500);
-    	rightWheels.writeMicroseconds(1500);
+  		backward();
     }
 
 
@@ -65,24 +54,14 @@ void loop() {
      * Turn left
     **/
     if(input == 'a') {
-      leftWheels.writeMicroseconds(levelLeft[i]);
-      rightWheels.writeMicroseconds(levelLeft[i]);
-      delay(500);
-			kill();
-	   	leftWheels.writeMicroseconds(1500);
-    	rightWheels.writeMicroseconds(1500);
+			left();
     }
 
     /**
      * Turn right
     **/
     if(input == 'd') {
-      leftWheels.writeMicroseconds(levelRight[i]);
-      rightWheels.writeMicroseconds(levelRight[i]);
-      delay(500);
-			kill();
-	   	leftWheels.writeMicroseconds(1500);
-    	rightWheels.writeMicroseconds(1500);
+			right();
     }
 
 
@@ -201,8 +180,11 @@ void loop() {
 }
 
 void speedUp() {
-	reportSpeed();
-	if(i <= 2) i = i+1;
+	if(i <= 2) {
+		i = i+1;
+		reportSpeed();
+	}
+
 	else {
 		Serial.println("Max speed reached");		
 		return;
@@ -210,8 +192,10 @@ void speedUp() {
 }
 
 void speedDown() {
-	reportSpeed();
-	if(i >= 0) i = i-1;
+	if(i >= 0) {
+		i = i-1;
+		reportSpeed();	
+	}
 	else {
 		Serial.println("Min speed reached");	
 		return;
@@ -230,4 +214,43 @@ void reportSpeed() {
 	Serial.println("Current speed right: ");
 	Serial.println(levelRight[i]);
 }
+
+void forward() {
+	leftWheels.writeMicroseconds(levelRight[i]);
+	rightWheels.writeMicroseconds(levelLeft[i]);
+  delay(500);
+	kill();
+	leftWheels.writeMicroseconds(1500);
+	rightWheels.writeMicroseconds(1500);
+}
+
+void backward() {
+	leftWheels.writeMicroseconds(levelLeft[i]);
+	rightWheels.writeMicroseconds(levelRight[i]);
+  delay(500);
+	kill();
+	leftWheels.writeMicroseconds(1500);
+	rightWheels.writeMicroseconds(1500);
+}
+
+void left() {
+  leftWheels.writeMicroseconds(levelLeft[i]);
+	rightWheels.writeMicroseconds(levelLeft[i]);
+	delay(500);
+	kill();
+ 	leftWheels.writeMicroseconds(1500);
+	rightWheels.writeMicroseconds(1500);
+}
+
+void right() {
+  leftWheels.writeMicroseconds(levelRight[i]);
+  rightWheels.writeMicroseconds(levelRight[i]);
+  delay(500);
+	kill();
+ 	leftWheels.writeMicroseconds(1500);
+	rightWheels.writeMicroseconds(1500);
+}
+
+
+
 
