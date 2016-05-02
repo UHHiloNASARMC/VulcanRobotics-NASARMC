@@ -11,7 +11,7 @@
 Servo leftWheels;
 Servo rightWheels;
 Servo arm;
-int PWMA = 13;
+int armBrake = 13;
 int AIN1 = 49;
 int AIN2 = 48;
 int levelLeft[3] = {1600, 1700, 1800};
@@ -21,7 +21,7 @@ int timeInterval = 0; // Kills machine after a certain time of zero user input
 int input; // Stores the user's input
 
 void setup() {
-  pinMode(PWMA, OUTPUT);
+  pinMode(armBrake, OUTPUT);
   pinMode(AIN2, OUTPUT);
   pinMode(AIN1, OUTPUT);
   leftWheels.attach(10);
@@ -29,6 +29,8 @@ void setup() {
   arm.attach(8);
   leftWheels.writeMicroseconds(1500);
   rightWheels.writeMicroseconds(1500);
+	arm.writeMicroseconds(1500);
+	analogWrite(armBrake, 0);
   Serial.begin(57600);
 }
 
@@ -43,6 +45,8 @@ void loop() {
 		if(input == 'x') break;
 		if(input == 'q') {speedDown(); break;}
 		if(input == 'e') {speedUp(); break;}
+		if(input == 'i') {armUp(); break;}
+		if(input == 'n') {armDown(); break;}
 		timeInterval++;
 		} while(checkInput() == true || timeInterval < 6);
 		kill();
@@ -58,7 +62,7 @@ void kill() {
 	leftWheels.writeMicroseconds(1500);
 	rightWheels.writeMicroseconds(1500);
 	arm.writeMicroseconds(1500);
-	analogWrite(PWMA, 0);
+	analogWrite(armBrake, 0);
 	timeInterval = 0;
 }
 
@@ -95,6 +99,46 @@ void right() {
 	rightWheels.writeMicroseconds(levelRight[i]);
 	Serial.println("Turning right");
 	delay(500);
+}
+
+void armUp() {
+	timeInterval = 0;
+	do{
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else {
+			arm.writeMicroseconds(1650);
+			analogWrite(armBrake, 255);
+			Serial.println("Arm going up normal speed");
+			delay(200);
+		}
+		timeInterval++;
+	} while(checkInput() == true || timeInterval < 5);
+}
+
+void armDown() {
+	timeInterval = 0;
+	do{
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else {
+			arm.writeMicroseconds(1350);
+			analogWrite(armBrake, 255);
+			Serial.println("Arm going down normal speed");
+			delay(200);
+		}
+		timeInterval++;
+	} while(checkInput() == true || timeInterval < 5);
 }
 
 /**
