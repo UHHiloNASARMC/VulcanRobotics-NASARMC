@@ -37,22 +37,17 @@ void setup() {
 
 void loop() {
   if(Serial.available()) {
-		timeInterval = 0;
     input = Serial.read();
-    
+
     /**
      * Move forward
     **/
     if(input == 'w') {
-			//Serial.println("Moving forward");
-			while(timeInterval != 200) {
-					forward();
-					Serial.println("Moving forward");
-					timeInterval = timeInterval + 1;
-					if(Serial.available()){
-					input = Serial.read();
-					if(input != 'w') {Serial.println("Exited"); break;}	
-				}
+			while(timeInterval != 6) {
+				forward();
+				Serial.println("Moving forward");
+				timeInterval = timeInterval + 1;	
+				if(readInput() == true) break;
 			}
 			kill();
 		}
@@ -61,24 +56,45 @@ void loop() {
      * Move backwards
     **/
     if(input == 's') {
-			Serial.println("Moving backwards");
-			backward();
+			while(timeInterval != 6) {
+				Serial.println("Moving backwards");
+				backward();
+				timeInterval = timeInterval + 1;
+				if(readInput() == true) break;
+			}
+			kill();
 		}
 
 
     /**
      * Turn left
     **/
-    if(input == 'a') left();
+    if(input == 'a') {
+			while(timeInterval != 6) {
+				Serial.println("Turning left");
+				left();
+				timeInterval = timeInterval + 1;
+				if(readInput() == true) break;
+			}
+			kill();
+		}
 
     /**
      * Turn right
     **/
-    if(input == 'd') right();
+    if(input == 'd') {
+			while(timeInterval != 6) {
+				Serial.println("Turning right");
+				right();
+				timeInterval = timeInterval + 1;
+				if(readInput() == true) break;
+			}
+			kill();
+		}
 
 
 	 /**
-     * Move forward + turn left
+     * Move forward + turn left (work on)
     **/
     if(input == 'A') {
     	leftWheels.writeMicroseconds(levelRight[i]+150);
@@ -91,7 +107,7 @@ void loop() {
 
 
 		/**
-     * Move forward + turn left
+     * Move forward + turn left (work on)
     **/
     if(input == 'D') {
     	leftWheels.writeMicroseconds(levelRight[i]);
@@ -103,7 +119,7 @@ void loop() {
     }
 
     /**
-     * arm up
+     * arm up normal (work on)
     **/
     if(input == 'i') {
       arm.writeMicroseconds(1650);
@@ -119,6 +135,9 @@ void loop() {
       arm.writeMicroseconds(1500);
     }
 
+		/**
+		 * arm up fast (work on)
+		**/
 		if(input == 'p') {
 			arm.writeMicroseconds(1750);
 			//delay(30);
@@ -147,7 +166,7 @@ void loop() {
 		}
 
     /**
-     * arm down
+     * arm down normal (work on)
     **/
     if(input == 'n') {
       arm.writeMicroseconds(1350);
@@ -162,7 +181,7 @@ void loop() {
     }
 
 		/**
-		 * kill
+		 * kill switch
 		**/
     if(input == 'x') {
       leftWheels.writeMicroseconds(1500);
@@ -233,27 +252,26 @@ void backward() {
 	leftWheels.writeMicroseconds(levelLeft[i]);
 	rightWheels.writeMicroseconds(levelRight[i]);
   delay(500);
-	kill();
-	leftWheels.writeMicroseconds(1500);
-	rightWheels.writeMicroseconds(1500);
 }
 
 void left() {
   leftWheels.writeMicroseconds(levelLeft[i]);
 	rightWheels.writeMicroseconds(levelLeft[i]);
 	delay(500);
-	kill();
- 	leftWheels.writeMicroseconds(1500);
-	rightWheels.writeMicroseconds(1500);
 }
 
 void right() {
   leftWheels.writeMicroseconds(levelRight[i]);
   rightWheels.writeMicroseconds(levelRight[i]);
   delay(500);
-	kill();
- 	leftWheels.writeMicroseconds(1500);
-	rightWheels.writeMicroseconds(1500);
+}
+
+bool readInput() {
+	somewhere:
+	if(Serial.available()) {
+		input = Serial.read();
+		return true;
+	}
 }
 
 
