@@ -21,6 +21,7 @@ int levelRight[3] = {1450, 1200, 1125};
 **/
 int i = 0;
 int timeInterval = 0;
+int input;
 
 void setup() {
   pinMode(PWMA, OUTPUT);
@@ -37,7 +38,7 @@ void setup() {
 void loop() {
   if(Serial.available()) {
 		timeInterval = 0;
-    int input = Serial.read();
+    input = Serial.read();
     
     /**
      * Move forward
@@ -48,8 +49,6 @@ void loop() {
 				forward();
 				Serial.println("Moving forward");
 				timeInterval = timeInterval + 1;
-				int fun = Serial.read();
-				if(fun != 'w') break;
 			}
 			kill();
 		}
@@ -57,7 +56,10 @@ void loop() {
 		/**
      * Move backwards
     **/
-    if(input == 's') backward();
+    if(input == 's') {
+			Serial.println("Moving backwards");
+			backward();
+		}
 
 
     /**
@@ -250,6 +252,12 @@ void right() {
 	rightWheels.writeMicroseconds(1500);
 }
 
+void serialEvent() {
+	while(Serial.available()) {
+		int newInput = Serial.read();
+		input = newInput;
+	}
+}
 
 
 
