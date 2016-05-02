@@ -3,7 +3,7 @@
  * 04/12/16
  * ARM and WHEELS.c
  * Vulcan Space Robotics Team
- * Main program to control Spock rover
+ * Main program to control Spock rover (Controls movement and bucket)
 **/
 
 
@@ -245,6 +245,9 @@ void reportSpeed() {
 	Serial.println(levelRight[i]);
 }
 
+/**
+ * Since the following functions are similar, consider passing speed + direction as parameters
+**/
 void forward() {
 	leftWheels.writeMicroseconds(levelRight[i]);
 	rightWheels.writeMicroseconds(levelLeft[i]);
