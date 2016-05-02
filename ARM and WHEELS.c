@@ -8,17 +8,17 @@
 
 
 #include <Servo.h>
-Servo leftWheels;
-Servo rightWheels;
-Servo arm;
-int armBrake = 13;
-int AIN1 = 49;
-int AIN2 = 48;
-int levelLeft[3] = {1600, 1700, 1800};
-int levelRight[3] = {1400, 1300, 1200};
-int i = 0; // Keeps track of the speed array index
-int timeInterval = 0; // Kills machine after a certain time of zero user input
-int input; // Stores the user's input
+Servo leftWheels;	// Talon: servo object for left wheels (right now, orientation is misleading)
+Servo rightWheels;	// Talon: servo object for right wheels (right now, orientation is misleading)
+Servo arm;	// Talon: servo object for the arm motor
+int armBrake = 13;	// Pololu: provides voltage for the arm's brake
+int AIN1 = 49;	// Pololu: direction for arm's brake TODO: Test if this is necessary
+int AIN2 = 48;	// Pololu: direction for arm's brake TODO: Test if this is necessary
+int levelLeft[3] = {1600, 1700, 1800};	// speed array to adjust speed on left side (orientation is misleading)
+int levelRight[3] = {1400, 1300, 1200};	// speed array to adjust speed on right side (orientation is misleading)
+int i = 0;	// Keeps track of the speed array index
+int timeInterval = 0;	// Kills machine after a certain time of zero user input
+int input;	// Stores the user's input
 
 void setup() {
   pinMode(armBrake, OUTPUT);
@@ -36,7 +36,7 @@ void setup() {
 
 void loop() {
 	if(Serial.available()) {
-		input = Serial.read();
+		input = Serial.read();	// read in user input from serial monitor
 		do {
 		if(input == 'w') forward();
 		if(input == 's') backward();
@@ -47,16 +47,26 @@ void loop() {
 		if(input == 'e') {speedUp(); break;}
 		if(input == 'i') {armUp(); break;}
 		if(input == 'n') {armDown(); break;}
-		timeInterval++;
-		} while(checkInput() == true || timeInterval < 6);
+		timeInterval++;	// increment timeInterval
+		} while(checkInput() == true || timeInterval < 6);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 		kill();
 	}
 }
 
+/**
+ * increases speed
+**/
 void speedUp() {if(i < 2) {i=i+1; reportSpeed();} else {Serial.println("Max speed reached"); reportSpeed(); return;}}
 
+
+/**
+ * decreases speed
+**/
 void speedDown() {if(i > 0) {i=i-1; reportSpeed();} else {Serial.println("Min speed reached"); reportSpeed(); return;}}
 
+/**
+ * kills all motors
+**/
 void kill() {
 	Serial.println("Killed");
 	leftWheels.writeMicroseconds(1500);
@@ -66,6 +76,9 @@ void kill() {
 	timeInterval = 0;
 }
 
+/**
+ * retrieves the current speed of wheel motors
+**/
 void reportSpeed() {
 	Serial.print("Current speed left: ");
 	Serial.println(levelLeft[i]);
@@ -73,6 +86,9 @@ void reportSpeed() {
 	Serial.println(levelRight[i]);
 }
 
+/**
+ * moves the robot forward
+**/
 void forward() {
 	leftWheels.writeMicroseconds(levelRight[i]);
 	rightWheels.writeMicroseconds(levelLeft[i]);
@@ -80,6 +96,9 @@ void forward() {
 	delay(500);
 }
 
+/**
+ * moves the robot backwards
+**/
 void backward() {
 	leftWheels.writeMicroseconds(levelLeft[i]);
 	rightWheels.writeMicroseconds(levelRight[i]);
@@ -87,6 +106,9 @@ void backward() {
 	delay(500);
 }
 
+/**
+ * robot turns left
+**/
 void left() {
 	leftWheels.writeMicroseconds(levelLeft[i]);
 	rightWheels.writeMicroseconds(levelLeft[i]);
@@ -94,6 +116,9 @@ void left() {
 	delay(500);
 }
 
+/**
+ * robot turns right
+**/
 void right() {
 	leftWheels.writeMicroseconds(levelRight[i]);
 	rightWheels.writeMicroseconds(levelRight[i]);
@@ -101,6 +126,9 @@ void right() {
 	delay(500);
 }
 
+/**
+ * lifts arm motor up TODO: implement potentiometer
+**/
 void armUp() {
 	timeInterval = 0;
 	do{
@@ -119,9 +147,12 @@ void armUp() {
 			delay(200);
 		}
 		timeInterval++;
-	} while(checkInput() == true || timeInterval < 5);
+	} while(checkInput() == true || timeInterval < 5);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 }
 
+/**
+ * moves arm down TODO: implement potentiometer
+**/
 void armDown() {
 	timeInterval = 0;
 	do{
@@ -140,11 +171,13 @@ void armDown() {
 			delay(200);
 		}
 		timeInterval++;
-	} while(checkInput() == true || timeInterval < 5);
+	} while(checkInput() == true || timeInterval < 5);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 }
 
 /**
  * Reads in new value while previous value is still in action
+ * If no value is sent, current input will remain the same and it will not return true
+ * If any character is inserted, it will return true
 **/
 bool checkInput() {
 	if(Serial.available()) {
