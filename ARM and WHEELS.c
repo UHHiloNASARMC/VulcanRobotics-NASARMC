@@ -22,6 +22,7 @@ int levelRight[3] = {1400, 1300, 1200};
 int i = 0;
 int timeInterval = 0;
 int input;
+bool checkAvail;
 
 void setup() {
   pinMode(PWMA, OUTPUT);
@@ -36,173 +37,15 @@ void setup() {
 }
 
 void loop() {
-  if(Serial.available()) {
-    input = Serial.read();
-
-    /**
-     * Move forward
-    **/
-    if(input == 'w') {
-			while(timeInterval != 6) {
-				forward();
-				Serial.println("Moving forward");
-				timeInterval = timeInterval + 1;	
-				if(readInput() == true) break;
-			}
-			kill();
-		}
-		
-		/**
-     * Move backwards
-    **/
-    if(input == 's') {
-			while(timeInterval != 6) {
-				Serial.println("Moving backwards");
-				backward();
-				timeInterval = timeInterval + 1;
-				if(readInput() == true) break;
-			}
-			kill();
-		}
-
-
-    /**
-     * Turn left
-    **/
-    if(input == 'a') {
-			while(timeInterval != 6) {
-				Serial.println("Turning left");
-				left();
-				timeInterval = timeInterval + 1;
-				if(readInput() == true) break;
-			}
-			kill();
-		}
-
-    /**
-     * Turn right
-    **/
-    if(input == 'd') {
-			while(timeInterval != 6) {
-				Serial.println("Turning right");
-				right();
-				timeInterval = timeInterval + 1;
-				if(readInput() == true) break;
-			}
-			kill();
-		}
-
-
-	 /**
-     * Move forward + turn left (work on)
-    **/
-    if(input == 'A') {
-    	leftWheels.writeMicroseconds(levelRight[i]+150);
-    	rightWheels.writeMicroseconds(levelLeft[i]);
-      delay(500);
-			kill();
-    	leftWheels.writeMicroseconds(1500);
-    	rightWheels.writeMicroseconds(1500);
-    }
-
-
-		/**
-     * Move forward + turn left (work on)
-    **/
-    if(input == 'D') {
-    	leftWheels.writeMicroseconds(levelRight[i]);
-    	rightWheels.writeMicroseconds(levelLeft[i]-150);
-      delay(500);
-			kill();
-    	leftWheels.writeMicroseconds(1500);
-    	rightWheels.writeMicroseconds(1500);
-    }
-
-    /**
-     * arm up normal (work on)
-    **/
-    if(input == 'i') {
-      arm.writeMicroseconds(1650);
-			//delay(30);      
-      digitalWrite(AIN1, HIGH);
-      digitalWrite(AIN2, LOW);
-			analogWrite(PWMA, 255);
-      delay(200);
-      digitalWrite(AIN1, LOW);
-      digitalWrite(AIN2, LOW);
-      analogWrite(PWMA, 0);
-			//delay(50);
-      arm.writeMicroseconds(1500);
-    }
-
-		/**
-		 * arm up fast (work on)
-		**/
-		if(input == 'p') {
-			arm.writeMicroseconds(1750);
-			//delay(30);
-			digitalWrite(AIN1, HIGH);
-			digitalWrite(AIN2, LOW);
-			analogWrite(PWMA, 255);
-			delay(200);
-			digitalWrite(AIN1, LOW);
-      digitalWrite(AIN2, LOW);
-      analogWrite(PWMA, 0);
-			//delay(30);
-      arm.writeMicroseconds(1500);								
-		}
-
-		/**
-		 * toggle brake (Testing)
-		**/
-		if(input == 'b') {
-			digitalWrite(AIN1, HIGH);
-			digitalWrite(AIN2, LOW);
-			analogWrite(PWMA, 255);
-			delay(100);
-			digitalWrite(AIN1, LOW);
-			digitalWrite(AIN2, LOW);
-			analogWrite(PWMA, 0);
-		}
-
-    /**
-     * arm down normal (work on)
-    **/
-    if(input == 'n') {
-      arm.writeMicroseconds(1350);
-      digitalWrite(AIN1, HIGH);
-      digitalWrite(AIN2, LOW);
-			analogWrite(PWMA, 255);
-      delay(100);
-      digitalWrite(AIN1, LOW);
-      digitalWrite(AIN2, LOW);
-      analogWrite(PWMA, 0);
-      arm.writeMicroseconds(1500);
-    }
-
-		/**
-		 * kill switch
-		**/
-    if(input == 'x') {
-      leftWheels.writeMicroseconds(1500);
-      rightWheels.writeMicroseconds(1500);
-    }
-		/**
-		 * decrease speed
-		**/
-		if(input == 'q') {
-			Serial.println("Speed decreased");
-			speedDown();
-		}
-		
-		/**
-		 * increase speed
-		**/
-		if(input == 'e') {
-			Serial.println("Speed increased");
-			speedUp();		
-		}
-  }
+	if(Serial.available()) {
+		input = Serial.read();
+		do {
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		} while(checkInput() == true);
+	}
 }
 
 void speedUp() {
@@ -249,35 +92,73 @@ void reportSpeed() {
  * Since the following functions are similar, consider passing speed + direction as parameters
 **/
 void forward() {
-	leftWheels.writeMicroseconds(levelRight[i]);
-	rightWheels.writeMicroseconds(levelLeft[i]);
-  delay(500);
+	while(timeInterval != 6) {
+		leftWheels.writeMicroseconds(levelRight[i]);
+		rightWheels.writeMicroseconds(levelLeft[i]);
+		Serial.println("Moving forward");
+		timeInterval = timeInterval + 1;	
+		if(checkInput() == true) {
+			kill();
+			return;
+		}
+		delay(500);
+	}
+	kill();
 }
 
 void backward() {
-	leftWheels.writeMicroseconds(levelLeft[i]);
-	rightWheels.writeMicroseconds(levelRight[i]);
-  delay(500);
+	while(timeInterval != 6) {
+		leftWheels.writeMicroseconds(levelLeft[i]);
+		rightWheels.writeMicroseconds(levelRight[i]);
+		Serial.println("Moving backwards");
+		timeInterval = timeInterval + 1;
+		if(checkInput() == true) {
+			kill();
+			return;
+		}
+		delay(500);
+	}
+	kill();
 }
 
 void left() {
-  leftWheels.writeMicroseconds(levelLeft[i]);
-	rightWheels.writeMicroseconds(levelLeft[i]);
-	delay(500);
+	while(timeInterval != 6) {
+		leftWheels.writeMicroseconds(levelLeft[i]);
+		rightWheels.writeMicroseconds(levelLeft[i]);
+		Serial.println("Turning left");
+		timeInterval = timeInterval + 1;
+		if(checkInput() == true) {
+			kill();
+			return;
+		}	
+		delay(500);
+	}
+	kill();
 }
 
 void right() {
-  leftWheels.writeMicroseconds(levelRight[i]);
-  rightWheels.writeMicroseconds(levelRight[i]);
-  delay(500);
+	while(timeInterval != 6) {
+  	leftWheels.writeMicroseconds(levelRight[i]);
+  	rightWheels.writeMicroseconds(levelRight[i]);
+		Serial.println("Turning right");
+		timeInterval = timeInterval + 1;
+		if(checkInput() == true) {
+			kill();
+			return;
+		} 
+		delay(500);
+	}
+	kill();
 }
 
-bool readInput() {
-	somewhere:
+bool checkInput() {
 	if(Serial.available()) {
 		input = Serial.read();
-		return true;
+		Serial.println("check made");
+		if(input == '\n') {return false; checkAvail = false;}
+		else {checkAvail = true; return true;}
 	}
+	else return false;
 }
 
 
