@@ -49,7 +49,7 @@ void loop() {
 		if(input == 'i') {armUp(); break;}
 		if(input == 'n') {armDown(); break;}
 
-		if(input == 't') {testBrake(); break;}
+		if(input == 't') {testPot(); break;}
 
 		timeInterval++;	// increment timeInterval
 		} while(checkInput() == true || timeInterval < 6);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
@@ -72,12 +72,13 @@ void speedDown() {if(i > 0) {i=i-1; reportSpeed();} else {Serial.println("Min sp
  * kills all motors
 **/
 void kill() {
-	Serial.println("Killed");
+	brakeLock();
 	leftWheels.writeMicroseconds(1500);
 	rightWheels.writeMicroseconds(1500);
 	arm.writeMicroseconds(1500);
 	analogWrite(armBrake, 0);
 	timeInterval = 0;
+	Serial.println("Killed");
 }
 
 /**
@@ -145,8 +146,8 @@ void armUp() {
 		else if(input == 'x') break;
 		else if(input == 'n') armDown();
 		else {
-			arm.writeMicroseconds(1750);
-			analogWrite(armBrake, 255);
+			arm.writeMicroseconds(1700);
+			brakeUnlock();
 			Serial.println("Arm going down normal speed");
 			delay(200);
 		}
@@ -170,8 +171,9 @@ void armDown() {
 		else if(input == 'x') break;
 		else if(input == 'i') armUp();
 		else {
-			arm.writeMicroseconds(1300);
+			arm.writeMicroseconds(1350);
 			analogWrite(armBrake, 255);
+			brakeUnlock();
 			Serial.println("Arm going down normal speed");
 			delay(200);
 		}
@@ -194,17 +196,32 @@ bool checkInput() {
 	}
 }
 
+void brakeUnlock() {
+	digitalWrite(AIN1, HIGH);
+	digitalWrite(AIN2, LOW);
+	analogWrite(armBrake, 255);
+}
 
+void brakeLock() {
+	digitalWrite(AIN1, LOW);
+	digitalWrite(AIN2, LOW);
+	analogWrite(armBrake, 0);
+}
 
 void testBrake() {
-	//digitalWrite(AIN1, HIGH);
-	//digitalWrite(AIN2, LOW);
+	digitalWrite(AIN1, HIGH);
+	digitalWrite(AIN2, LOW);
 	analogWrite(armBrake, 255);
 	delay(2000);
-	//digitalWrite(AIN1, LOW);
-	//digitalWrite(AIN2, LOW);
+	digitalWrite(AIN1, LOW);
+	digitalWrite(AIN2, LOW);
 	analogWrite(armBrake, 0);
 	
+}
+
+void testPot() {
+	while(analogRead(potPin) < 500) brakeUnlock();
+	kill();
 }
 
 
