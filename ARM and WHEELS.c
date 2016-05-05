@@ -197,12 +197,12 @@ bool checkInput() {
 
 
 void testBrake() {
-	digitalWrite(AIN1, HIGH);
-	digitalWrite(AIN2, LOW);
+	//digitalWrite(AIN1, HIGH);
+	//digitalWrite(AIN2, LOW);
 	analogWrite(armBrake, 255);
-	delay(1000);
-	digitalWrite(AIN1, LOW);
-	digitalWrite(AIN2, LOW);
+	delay(2000);
+	//digitalWrite(AIN1, LOW);
+	//digitalWrite(AIN2, LOW);
 	analogWrite(armBrake, 0);
 	
 }
