@@ -32,7 +32,7 @@ void setup() {
   rightWheels.writeMicroseconds(1500);
 	arm.writeMicroseconds(1500);
 	analogWrite(armBrake, 0);
-  Serial.begin(57600);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -48,6 +48,9 @@ void loop() {
 		if(input == 'e') {speedUp(); break;}
 		if(input == 'i') {armUp(); break;}
 		if(input == 'n') {armDown(); break;}
+
+		if(input == 't') {testBrake(); break;}
+
 		timeInterval++;	// increment timeInterval
 		} while(checkInput() == true || timeInterval < 6);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 		kill();
@@ -144,11 +147,11 @@ void armUp() {
 		else {
 			arm.writeMicroseconds(1750);
 			analogWrite(armBrake, 255);
-			Serial.println("Arm going up normal speed");
-			delay(20);
+			Serial.println("Arm going down normal speed");
+			delay(200);
 		}
 		timeInterval++;
-	} while(checkInput() == true || analogRead(potPin)<300);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || timeInterval < 5);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
@@ -167,13 +170,13 @@ void armDown() {
 		else if(input == 'x') break;
 		else if(input == 'i') armUp();
 		else {
-			arm.writeMicroseconds(1350);
+			arm.writeMicroseconds(1300);
 			analogWrite(armBrake, 255);
 			Serial.println("Arm going down normal speed");
 			delay(200);
 		}
 		timeInterval++;
-	} while((checkInput() == true || timeInterval < 5) && analogRead(potPin) > 70);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || timeInterval < 3);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
@@ -189,6 +192,19 @@ bool checkInput() {
 		Serial.println("check made");
 		return true;
 	}
+}
+
+
+
+void testBrake() {
+	digitalWrite(AIN1, HIGH);
+	digitalWrite(AIN2, LOW);
+	analogWrite(armBrake, 255);
+	delay(1000);
+	digitalWrite(AIN1, LOW);
+	digitalWrite(AIN2, LOW);
+	analogWrite(armBrake, 0);
+	
 }
 
 
