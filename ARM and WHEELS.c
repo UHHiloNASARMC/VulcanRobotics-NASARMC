@@ -19,6 +19,7 @@ int levelRight[3] = {1400, 1300, 1175};	// speed array to adjust speed on right 
 int i = 0;	// Keeps track of the speed array index
 int timeInterval = 0;	// Kills machine after a certain time of zero user input
 int input;	// Stores the user's input
+int potPin = 0;
 
 void setup() {
   pinMode(armBrake, OUTPUT);
@@ -141,13 +142,14 @@ void armUp() {
 		else if(input == 'x') break;
 		else if(input == 'n') armDown();
 		else {
-			arm.writeMicroseconds(1650);
+			arm.writeMicroseconds(1750);
 			analogWrite(armBrake, 255);
 			Serial.println("Arm going up normal speed");
-			delay(200);
+			delay(20);
 		}
 		timeInterval++;
-	} while(checkInput() == true || timeInterval < 5);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin)<300);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	kill();
 }
 
 /**
@@ -171,7 +173,8 @@ void armDown() {
 			delay(200);
 		}
 		timeInterval++;
-	} while(checkInput() == true || timeInterval < 5);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while((checkInput() == true || timeInterval < 5) && analogRead(potPin) > 70);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	kill();
 }
 
 /**
