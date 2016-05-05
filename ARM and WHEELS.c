@@ -14,8 +14,8 @@ Servo arm;	// Talon: servo object for the arm motor
 int armBrake = 13;	// Pololu: provides voltage for the arm's brake
 int AIN1 = 49;	// Pololu: direction for arm's brake TODO: Test if this is necessary
 int AIN2 = 48;	// Pololu: direction for arm's brake TODO: Test if this is necessary
-int levelLeft[3] = {1600, 1700, 1800};	// speed array to adjust speed on left side (orientation is misleading)
-int levelRight[3] = {1400, 1300, 1200};	// speed array to adjust speed on right side (orientation is misleading)
+int levelLeft[3] = {1600, 1700, 1825};	// speed array to adjust speed on left side (orientation is misleading)
+int levelRight[3] = {1400, 1300, 1175};	// speed array to adjust speed on right side (orientation is misleading)
 int i = 0;	// Keeps track of the speed array index
 int timeInterval = 0;	// Kills machine after a certain time of zero user input
 int input;	// Stores the user's input
