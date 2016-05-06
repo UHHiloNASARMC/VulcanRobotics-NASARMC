@@ -198,18 +198,27 @@ bool checkInput() {
 	}
 }
 
+/**
+ * Unlocks brake for the wheelchair motor
+ **/
 void brakeUnlock() {
 	digitalWrite(AIN1, HIGH);
 	digitalWrite(AIN2, LOW);
 	analogWrite(armBrake, 255);
 }
 
+/**
+ * Locks brake for the wheelchair motor
+ **/
 void brakeLock() {
 	digitalWrite(AIN1, LOW);
 	digitalWrite(AIN2, LOW);
 	analogWrite(armBrake, 0);
 }
 
+/**
+ * Test cases
+ **/
 void testBrake() {
 	digitalWrite(AIN1, HIGH);
 	digitalWrite(AIN2, LOW);
