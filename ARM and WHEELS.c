@@ -49,7 +49,9 @@ void loop() {
 		if(input == 'i') {armUp(); break;}
 		if(input == 'n') {armDown(); break;}
 
-		if(input == 't') {testPot(); break;}
+		if(input == 't') {testPot250(); break;}
+		if(input == 'g') {testPot500();break;}
+		if(input == 'b') {testPot750(); break;}
 
 		timeInterval++;	// increment timeInterval
 		} while(checkInput() == true || timeInterval < 6);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
@@ -152,7 +154,7 @@ void armUp() {
 			delay(200);
 		}
 		timeInterval++;
-	} while(checkInput() == true || timeInterval < 5);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || timeInterval < 3);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
@@ -219,7 +221,20 @@ void testBrake() {
 	
 }
 
-void testPot() {
+void testPot750() {
+	Serial.println("pot750");
+	while(analogRead(potPin) < 750) brakeUnlock();
+	kill();
+}
+
+void testPot250() {
+	Serial.println("pot250");
+	while(analogRead(potPin) < 250) brakeUnlock();
+	kill();
+}
+
+void testPot500() {
+	Serial.println("pot500");
 	while(analogRead(potPin) < 500) brakeUnlock();
 	kill();
 }
