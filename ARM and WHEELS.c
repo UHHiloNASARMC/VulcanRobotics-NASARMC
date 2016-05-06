@@ -159,7 +159,7 @@ void armUp() {
 }
 
 /**
- * moves arm down TODO: implement potentiometer
+ * moves arm up by a static number
 **/
 void armDown() {
 	timeInterval = 0;
@@ -215,6 +215,11 @@ void brakeLock() {
 	digitalWrite(AIN2, LOW);
 	analogWrite(armBrake, 0);
 }
+
+
+
+
+
 
 /**
  * Test cases
