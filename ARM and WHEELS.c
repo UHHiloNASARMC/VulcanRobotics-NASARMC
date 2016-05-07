@@ -48,7 +48,12 @@ void loop() {
 		if(input == 'e') {speedUp(); break;}
 		if(input == 'i') {armUp(); break;}
 		if(input == 'n') {armDown(); break;}
+		if(input == 'j') {dump(); break;}
+		if(input == 'k') {setArmDrive(); break;}
 
+		/**
+		 * Test cases
+		**/
 		if(input == 't') {testPot250(); break;}
 		if(input == 'g') {testPot500();break;}
 		if(input == 'b') {testPot750(); break;}
@@ -134,10 +139,11 @@ void right() {
 }
 
 /**
- * lifts arm motor up TODO: implement potentiometer
+ * lifts arm motor up
 **/
 void armUp() {
 	timeInterval = 0;
+	int maxHeight = analogRead(potPin) + 100;
 	do{
 		if(input == 'w') forward();
 		else if(input == 's') backward();
@@ -154,15 +160,16 @@ void armUp() {
 			delay(200);
 		}
 		timeInterval++;
-	} while(checkInput() == true || timeInterval < 3);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin) < maxHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
 /**
- * moves arm up by a static number
+ * moves arm down by static number
 **/
 void armDown() {
 	timeInterval = 0;
+	int minHeight = analogRead(potPin) - 100;
 	do{
 		if(input == 'w') forward();
 		else if(input == 's') backward();
@@ -180,8 +187,56 @@ void armDown() {
 			delay(200);
 		}
 		timeInterval++;
-	} while(checkInput() == true || timeInterval < 3);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin) > minHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
+}
+
+/**
+ * Sets arm to dump position
+**/
+void dump() {
+	timeInterval = 0;
+	do{
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else {
+			arm.writeMicroseconds(1700);
+			analogWrite(armBrake, 255);
+			brakeUnlock();
+			Serial.println("Dumping load");
+			delay(200);
+		}
+		timeInterval++;
+	} while(checkInput() == true || analogRead(potPin) < 860);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+}
+
+/**
+ * Sets arm to drive position
+**/
+void setArmDrive() {
+	timeInterval = 0;
+	do{
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else {
+			arm.writeMicroseconds(1350);
+			analogWrite(armBrake, 255);
+			brakeUnlock();
+			Serial.println("Setting arm down to drive position");
+			delay(200);
+		}
+		timeInterval++;
+	} while(checkInput() == true || analogRead(potPin) > 40);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 }
 
 /**
