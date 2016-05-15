@@ -48,6 +48,8 @@ void loop() {
 			if(input == 'x') break;
 			if(input == 'q') {speedDown(); break;}
 			if(input == 'e') {speedUp(); break;}
+			if(input == 'Q') {armSpeedUp(); break;}
+			if(input == 'E') {armSpeedDown(); break;}
 			if(input == 'i') {armUp(); break;}
 			if(input == 'n') {armDown(); break;}
 			if(input == 'j') {dump(); break;}
@@ -276,6 +278,7 @@ void setArmTransport() {
 		else if(input == 'x') break;
 		else if(input == 'j') dump();
 		else if(input == 'k') setArmDrive();
+		else if(input == '?') {printControls; break;}
 		else {
 			if(analogRead(potPin) > 420) {
 				arm.writeMicroseconds(1500 - levelArm[j]);
@@ -327,15 +330,19 @@ void brakeLock() {
 }
 
 void printControls() {
-	Serial.println("W - Forward");
-	Serial.println("A - Left");
-	Serial.println("S - Backwards");
-	Serial.println("D - Right");
-	Serial.println("I - Raise arm up");
-	Serial.println("N - Lower arm down");
-	Serial.println("J - Set arm to dump position");
-	Serial.println("K - Set arm to drive position");
-	Serial.println("X - KILL EVERYTHING!!!");
+	Serial.println("w - Forward");
+	Serial.println("a - Left");
+	Serial.println("s - Backwards");
+	Serial.println("d - Right");
+	Serial.println("i - Raise arm up");
+	Serial.println("n - Lower arm down");
+	Serial.println("j - Set arm to dump position");
+	Serial.println("k - Set arm to drive position");
+	Serial.println("x - KILL EVERYTHING!!!");
+	Serial.println("q - decrease wheel speed");
+	Serial.println("e - increase wheel speed");
+	Serial.println("Q - decrease arm speed");
+	Serial.println("E - increase arm speed");
 }
 
 
