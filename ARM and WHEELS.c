@@ -16,6 +16,7 @@ int AIN1 = 49;	// Pololu: direction for arm's brake TODO: Test if this is necess
 int AIN2 = 48;	// Pololu: direction for arm's brake TODO: Test if this is necessary
 int levelLeft[3] = {1600, 1700, 1825};	// speed array to adjust speed on left side (orientation is misleading)
 int levelRight[3] = {1400, 1300, 1175};	// speed array to adjust speed on right side (orientation is misleading)
+int levelArm[3] = {150, 200, 250};	// speed arry to adjust speed on arm
 int i = 0;	// Keeps track of the speed array index
 int timeInterval = 0;	// Kills machine after a certain time of zero user input
 int input;	// Stores the user's input
@@ -209,13 +210,20 @@ void dump() {
 		else if(input == 'k') setArmDrive();
 		else if(input == '?') {printControls(); break;}
 		else {
-			arm.writeMicroseconds(1700);
-			analogWrite(armBrake, 255);
-			brakeUnlock();
-			Serial.println("Setting arm to dump position");
-			delay(200);
+			if(analogRead(potPin) < 860) {
+				arm.writeMicroseconds(1650);
+				brakeUnlock();
+				Serial.println("Setting arm to dump position");
+				delay(200);
+			}
+			else {
+				arm.writeMicroseconds(1350);
+				brakeUnlock();
+				Serial.println("Setting arm to dump position");
+				delay(200);
+			}
 		}
-	} while(checkInput() == true || analogRead(potPin) < 860);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin) != 860);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
@@ -234,13 +242,20 @@ void setArmDrive() {
 		else if(input == 'j') dump();
 		else if(input == '?') {printControls(); break;}
 		else {
-			arm.writeMicroseconds(1350);
-			analogWrite(armBrake, 255);
-			brakeUnlock();
-			Serial.println("Setting arm down to drive position");
-			delay(200);
+			if(analogRead(potPin) > 40) {
+				arm.writeMicroseconds(1350);
+				brakeUnlock();
+				Serial.println("Setting arm to drive position");
+				delay(200);
+			}
+			else {
+				arm.writeMicroseconds(1650);
+				brakeUnlock();
+				Serial.println("Setting arm to drive position");
+				delay(200);
+			}
 		}
-	} while(checkInput() == true || analogRead(potPin) > 40);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin) != 40);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
@@ -259,10 +274,14 @@ void setArmTransport() {
 			if(analogRead(potPin) > 420) {
 				arm.writeMicroseconds(1350);
 				brakeUnlock();
+				Serial.println("Setting arm to transport position");
+				delay(200);
 			}
 			else {
 				arm.writeMicroseconds(1650);
 				brakeUnlock();
+				Serial.println("Setting arm to transport position");
+				delay(200);
 			}
 		}
 	} while(checkInput() == true || analogRead(potPin) != 420);
