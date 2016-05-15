@@ -18,6 +18,7 @@ int levelLeft[3] = {1600, 1700, 1825};	// speed array to adjust speed on left si
 int levelRight[3] = {1400, 1300, 1175};	// speed array to adjust speed on right side (orientation is misleading)
 int levelArm[3] = {150, 200, 250};	// speed arry to adjust speed on arm
 int i = 0;	// Keeps track of the speed array index
+int j = 0;	// Keeps track of arm speed array index
 int timeInterval = 0;	// Kills machine after a certain time of zero user input
 int input;	// Stores the user's input
 int potPin = 0;
@@ -69,13 +70,17 @@ void loop() {
 /**
  * increases speed
 **/
-void speedUp() {if(i < 2) {i=i+1; reportSpeed();} else {Serial.println("Max speed reached"); reportSpeed(); return;}}
+void speedUp() {if(i<2) {i=i+1; reportSpeed();} else {Serial.println("Max speed reached"); reportSpeed(); return;}}
 
 
 /**
  * decreases speed
 **/
-void speedDown() {if(i > 0) {i=i-1; reportSpeed();} else {Serial.println("Min speed reached"); reportSpeed(); return;}}
+void speedDown() {if(i>0) {i=i-1; reportSpeed();} else {Serial.println("Min speed reached"); reportSpeed(); return;}}
+
+void armSpeedUp() {if(j<2) {j=j+1; reportSpeed();} else{Serial.println("Max speed reached"); reportSpeed(); return;}}
+
+void armSpeedDown() {if(j>0) {j=j+1; reportSpeed();} else{Serial.println("Min speed reached"); reportSpeed(); return;}}
 
 /**
  * kills all motors
@@ -98,6 +103,8 @@ void reportSpeed() {
 	Serial.println(levelLeft[i]);
 	Serial.print("Current speed right: ");
 	Serial.println(levelRight[i]);
+	Serial.print("Current arm speed: ");
+	Serial.println(levelArm[j]
 }
 
 /**
@@ -157,7 +164,7 @@ void armUp() {
 		else if(input == 'n') armDown();
 		else if(input == '?') {printControls(); break;}
 		else {
-			arm.writeMicroseconds(1700);
+			arm.writeMicroseconds(1500 + levelArm[j]);
 			brakeUnlock();
 			Serial.println("Arm going up normal speed");
 			delay(200);
@@ -184,7 +191,7 @@ void armDown() {
 		else if(input == 'i') armUp();
 		else if(input == '?') {printControls(); break;}
 		else {
-			arm.writeMicroseconds(1350);
+			arm.writeMicroseconds(1500 - levelArm[j]);
 			analogWrite(armBrake, 255);
 			brakeUnlock();
 			Serial.println("Arm going down normal speed");
@@ -211,13 +218,13 @@ void dump() {
 		else if(input == '?') {printControls(); break;}
 		else {
 			if(analogRead(potPin) < 860) {
-				arm.writeMicroseconds(1650);
+				arm.writeMicroseconds(1500 + levelArm[j]);
 				brakeUnlock();
 				Serial.println("Setting arm to dump position");
 				delay(200);
 			}
 			else {
-				arm.writeMicroseconds(1350);
+				arm.writeMicroseconds(1500 - levelArm[j]);
 				brakeUnlock();
 				Serial.println("Setting arm to dump position");
 				delay(200);
@@ -243,13 +250,13 @@ void setArmDrive() {
 		else if(input == '?') {printControls(); break;}
 		else {
 			if(analogRead(potPin) > 40) {
-				arm.writeMicroseconds(1350);
+				arm.writeMicroseconds(1500 - levelArm[j]);
 				brakeUnlock();
 				Serial.println("Setting arm to drive position");
 				delay(200);
 			}
 			else {
-				arm.writeMicroseconds(1650);
+				arm.writeMicroseconds(1500 + levelArm[j]);
 				brakeUnlock();
 				Serial.println("Setting arm to drive position");
 				delay(200);
@@ -272,13 +279,13 @@ void setArmTransport() {
 		else if(input == 'k') setArmDrive();
 		else {
 			if(analogRead(potPin) > 420) {
-				arm.writeMicroseconds(1350);
+				arm.writeMicroseconds(1500 - levelArm[j]);
 				brakeUnlock();
 				Serial.println("Setting arm to transport position");
 				delay(200);
 			}
 			else {
-				arm.writeMicroseconds(1650);
+				arm.writeMicroseconds(1500 + levelArm[j]);
 				brakeUnlock();
 				Serial.println("Setting arm to transport position");
 				delay(200);
