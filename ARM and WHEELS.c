@@ -104,7 +104,7 @@ void reportSpeed() {
 	Serial.print("Current speed right: ");
 	Serial.println(levelRight[i]);
 	Serial.print("Current arm speed: ");
-	Serial.println(levelArm[j]
+	Serial.println(levelArm[j]);
 }
 
 /**
