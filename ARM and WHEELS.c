@@ -81,8 +81,14 @@ void speedUp() {if(i<2) {i=i+1; reportSpeed();} else {Serial.println("Max speed 
 **/
 void speedDown() {if(i>0) {i=i-1; reportSpeed();} else {Serial.println("Min speed reached"); reportSpeed(); return;}}
 
+/**
+ * increases spped for arm
+**/
 void armSpeedUp() {if(j<2) {j=j+1; reportSpeed();} else{Serial.println("Max speed reached"); reportSpeed(); return;}}
 
+/**
+ * decreases speed for arm
+**/
 void armSpeedDown() {if(j>0) {j=j+1; reportSpeed();} else{Serial.println("Min speed reached"); reportSpeed(); return;}}
 
 /**
@@ -99,7 +105,7 @@ void kill() {
 }
 
 /**
- * retrieves the current speed of wheel motors
+ * retrieves the current speed of wheel motors and arm motor
 **/
 void reportSpeed() {
 	Serial.print("Current speed left: ");
@@ -329,6 +335,9 @@ void brakeLock() {
 	analogWrite(armBrake, 0);
 }
 
+/**
+ * For the novice user, this function prints out the available controls
+**/
 void printControls() {
 	Serial.println("w - Forward");
 	Serial.println("a - Left");
