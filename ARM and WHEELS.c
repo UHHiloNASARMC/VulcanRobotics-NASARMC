@@ -52,6 +52,7 @@ void loop() {
 			if(input == 'n') {armDown(); break;}
 			if(input == 'j') {dump(); break;}
 			if(input == 'k') {setArmDrive(); break;}
+			if(input == 'l') {setArmTransport(); break;}
 			if(input == '?') {printControls(); break;}
 
 			/**
@@ -151,7 +152,6 @@ void right() {
  * lifts arm motor up
 **/
 void armUp() {
-	timeInterval = 0;
 	int maxHeight = analogRead(potPin) + 100;
 	do{
 		if(input == 'w') forward();
@@ -169,7 +169,6 @@ void armUp() {
 			Serial.println("Arm going up normal speed");
 			delay(200);
 		}
-		timeInterval++;
 	} while(checkInput() == true || analogRead(potPin) < maxHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
@@ -178,7 +177,6 @@ void armUp() {
  * moves arm down by static number
 **/
 void armDown() {
-	timeInterval = 0;
 	int minHeight = analogRead(potPin) - 100;
 	do{
 		if(input == 'w') forward();
@@ -197,7 +195,6 @@ void armDown() {
 			Serial.println("Arm going down normal speed");
 			delay(200);
 		}
-		timeInterval++;
 	} while(checkInput() == true || analogRead(potPin) > minHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
@@ -215,6 +212,7 @@ void dump() {
 		else if(input == 'e') {speedUp(); break;}
 		else if(input == 'x') break;
 		else if(input == 'k') setArmDrive();
+		else if(input == 'l') setArmTransport();
 		else if(input == '?') {printControls(); break;}
 		else {
 			if(analogRead(potPin) < 860) {
@@ -247,6 +245,7 @@ void setArmDrive() {
 		else if(input == 'e') {speedUp(); break;}
 		else if(input == 'x') break;
 		else if(input == 'j') dump();
+		else if(input == 'l') setArmTransport();
 		else if(input == '?') {printControls(); break;}
 		else {
 			if(analogRead(potPin) > 40) {
