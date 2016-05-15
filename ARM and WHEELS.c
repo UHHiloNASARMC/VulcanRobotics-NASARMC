@@ -39,26 +39,27 @@ void loop() {
 	if(Serial.available()) {
 		input = Serial.read();	// read in user input from serial monitor
 		do {
-		if(input == 'w') forward();
-		if(input == 's') backward();
-		if(input == 'a') left();
-		if(input == 'd') right();
-		if(input == 'x') break;
-		if(input == 'q') {speedDown(); break;}
-		if(input == 'e') {speedUp(); break;}
-		if(input == 'i') {armUp(); break;}
-		if(input == 'n') {armDown(); break;}
-		if(input == 'j') {dump(); break;}
-		if(input == 'k') {setArmDrive(); break;}
+			if(input == 'w') forward();
+			if(input == 's') backward();
+			if(input == 'a') left();
+			if(input == 'd') right();
+			if(input == 'x') break;
+			if(input == 'q') {speedDown(); break;}
+			if(input == 'e') {speedUp(); break;}
+			if(input == 'i') {armUp(); break;}
+			if(input == 'n') {armDown(); break;}
+			if(input == 'j') {dump(); break;}
+			if(input == 'k') {setArmDrive(); break;}
+			if(input == '?') {printControls(); break;}
 
-		/**
-		 * Test cases
-		**/
-		if(input == 't') {testPot250(); break;}
-		if(input == 'g') {testPot500();break;}
-		if(input == 'b') {testPot750(); break;}
+			/**
+			 * Test cases
+			**/
+			if(input == 't') {testPot250(); break;}
+			if(input == 'g') {testPot500();break;}
+			if(input == 'b') {testPot750(); break;}
 
-		timeInterval++;	// increment timeInterval
+			timeInterval++;	// increment timeInterval
 		} while(checkInput() == true || timeInterval < 6);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 		kill();
 	}
@@ -153,10 +154,11 @@ void armUp() {
 		else if(input == 'e') {speedUp(); break;}
 		else if(input == 'x') break;
 		else if(input == 'n') armDown();
+		else if(input == '?') {printControls(); break;}
 		else {
 			arm.writeMicroseconds(1700);
 			brakeUnlock();
-			Serial.println("Arm going down normal speed");
+			Serial.println("Arm going up normal speed");
 			delay(200);
 		}
 		timeInterval++;
@@ -179,6 +181,7 @@ void armDown() {
 		else if(input == 'e') {speedUp(); break;}
 		else if(input == 'x') break;
 		else if(input == 'i') armUp();
+		else if(input == '?') {printControls(); break;}
 		else {
 			arm.writeMicroseconds(1350);
 			analogWrite(armBrake, 255);
@@ -195,7 +198,6 @@ void armDown() {
  * Sets arm to dump position
 **/
 void dump() {
-	timeInterval = 0;
 	do{
 		if(input == 'w') forward();
 		else if(input == 's') backward();
@@ -204,22 +206,23 @@ void dump() {
 		else if(input == 'q') {speedDown(); break;}
 		else if(input == 'e') {speedUp(); break;}
 		else if(input == 'x') break;
+		else if(input == 'k') setArmDrive();
+		else if(input == '?') {printControls(); break;}
 		else {
 			arm.writeMicroseconds(1700);
 			analogWrite(armBrake, 255);
 			brakeUnlock();
-			Serial.println("Dumping load");
+			Serial.println("Setting arm to dump position");
 			delay(200);
 		}
-		timeInterval++;
 	} while(checkInput() == true || analogRead(potPin) < 860);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	kill();
 }
 
 /**
  * Sets arm to drive position
 **/
 void setArmDrive() {
-	timeInterval = 0;
 	do{
 		if(input == 'w') forward();
 		else if(input == 's') backward();
@@ -228,6 +231,8 @@ void setArmDrive() {
 		else if(input == 'q') {speedDown(); break;}
 		else if(input == 'e') {speedUp(); break;}
 		else if(input == 'x') break;
+		else if(input == 'j') dump();
+		else if(input == '?') {printControls(); break;}
 		else {
 			arm.writeMicroseconds(1350);
 			analogWrite(armBrake, 255);
@@ -235,8 +240,33 @@ void setArmDrive() {
 			Serial.println("Setting arm down to drive position");
 			delay(200);
 		}
-		timeInterval++;
 	} while(checkInput() == true || analogRead(potPin) > 40);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	kill();
+}
+
+void setArmTransport() {
+	do{
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else if(input == 'j') dump();
+		else if(input == 'k') setArmDrive();
+		else {
+			if(analogRead(potPin) > 420) {
+				arm.writeMicroseconds(1350);
+				brakeUnlock();
+			}
+			else {
+				arm.writeMicroseconds(1650);
+				brakeUnlock();
+			}
+		}
+	} while(checkInput() == true || analogRead(potPin) != 420);
+	kill();
 }
 
 /**
@@ -271,7 +301,17 @@ void brakeLock() {
 	analogWrite(armBrake, 0);
 }
 
-
+void printControls() {
+	Serial.println("W - Forward");
+	Serial.println("A - Left");
+	Serial.println("S - Backwards");
+	Serial.println("D - Right");
+	Serial.println("I - Raise arm up");
+	Serial.println("N - Lower arm down");
+	Serial.println("J - Set arm to dump position");
+	Serial.println("K - Set arm to drive position");
+	Serial.println("X - KILL EVERYTHING!!!");
+}
 
 
 
