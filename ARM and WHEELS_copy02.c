@@ -49,8 +49,8 @@ void loop() {
 			if(input == 'x') break;
 			if(input == 'q') {speedDown(); break;}
 			if(input == 'e') {speedUp(); break;}
-			if(input == 'Q') {armSpeedUp(); break;}
-			if(input == 'E') {armSpeedDown(); break;}
+			if(input == 'Q') {armSpeedDown(); break;}
+			if(input == 'E') {armSpeedUp(); break;}
 			if(input == 'i') {armUp(); break;}
 			if(input == 'n') {armDown(); break;}
 			if(input == 'j') {dump(); break;}
@@ -82,7 +82,7 @@ void armSpeedUp() {if(j<2) {j=j+1; reportSpeed();} else{Serial.println("Max spee
 /**
  * decreases speed for arm
 **/
-void armSpeedDown() {if(j>0) {j=j+1; reportSpeed();} else{Serial.println("Min speed reached"); reportSpeed(); return;}}
+void armSpeedDown() {if(j>0) {j=j-1; reportSpeed();} else{Serial.println("Min speed reached"); reportSpeed(); return;}}
 
 /**
  * kills all motors
@@ -105,8 +105,10 @@ void reportSpeed() {
 	Serial.println(levelLeft[i]);
 	Serial.print("Current speed right: ");
 	Serial.println(levelRight[i]);
-	Serial.print("Current arm speed: ");
-	Serial.println(levelArm[j]);
+	Serial.print("Current arm speed up: ");
+	Serial.println(1500+levelArm[j]);
+	Serial.print("Current arm speed down: ");
+	Serial.println(1500-levelArm[j]);
 }
 
 /**
@@ -345,6 +347,7 @@ void printControls() {
 	Serial.println("e - increase wheel speed");
 	Serial.println("Q - decrease arm speed");
 	Serial.println("E - increase arm speed");
+	reportSpeed();
 }
 
 
