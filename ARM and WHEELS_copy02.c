@@ -57,14 +57,6 @@ void loop() {
 			if(input == 'k') {setArmDrive(); break;}
 			if(input == 'l') {setArmTransport(); break;}
 			if(input == '?') {printControls(); break;}
-
-			/**
-			 * Test cases
-			**/
-			if(input == 't') {testPot250(); break;}
-			if(input == 'g') {testPot500();break;}
-			if(input == 'b') {testPot750(); break;}
-
 			timeInterval++;	// increment timeInterval
 		} while(checkInput() == true || timeInterval < 6);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 		kill();
@@ -353,41 +345,6 @@ void printControls() {
 	Serial.println("e - increase wheel speed");
 	Serial.println("Q - decrease arm speed");
 	Serial.println("E - increase arm speed");
-}
-
-
-
-
-/**
- * Test cases
- **/
-void testBrake() {
-	digitalWrite(AIN1, HIGH);
-	digitalWrite(AIN2, LOW);
-	analogWrite(armBrake, 255);
-	delay(2000);
-	digitalWrite(AIN1, LOW);
-	digitalWrite(AIN2, LOW);
-	analogWrite(armBrake, 0);
-	
-}
-
-void testPot750() {
-	Serial.println("pot750");
-	while(analogRead(potPin) < 750) brakeUnlock();
-	kill();
-}
-
-void testPot250() {
-	Serial.println("pot250");
-	while(analogRead(potPin) < 250) brakeUnlock();
-	kill();
-}
-
-void testPot500() {
-	Serial.println("pot500");
-	while(analogRead(potPin) < 500) brakeUnlock();
-	kill();
 }
 
 
