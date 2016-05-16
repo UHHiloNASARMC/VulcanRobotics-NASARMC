@@ -1,9 +1,10 @@
 /**
  * Daryl Albano
  * 04/12/16
- * ARM and WHEELS.c
+ * ARM and WHEELS_copy01.c
  * Vulcan Space Robotics Team
  * Main program to control Spock rover (Controls movement and bucket)
+ * Copy of main program has arm speed adjustment function, as well as a read input function
 **/
 
 
