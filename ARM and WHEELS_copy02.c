@@ -4,7 +4,7 @@
  * ARM and WHEELS_copy02.c
  * Vulcan Space Robotics Team
  * Main program to control Spock rover (Controls movement and bucket)
- * Copy of main program that contains function to control speed of arm
+ * Copy of main program
 **/
 
 
