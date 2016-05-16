@@ -1,10 +1,10 @@
 /**
  * Daryl Albano
  * 04/12/16
- * ARM and WHEELS_copy01.c
+ * ARM and WHEELS_copy02.c
  * Vulcan Space Robotics Team
  * Main program to control Spock rover (Controls movement and bucket)
- * Copy of main program has arm speed adjustment function, as well as a read input function
+ * Copy of main program that contains function to control speed of arm
 **/
 
 
@@ -23,7 +23,6 @@ int j = 0;	// Keeps track of arm speed array index
 int timeInterval = 0;	// Kills machine after a certain time of zero user input
 int input;	// Stores the user's input
 int potPin = 0;
-int ticket;
 
 void setup() {
   pinMode(armBrake, OUTPUT);
@@ -164,16 +163,22 @@ void right() {
 void armUp() {
 	int maxHeight = analogRead(potPin) + 100;
 	do{
-		ticket = readInput();
-		if(ticket == 1) continue;
-		else if(ticket == 2) break;
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else if(input == 'n') armDown();
+		else if(input == '?') {printControls(); break;}
 		else {
 			arm.writeMicroseconds(1500 + levelArm[j]);
 			brakeUnlock();
 			Serial.println("Arm going up normal speed");
 			delay(200);
 		}
-	} while(analogRead(potPin) < maxHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin) < maxHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
@@ -183,9 +188,15 @@ void armUp() {
 void armDown() {
 	int minHeight = analogRead(potPin) - 100;
 	do{
-		ticket = readInput();
-		if(readInput() == true) continue;
-		else if(readInput() == 2) break;
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else if(input == 'i') armUp();
+		else if(input == '?') {printControls(); break;}
 		else {
 			arm.writeMicroseconds(1500 - levelArm[j]);
 			analogWrite(armBrake, 255);
@@ -193,7 +204,7 @@ void armDown() {
 			Serial.println("Arm going down normal speed");
 			delay(200);
 		}
-	} while(analogRead(potPin) > minHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin) > minHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
@@ -202,9 +213,16 @@ void armDown() {
 **/
 void dump() {
 	do{
-		ticket = readInput();
-		if(ticket == true) continue;
-		else if(ticket == 2) break;
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else if(input == 'k') setArmDrive();
+		else if(input == 'l') setArmTransport();
+		else if(input == '?') {printControls(); break;}
 		else {
 			if(analogRead(potPin) < 860) {
 				arm.writeMicroseconds(1500 + levelArm[j]);
@@ -219,7 +237,7 @@ void dump() {
 				delay(200);
 			}
 		}
-	} while(analogRead(potPin) != 860);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin) != 860);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
@@ -228,9 +246,16 @@ void dump() {
 **/
 void setArmDrive() {
 	do{
-		ticket = readInput();
-		if(ticket == true) continue;
-		else if(ticket == 2) break;
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else if(input == 'j') dump();
+		else if(input == 'l') setArmTransport();
+		else if(input == '?') {printControls(); break;}
 		else {
 			if(analogRead(potPin) > 40) {
 				arm.writeMicroseconds(1500 - levelArm[j]);
@@ -245,15 +270,22 @@ void setArmDrive() {
 				delay(200);
 			}
 		}
-	} while(analogRead(potPin) != 40);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin) != 40);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
 void setArmTransport() {
 	do{
-		ticket = readInput();
-		if(ticket == true) continue;
-		else if(ticket == 2) break;
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else if(input == 'j') dump();
+		else if(input == 'k') setArmDrive();
+		else if(input == '?') {printControls; break;}
 		else {
 			if(analogRead(potPin) > 420) {
 				arm.writeMicroseconds(1500 - levelArm[j]);
@@ -268,7 +300,7 @@ void setArmTransport() {
 				delay(200);
 			}
 		}
-	} while(analogRead(potPin) != 420);
+	} while(checkInput() == true || analogRead(potPin) != 420);
 	kill();
 }
 
@@ -321,24 +353,6 @@ void printControls() {
 	Serial.println("e - increase wheel speed");
 	Serial.println("Q - decrease arm speed");
 	Serial.println("E - increase arm speed");
-}
-
-int readInput() {
-	if(Serial.available()) {
-		input = Serial.read();
-		if(input == 'w') forward();
-		else if(input == 's') backward();
-		else if(input == 'a') left();
-		else if(input == 'd') right();
-		else if(input == 'x') {kill(); return 2;}
-		else if(input == 'q') {speedDown(); return 0;}
-		else if(input == 'e') {speedUp(); return 0;}
-		else if(input == 'Q') {armSpeedUp(); return 0;}
-		else if(input == 'E') {armSpeedDown(); return 0;}
-		else if(input == '?') {printControls(); return 2;}
-		else return 0;
-	}
-	return 1;
 }
 
 
