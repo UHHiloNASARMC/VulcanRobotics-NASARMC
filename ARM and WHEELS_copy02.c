@@ -234,7 +234,7 @@ void dump() {
 				delay(50);
 			}
 		}
-	} while(checkInput() == true && ((if(direction == 1 && analogRead(potPin) < 860) || (if(direction == 0 && analogRead(potPin) > 860));	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true && ((direction == 1 && analogRead(potPin) < 860) || (direction == 0 && analogRead(potPin) > 860)));	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
