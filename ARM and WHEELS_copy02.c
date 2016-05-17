@@ -222,13 +222,13 @@ void dump() {
 				arm.writeMicroseconds(1500 + levelArm[j]);
 				brakeUnlock();
 				Serial.println("Setting arm to dump position");
-				delay(200);
+				delay(50);
 			}
 			else {
 				arm.writeMicroseconds(1500 - levelArm[j]);
 				brakeUnlock();
 				Serial.println("Setting arm to dump position");
-				delay(200);
+				delay(50);
 			}
 		}
 	} while(checkInput() == true || analogRead(potPin) != 860);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
