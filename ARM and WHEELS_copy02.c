@@ -268,6 +268,9 @@ void setArmDrive() {
 	kill();
 }
 
+/**
+ * Sets the arm to transport position for transporting a full bucket. Allows visual on camera
+**/
 void setArmTransport() {
 	do{
 		if(input == 'w') forward();
@@ -331,7 +334,7 @@ void brakeLock() {
 }
 
 /**
- * For the novice user, this function prints out the available controls
+ * For the novice user, this function prints out the available controls and current speed of arm and wheels
 **/
 void printControls() {
 	Serial.println("w - Forward");
