@@ -345,6 +345,7 @@ void printControls() {
 	Serial.println("n - Lower arm down");
 	Serial.println("j - Set arm to dump position");
 	Serial.println("k - Set arm to drive position");
+	Serial.println("l - Set arm to transport position");
 	Serial.println("x - KILL EVERYTHING!!!");
 	Serial.println("q - decrease wheel speed");
 	Serial.println("e - increase wheel speed");
