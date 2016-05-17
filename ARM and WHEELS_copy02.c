@@ -176,6 +176,36 @@ void armUp() {
 	kill();
 }
 
+void armUp(int maxHeight) {
+	do{
+		if(input == 'w') forward();
+		else if(input == 's') backward();
+		else if(input == 'a') left();
+		else if(input == 'd') right();
+		else if(input == 'q') {speedDown(); break;}
+		else if(input == 'e') {speedUp(); break;}
+		else if(input == 'x') break;
+		else if(input == 'n') armDown();
+		else if(input == '?') {printControls(); break;}
+		else {
+			if(analogRead(potPin) > maxHeight - 100) {
+				armSpeedDown();
+				arm.writeMicroseconds(1500 - levelArm[j]);
+				brakeUnlock();
+				Serial.println("Arm going up normal speed");
+				delay(50);
+			}
+			else {
+				arm.writeMicroseconds(1500 + levelArm[j]);
+				brakeUnlock();
+				Serial.println("Arm going up normal speed");
+				delay(50);
+			}
+		}
+	} while(checkInput() == true || analogRead(potPin) < maxHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	kill();
+}
+
 /**
  * moves arm down by static number
 **/
@@ -202,13 +232,7 @@ void armDown() {
 	kill();
 }
 
-/**
- * Sets arm to dump position
-**/
-void dump() {
-	int direction;
-	if(analogRead(potPin) < 860) direction = 1;
-	else direction = 0;
+void armDown(int minHeight) {
 	do{
 		if(input == 'w') forward();
 		else if(input == 's') backward();
@@ -217,24 +241,28 @@ void dump() {
 		else if(input == 'q') {speedDown(); break;}
 		else if(input == 'e') {speedUp(); break;}
 		else if(input == 'x') break;
-		else if(input == 'k') setArmDrive();
-		else if(input == 'l') setArmTransport();
+		else if(input == 'i') armUp();
 		else if(input == '?') {printControls(); break;}
 		else {
-			if(direction == 1) {
-				arm.writeMicroseconds(1500 + levelArm[j]);
-				brakeUnlock();
-				Serial.println("Setting arm to dump position");
-				delay(50);
-			}
-			else {
-				arm.writeMicroseconds(1500 - levelArm[j]);
-				brakeUnlock();
-				Serial.println("Setting arm to dump position");
-				delay(50);
-			}
+			arm.writeMicroseconds(1500 - levelArm[j]);
+			analogWrite(armBrake, 255);
+			brakeUnlock();
+			Serial.println("Arm going down normal speed");
+			delay(200);
 		}
-	} while(checkInput() == true && ((direction == 1 && analogRead(potPin) < 860) || (direction == 0 && analogRead(potPin) > 860)));	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true || analogRead(potPin) > minHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	kill();
+}
+
+/**
+ * Sets arm to dump position
+**/
+void dump() {
+	int direction;
+	if(analogRead(potPin) < 400) direction = 1;
+	else direction = 0;
+	if(direction == 1) armUp(400);
+	else armDown(400);
 	kill();
 }
 
@@ -355,6 +383,7 @@ void printControls() {
 	Serial.println("Q - decrease arm speed");
 	Serial.println("E - increase arm speed");
 	reportSpeed();
+	Serial.println(analogRead(potPin));
 }
 
 
