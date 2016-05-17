@@ -17,7 +17,7 @@ int AIN1 = 49;	// Pololu: direction for arm's brake TODO: Test if this is necess
 int AIN2 = 48;	// Pololu: direction for arm's brake TODO: Test if this is necessary
 int levelLeft[3] = {1600, 1700, 1825};	// speed array to adjust speed on left side (orientation is misleading)
 int levelRight[3] = {1400, 1300, 1175};	// speed array to adjust speed on right side (orientation is misleading)
-int levelArm[3] = {100, 150, 250};	// speed arry to adjust speed on arm
+int levelArm[3] = {100, 125, 150};	// speed arry to adjust speed on arm
 int i = 0;	// Keeps track of the speed array index
 int j = 0;	// Keeps track of arm speed array index
 int timeInterval = 0;	// Kills machine after a certain time of zero user input
@@ -155,7 +155,7 @@ void right() {
  * lifts arm motor up
 **/
 void armUp() {
-	int maxHeight = analogRead(potPin) + 50;
+	int maxHeight = analogRead(potPin) + 10;
 	do{
 		if(input == 'w') forward();
 		else if(input == 's') backward();
@@ -170,7 +170,6 @@ void armUp() {
 			arm.writeMicroseconds(1500 + levelArm[j]);
 			brakeUnlock();
 			Serial.println("Arm going up normal speed");
-			delay(200);
 		}
 	} while(checkInput() == true || analogRead(potPin) < maxHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
@@ -200,7 +199,7 @@ void armUp(int maxHeight) {
  * moves arm down by static number
 **/
 void armDown() {
-	int minHeight = analogRead(potPin) - 50;
+	int minHeight = analogRead(potPin) - 10;
 	do{
 		if(input == 'w') forward();
 		else if(input == 's') backward();
@@ -213,10 +212,8 @@ void armDown() {
 		else if(input == '?') {printControls(); break;}
 		else {
 			arm.writeMicroseconds(1500 - levelArm[j]);
-			analogWrite(armBrake, 255);
 			brakeUnlock();
 			Serial.println("Arm going down normal speed");
-			delay(200);
 		}
 	} while(checkInput() == true || analogRead(potPin) > minHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
@@ -235,10 +232,8 @@ void armDown(int minHeight) {
 		else if(input == '?') {printControls(); break;}
 		else {
 			arm.writeMicroseconds(1500 - levelArm[j]);
-			analogWrite(armBrake, 255);
 			brakeUnlock();
 			Serial.println("Arm going down normal speed");
-			delay(200);
 		}
 	} while(checkInput() == true || analogRead(potPin) > minHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
@@ -248,10 +243,7 @@ void armDown(int minHeight) {
  * Sets arm to dump position
 **/
 void dump() {
-	int direction;
-	if(analogRead(potPin) < 400) direction = 1;
-	else direction = 0;
-	if(direction == 1) armUp(700);
+	if(analogRead(potPin) < 700) armUp(700);
 	else armDown(700);
 	kill();
 }
@@ -260,32 +252,8 @@ void dump() {
  * Sets arm to drive position
 **/
 void setArmDrive() {
-	do{
-		if(input == 'w') forward();
-		else if(input == 's') backward();
-		else if(input == 'a') left();
-		else if(input == 'd') right();
-		else if(input == 'q') {speedDown(); break;}
-		else if(input == 'e') {speedUp(); break;}
-		else if(input == 'x') break;
-		else if(input == 'j') dump();
-		else if(input == 'l') setArmTransport();
-		else if(input == '?') {printControls(); break;}
-		else {
-			if(analogRead(potPin) > 40) {
-				arm.writeMicroseconds(1500 - levelArm[j]);
-				brakeUnlock();
-				Serial.println("Setting arm to drive position");
-				delay(200);
-			}
-			else {
-				arm.writeMicroseconds(1500 + levelArm[j]);
-				brakeUnlock();
-				Serial.println("Setting arm to drive position");
-				delay(200);
-			}
-		}
-	} while(checkInput() == true || analogRead(potPin) != 40);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	if(analogRead(potPin) < 40) armUp(40);
+	else armDown(140);
 	kill();
 }
 
@@ -293,32 +261,8 @@ void setArmDrive() {
  * Sets the arm to transport position for transporting a full bucket. Allows visual on camera
 **/
 void setArmTransport() {
-	do{
-		if(input == 'w') forward();
-		else if(input == 's') backward();
-		else if(input == 'a') left();
-		else if(input == 'd') right();
-		else if(input == 'q') {speedDown(); break;}
-		else if(input == 'e') {speedUp(); break;}
-		else if(input == 'x') break;
-		else if(input == 'j') dump();
-		else if(input == 'k') setArmDrive();
-		else if(input == '?') {printControls; break;}
-		else {
-			if(analogRead(potPin) > 420) {
-				arm.writeMicroseconds(1500 - levelArm[j]);
-				brakeUnlock();
-				Serial.println("Setting arm to transport position");
-				delay(200);
-			}
-			else {
-				arm.writeMicroseconds(1500 + levelArm[j]);
-				brakeUnlock();
-				Serial.println("Setting arm to transport position");
-				delay(200);
-			}
-		}
-	} while(checkInput() == true || analogRead(potPin) != 420);
+	if(analogRead(potPin) < 120) armUp(120);
+	else armDown(240);
 	kill();
 }
 
