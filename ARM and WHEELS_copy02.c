@@ -206,6 +206,9 @@ void armDown() {
  * Sets arm to dump position
 **/
 void dump() {
+	int direction;
+	if(analogRead(potPin) < 860) direction = 1;
+	else direction = 0;
 	do{
 		if(input == 'w') forward();
 		else if(input == 's') backward();
@@ -218,7 +221,7 @@ void dump() {
 		else if(input == 'l') setArmTransport();
 		else if(input == '?') {printControls(); break;}
 		else {
-			if(analogRead(potPin) < 860) {
+			if(direction == 1) {
 				arm.writeMicroseconds(1500 + levelArm[j]);
 				brakeUnlock();
 				Serial.println("Setting arm to dump position");
@@ -231,7 +234,7 @@ void dump() {
 				delay(50);
 			}
 		}
-	} while(checkInput() == true || analogRead(potPin) != 860);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+	} while(checkInput() == true && ((if(direction == 1 && analogRead(potPin) < 860) || (if(direction == 0 && analogRead(potPin) > 860));	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
 }
 
@@ -354,5 +357,9 @@ void printControls() {
 	reportSpeed();
 }
 
+
+void setDirection() {
+	
+}
 
 
