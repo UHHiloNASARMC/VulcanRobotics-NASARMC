@@ -17,7 +17,7 @@ int AIN1 = 49;	// Pololu: direction for arm's brake TODO: Test if this is necess
 int AIN2 = 48;	// Pololu: direction for arm's brake TODO: Test if this is necessary
 int levelLeft[3] = {1600, 1700, 1825};	// speed array to adjust speed on left side (orientation is misleading)
 int levelRight[3] = {1400, 1300, 1175};	// speed array to adjust speed on right side (orientation is misleading)
-int levelArm[3] = {50, 150, 250};	// speed arry to adjust speed on arm
+int levelArm[3] = {100, 150, 250};	// speed arry to adjust speed on arm
 int i = 0;	// Keeps track of the speed array index
 int j = 0;	// Keeps track of arm speed array index
 int timeInterval = 0;	// Kills machine after a certain time of zero user input
@@ -188,19 +188,9 @@ void armUp(int maxHeight) {
 		else if(input == 'n') armDown();
 		else if(input == '?') {printControls(); break;}
 		else {
-			if(analogRead(potPin) > maxHeight - 100) {
-				armSpeedDown();
-				arm.writeMicroseconds(1500 - levelArm[j]);
-				brakeUnlock();
-				Serial.println("Arm going up normal speed");
-				delay(50);
-			}
-			else {
-				arm.writeMicroseconds(1500 + levelArm[j]);
-				brakeUnlock();
-				Serial.println("Arm going up normal speed");
-				delay(50);
-			}
+			arm.writeMicroseconds(1500 + levelArm[j]);
+			brakeUnlock();
+			Serial.println("Arm going up normal speed");
 		}
 	} while(checkInput() == true || analogRead(potPin) < maxHeight);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 	kill();
@@ -261,8 +251,8 @@ void dump() {
 	int direction;
 	if(analogRead(potPin) < 400) direction = 1;
 	else direction = 0;
-	if(direction == 1) armUp(400);
-	else armDown(400);
+	if(direction == 1) armUp(700);
+	else armDown(700);
 	kill();
 }
 
