@@ -58,7 +58,7 @@ void loop() {
 			if(input == 'l') {setArmTransport(); break;}
 			if(input == '?') {printControls(); break;}
 			timeInterval++;	// increment timeInterval
-		} while(checkInput() == true || timeInterval < 6);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
+		} while(checkInput() == true || timeInterval < 5);	// loop will exit once it reaches time limit. Loop can also continue if user inputs new character
 		kill();
 	}
 }
@@ -118,7 +118,7 @@ void forward() {
 	leftWheels.writeMicroseconds(levelRight[i]);
 	rightWheels.writeMicroseconds(levelLeft[i]);
 	Serial.println("Moving forward");
-	delay(500);
+	delay(300);
 }
 
 /**
@@ -128,7 +128,7 @@ void backward() {
 	leftWheels.writeMicroseconds(levelLeft[i]);
 	rightWheels.writeMicroseconds(levelRight[i]);
 	Serial.println("Moving backwards");
-	delay(500);
+	delay(300);
 }
 
 /**
@@ -138,7 +138,7 @@ void left() {
 	leftWheels.writeMicroseconds(levelLeft[i]);
 	rightWheels.writeMicroseconds(levelLeft[i]);
 	Serial.println("Turning left");
-	delay(500);
+	delay(300);
 }
 
 /**
@@ -148,7 +148,7 @@ void right() {
 	leftWheels.writeMicroseconds(levelRight[i]);
 	rightWheels.writeMicroseconds(levelRight[i]);
 	Serial.println("Turning right");
-	delay(500);
+	delay(300);
 }
 
 /**
