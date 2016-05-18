@@ -252,8 +252,8 @@ void dump() {
  * Sets arm to drive position
 **/
 void setArmDrive() {
-	if(analogRead(potPin) < 40) armUp(40);
-	else armDown(140);
+	if(analogRead(potPin) < 22) armUp(22);
+	else armDown(122);
 	kill();
 }
 
@@ -261,8 +261,8 @@ void setArmDrive() {
  * Sets the arm to transport position for transporting a full bucket. Allows visual on camera
 **/
 void setArmTransport() {
-	if(analogRead(potPin) < 120) armUp(120);
-	else armDown(240);
+	if(analogRead(potPin) < 460) armUp(460);
+	else armDown(580);
 	kill();
 }
 
