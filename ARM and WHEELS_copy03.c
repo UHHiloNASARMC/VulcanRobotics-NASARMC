@@ -17,7 +17,7 @@ int AIN1 = 49;	// Pololu: direction for arm's brake TODO: Test if this is necess
 int AIN2 = 48;	// Pololu: direction for arm's brake TODO: Test if this is necessary
 int levelLeft[3] = {1600, 1700, 1825};	// speed array to adjust speed on left side (orientation is misleading)
 int levelRight[3] = {1400, 1300, 1175};	// speed array to adjust speed on right side (orientation is misleading)
-int levelArm[4] = {100, 150, 175, 200};	// speed arry to adjust speed on arm
+int levelArm[10] = {100, 150, 175, 200, 250, 300, 350, 400, 450, 500};	// speed arry to adjust speed on arm
 int i = 0;	// Keeps track of the speed array index
 int j = 0;	// Keeps track of arm speed array index
 int timeInterval = 0;	// Kills machine after a certain time of zero user input
@@ -77,7 +77,7 @@ void speedDown() {if(i>0) {i=i-1; reportSpeed();} else {Serial.println("Min spee
 /**
  * increases spped for arm
 **/
-void armSpeedUp() {if(j<3) {j=j+1; reportSpeed();} else{Serial.println("Max speed reached"); reportSpeed(); return;}}
+void armSpeedUp() {if(j<9) {j=j+1; reportSpeed();} else{Serial.println("Max speed reached"); reportSpeed(); return;}}
 
 /**
  * decreases speed for arm
