@@ -1,10 +1,9 @@
 /**
  * Daryl Albano
- * 04/12/16
- * ARM and WHEELS_copy02.c
+ * 07/21/16 
+ * spock-program.c 
  * Vulcan Space Robotics Team
  * Main program to control Spock rover (Controls movement and bucket)
- * Copy of main program
 **/
 
 

@@ -1,6 +1,6 @@
 #Vulcan Space Robotics Team
 ##Instructions
-Use copy 03 of ARM and WHEELS code as final program to drive rover
+Use spock-program code as final program to drive rover
 
 ###Running from computer:
 1) Connect to Raspberry Pi via SSH cmd: ssh -X pi@someipaddr
