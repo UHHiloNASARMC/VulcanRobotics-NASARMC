@@ -1,9 +1,5 @@
 import struct, can, queue, time
 from threading import Thread, Lock
-from RPi import GPIO
-BRAKE_PIN = 24
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(BRAKE_PIN, GPIO.OUT)
 
 # Talon CAN interface class
 class TalonCANInterface:
@@ -188,21 +184,3 @@ class TalonSrxProtocol:
         self._cache |= (reverse & 0x1) << 48
         self.sendControl5()
 
-intf = TalonCANInterface()
-proto = TalonSrxProtocol(intf, 4)
-proto.setControlMode(TalonSrxProtocol.kDisabled)
-cycle_count = 0
-brake_state = True
-for val in range(-1023, 1024):
-    print('THROTTLE %d' % val)
-    proto.setDemand(val, TalonSrxProtocol.kThrottle)
-    time.sleep(0.01)
-
-    if not cycle_count % 50:
-        brake_state ^= True
-        if brake_state:
-            GPIO.output(BRAKE_PIN, GPIO.LOW)
-        else:
-            GPIO.output(BRAKE_PIN, GPIO.HIGH)
-        print('BRAKE', brake_state)
-    cycle_count += 1
