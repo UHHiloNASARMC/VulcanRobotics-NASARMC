@@ -2,7 +2,7 @@
 # Based on information from:
 # https://www.kernel.org/doc/Documentation/input/joystick-api.txt
 
-import os, struct, array
+import os, struct, array, time
 from fcntl import ioctl
 import talonsrx
 
@@ -136,13 +136,31 @@ print('%d buttons found: %s' % (num_buttons, ', '.join(button_map)))
 
 # Setup talon interface
 intf = talonsrx.TalonCANInterface()
-proto = talonsrx.TalonSrxProtocol(intf, 4)
+front_left = talonsrx.TalonSrxProtocol(intf, 1)
+front_right = talonsrx.TalonSrxProtocol(intf, 2)
+back_left = talonsrx.TalonSrxProtocol(intf, 3)
+back_right = talonsrx.TalonSrxProtocol(intf, 4)
+
+# Disable drive functionality
+disabled = True
+enable_start_time = None
+def set_disable(disable):
+    global disabled
+    disabled = disable
+    if disable:
+        print('DISABLED')
+        front_left.setControlMode(talonsrx.TalonSrxProtocol.kDisabled)
+        front_right.setControlMode(talonsrx.TalonSrxProtocol.kDisabled)
+        back_left.setControlMode(talonsrx.TalonSrxProtocol.kDisabled)
+        back_right.setControlMode(talonsrx.TalonSrxProtocol.kDisabled)
+    else:
+        print('ENABLED')
 
 # Main event loop
 while True:
     evbuf = jsdev.read(8)
     if evbuf:
-        time, value, type, number = struct.unpack('IhBB', evbuf)
+        evtime, value, type, number = struct.unpack('IhBB', evbuf)
 
         #if type & 0x80:
         #     print("(initial)")
@@ -151,10 +169,31 @@ while True:
             button = button_map[number]
             if button:
                 button_states[button] = value
-                if value:
-                    print("%s pressed" % (button))
-                else:
-                    print("%s released" % (button))
+                #if value:
+                #    print("%s pressed" % (button))
+                #else:
+                #    print("%s released" % (button))
+
+                # Circle button
+                if number == 13 and value:
+                    set_disable(True)
+
+                # PS button
+                if number == 16:
+                    if value:
+                        # Mark hold start time
+                        print('HOLD FOR 2 SEC')
+                        set_disable(True)
+                        enable_start_time = time.time()
+                    elif enable_start_time:
+                        if (time.time() - enable_start_time) > 2.0:
+                            # Button released after 2 seconds; enable control
+                            set_disable(False)
+                        else:
+                            # Button released before or at 2 seconds; cancel enable
+                            print('CANCELLED')
+                            enable_start_time = None
+                    
 
         if type & 0x02:
             axis = axis_map[number]
@@ -164,8 +203,16 @@ while True:
                 #if number in (0,1,2,3):
                 #    print("%s: %.3f" % (axis, fvalue))
 
-            if number == 1: # Left Stick Y
-                fvalue = min(1023, max(-1023, -value // 128))
-                print(fvalue)
-                proto.setDemand(fvalue, talonsrx.TalonSrxProtocol.kThrottle)
+            if not disabled:
+                if number == 1: # Left Stick Y
+                    fvalue = min(1023, max(-1023, -value // 128))
+                    print('LEFT', fvalue)
+                    front_left.setDemand(fvalue, talonsrx.TalonSrxProtocol.kThrottle)
+                    back_left.setDemand(fvalue, talonsrx.TalonSrxProtocol.kThrottle)
+                    
+                if number == 3: # Right Stick Y
+                    fvalue = min(1023, max(-1023, -value // 128))
+                    print('RIGHT', fvalue)
+                    front_right.setDemand(fvalue, talonsrx.TalonSrxProtocol.kThrottle)
+                    back_right.setDemand(fvalue, talonsrx.TalonSrxProtocol.kThrottle)
 
