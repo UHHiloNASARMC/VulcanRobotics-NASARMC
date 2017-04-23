@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>569</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Spock Control</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(34, 35, 36);
+color: rgb(255, 255, 255);</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>361</width>
+      <height>501</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="spacing">
+      <number>40</number>
+     </property>
+     <item row="0" column="1">
+      <widget class="SpockMotorStatusBox" name="frMotorStat">
+       <property name="title">
+        <string>Front Right</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="SpockMotorStatusBox" name="flMotorStat">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Front Left</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="SpockMotorStatusBox" name="blMotorStat">
+       <property name="title">
+        <string>Back Left</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="SpockMotorStatusBox" name="brMotorStat">
+       <property name="title">
+        <string>Back Right</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="SpockMotorStatusBox" name="armMotorStat">
+       <property name="title">
+        <string>Arm</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="SpockMotorStatusBox" name="bucketMotorStat">
+       <property name="title">
+        <string>Bucket</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="SpockDriveTrackpad" name="driveTrackpad">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>10</y>
+      <width>181</width>
+      <height>371</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Drive Trackpad</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>390</y>
+      <width>171</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Arm Drive</string>
+    </property>
+    <widget class="SpockMotorSlider" name="armSlider">
+     <property name="geometry">
+      <rect>
+       <x>19</x>
+       <y>30</y>
+       <width>131</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimum">
+      <number>-1023</number>
+     </property>
+     <property name="maximum">
+      <number>1023</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>450</y>
+      <width>171</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Bucket Drive</string>
+    </property>
+    <widget class="SpockMotorSlider" name="bucketSlider">
+     <property name="geometry">
+      <rect>
+       <x>19</x>
+       <y>30</y>
+       <width>131</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimum">
+      <number>-1023</number>
+     </property>
+     <property name="maximum">
+      <number>1023</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="connectionLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>520</y>
+      <width>561</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>600</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>SpockMotorStatusBox</class>
+   <extends>QGroupBox</extends>
+   <header>spockmotorstatusbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SpockDriveTrackpad</class>
+   <extends>QGroupBox</extends>
+   <header>spockdrivetrackpad.h</header>
+   <container>1</container>
+   <slots>
+    <signal>_mouseMoveEvent(SpockDriveTrackpad*,QMouseEvent*)</signal>
+    <signal>_mousePressEvent(SpockDriveTrackpad*,QMouseEvent*)</signal>
+    <signal>_mouseReleaseEvent(SpockDriveTrackpad*,QMouseEvent*)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>SpockMotorSlider</class>
+   <extends>QSlider</extends>
+   <header>spockmotorslider.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>armSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>armSliderChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>451</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bucketSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>bucketSliderChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>511</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>driveTrackpad</sender>
+   <signal>_mouseMoveEvent(SpockDriveTrackpad*,QMouseEvent*)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>driveMove(SpockDriveTrackpad*,QMouseEvent*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>490</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>driveTrackpad</sender>
+   <signal>_mouseReleaseEvent(SpockDriveTrackpad*,QMouseEvent*)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>driveRelease(SpockDriveTrackpad*,QMouseEvent*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>490</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>driveTrackpad</sender>
+   <signal>_mousePressEvent(SpockDriveTrackpad*,QMouseEvent*)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>driveMove(SpockDriveTrackpad*,QMouseEvent*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>490</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>armSliderChanged(int)</slot>
+  <slot>bucketSliderChanged(int)</slot>
+  <slot>driveMove(SpockDriveTrackpad*,QMouseEvent*)</slot>
+  <slot>driveRelease(SpockDriveTrackpad*,QMouseEvent*)</slot>
+ </slots>
+</ui>
