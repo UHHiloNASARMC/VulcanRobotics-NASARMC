@@ -1,6 +1,11 @@
 import struct, can, queue, time
 from threading import Thread, Lock
 
+# 24-bit 2's compliment sign extension
+def sign_extend_24(value):
+    sign_bit = 1 << 23
+    return (value & (sign_bit - 1)) - (value & sign_bit)
+
 # Talon CAN interface class
 class TalonCANInterface:
     def __init__(self):
@@ -32,15 +37,22 @@ class TalonCANInterface:
 
             # Receive messages
             message = self._bus.recv(timeout=0)
-            if message:
+            while message:
                 #print(message)
                 deviceId = message.arbitration_id & 0x3f
                 msgType = message.arbitration_id & ~0x3f
 
+                # STATUS_1
                 if msgType == 0x02041400:
                     self._status1Bufs[deviceId] = message.data
-                if msgType == 0x02041400:
-                    self._status1Bufs[deviceId] = message.data
+                # STATUS_2
+                elif msgType == 0x02041440:
+                    self._status2Bufs[deviceId] = message.data
+                # STATUS_4
+                elif msgType == 0x020414C0:
+                    self._status4Bufs[deviceId] = message.data
+
+                message = self._bus.recv(timeout=0)
 
             # 50ms CONTROL_1 update
             if not cycle_counter % 5:
@@ -74,6 +86,33 @@ class TalonCANInterface:
         self._control5Msgs[deviceNo] = msg
         self._l.release()
         #print('Control 5', msg)
+
+    # Get faults register
+    def getStatus1(self, deviceNo):
+        self._l.acquire()
+        ret = None
+        if deviceNo in self._status1Bufs:
+            ret = struct.unpack('<Q', self._status1Bufs[deviceNo])[0]
+        self._l.release()
+        return ret
+
+    # Get feedback register
+    def getStatus2(self, deviceNo):
+        self._l.acquire()
+        ret = None
+        if deviceNo in self._status2Bufs:
+            ret = struct.unpack('<Q', self._status2Bufs[deviceNo])[0]
+        self._l.release()
+        return ret
+
+        # Get analog in register
+    def getStatus4(self, deviceNo):
+        self._l.acquire()
+        ret = None
+        if deviceNo in self._status4Bufs:
+            ret = struct.unpack('<Q', self._status4Bufs[deviceNo])[0]
+        self._l.release()
+        return ret
 
 # Talon communication protocol interface class
 class TalonSrxProtocol:
@@ -184,3 +223,33 @@ class TalonSrxProtocol:
         self._cache |= (reverse & 0x1) << 48
         self.sendControl5()
 
+    # Read current potentiometer value [1,1023]
+    def getPotValue(self):
+        status2 = self._canIntf.getStatus4(self._deviceNo)
+        if status2 is None:
+            return 0
+        return sign_extend_24(((status2 & 0xff) << 16) | (status2 & 0xff00) | ((status2 & 0xff0000) >> 16))
+
+    # Read current consumption
+    def getCurrent(self):
+        status2 = self._canIntf.getStatus2(self._deviceNo)
+        if status2 is None:
+            return 0
+        high = (status2 >> 40) & 0xff
+        low = (status2 >> 48) & 0xc0
+        return ((high << 8) | low) >> 6
+
+    # Read battery voltage
+    def getBattV(self):
+        status4 = self._canIntf.getStatus4(self._deviceNo)
+        if status4 is None:
+            return 0
+        return (status4 >> 48) & 0xff
+
+    # Read temperature
+    def getTemp(self):
+        status4 = self._canIntf.getStatus4(self._deviceNo)
+        if status4 is None:
+            return 0
+        return (status4 >> 40) & 0xff
+         

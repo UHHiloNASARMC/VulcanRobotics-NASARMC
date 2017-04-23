@@ -95,7 +95,13 @@ button_map = []
 # Open the joystick device.
 fn = '/dev/input/js0'
 print('Opening %s...' % fn)
-jsdev = open(fn, 'rb')
+jsdev = None
+while not jsdev:
+    try:
+        jsdev = open(fn, 'rb')
+    except:
+        pass
+    time.sleep(1)
 
 # Get the device name.
 #buf = bytearray(63)
@@ -205,13 +211,13 @@ while True:
 
             if not disabled:
                 if number == 1: # Left Stick Y
-                    fvalue = min(1023, max(-1023, -value // 128))
+                    fvalue = min(1023, max(-1023, value // 32))
                     print('LEFT', fvalue)
                     front_left.setDemand(fvalue, talonsrx.TalonSrxProtocol.kThrottle)
                     back_left.setDemand(fvalue, talonsrx.TalonSrxProtocol.kThrottle)
                     
                 if number == 3: # Right Stick Y
-                    fvalue = min(1023, max(-1023, -value // 128))
+                    fvalue = min(1023, max(-1023, -value // 32))
                     print('RIGHT', fvalue)
                     front_right.setDemand(fvalue, talonsrx.TalonSrxProtocol.kThrottle)
                     back_right.setDemand(fvalue, talonsrx.TalonSrxProtocol.kThrottle)
