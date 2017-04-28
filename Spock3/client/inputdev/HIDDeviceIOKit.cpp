@@ -297,15 +297,11 @@ class HIDDeviceIOKit : public IHIDDevice
             return;
         }
 
-        /* Return control to main thread */
-        device->m_runningTransferLoop = true;
-        lk.unlock();
-        device->m_initCond.notify_one();
-
         /* Register input buffer */
+        std::unique_ptr<uint8_t[]> buffer;
         if (size_t bufSize = device->m_devImp.getInputBufferSize())
         {
-            std::unique_ptr<uint8_t[]> buffer(new uint8_t[bufSize]);
+            buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufSize]);
             CFTypeRef source;
             device->m_hidIntf->getAsyncEventSource(device->m_hidIntf.storage(), &source);
             device->m_hidIntf->setInputReportCallback(device->m_hidIntf.storage(), buffer.get(),
@@ -314,6 +310,11 @@ class HIDDeviceIOKit : public IHIDDevice
             CFRunLoopAddSource(rl, CFRunLoopSourceRef(source), kCFRunLoopDefaultMode);
             CFRunLoopWakeUp(rl);
         }
+
+        /* Return control to main thread */
+        device->m_runningTransferLoop = true;
+        lk.unlock();
+        device->m_initCond.notify_one();
 
         /* Start transfer loop */
         device->m_devImp.initialCycle();

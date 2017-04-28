@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QGamepad>
 #include "spocktcpsocket.h"
 #include "inputdev/DeviceFinder.hpp"
 #include "inputdev/DualshockPad.hpp"
@@ -20,7 +19,6 @@ public:
     DeviceFinder()
     : boo::DeviceFinder({typeid(boo::DualshockPad)})
     {
-        startScanning();
     }
 
     ~DeviceFinder()
@@ -33,9 +31,9 @@ public:
     {
         if (!m_device)
         {
-            gamepadConnected();
             m_device = tok.openAndGetDevice();
             static_cast<boo::DualshockPad*>(m_device.get())->setCallback(this);
+            gamepadConnected();
         }
     }
 
@@ -50,10 +48,10 @@ public:
 
     void controllerUpdate(const boo::DualshockPadState& state)
     {
-        axisLeftXChanged(state.m_leftStick[0] / 127.f - 1.f);
-        axisLeftYChanged(state.m_leftStick[1] / 127.f - 1.f);
-        axisRightXChanged(state.m_rightStick[0] / 127.f - 1.f);
-        axisRightYChanged(state.m_rightStick[1] / 127.f - 1.f);
+        emit axisLeftXChanged(state.m_leftStick[0] / 127.f - 1.f);
+        emit axisLeftYChanged(state.m_leftStick[1] / 127.f - 1.f);
+        emit axisRightXChanged(state.m_rightStick[0] / 127.f - 1.f);
+        emit axisRightYChanged(state.m_rightStick[1] / 127.f - 1.f);
     }
 
 signals:

@@ -115,8 +115,8 @@ class HIDListenerIOKit : public IHIDListener
                 getUSBStringDescriptor(dev, pstridx, pstr);
             }
 
-            if (!listener->m_finder._insertToken(DeviceToken(DeviceType::USB,
-                                                             vid, pid, vstr, pstr, devPath)))
+            if (!listener->m_finder._insertToken(std::make_unique<DeviceToken>(DeviceType::USB,
+                                                 vid, pid, vstr, pstr, devPath)))
             {
                 /* Matched-insertion failed; see if generic HID interface is available */
                 /* TODO: Do */
@@ -216,8 +216,8 @@ class HIDListenerIOKit : public IHIDListener
                     CFStringGetCString(pstridx.get(), pstr, 128, kCFStringEncodingUTF8);
             }
 
-            if (!listener->m_finder._insertToken(DeviceToken(DeviceType::HID,
-                                                             vidv, pidv, vstr, pstr, devPath)))
+            if (!listener->m_finder._insertToken(std::make_unique<DeviceToken>(DeviceType::HID,
+                                                 vidv, pidv, vstr, pstr, devPath)))
             {
                 /* Matched-insertion failed; see if generic HID interface is available */
                 /* TODO: Do */

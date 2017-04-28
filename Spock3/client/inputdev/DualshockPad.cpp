@@ -106,7 +106,7 @@ void DualshockPad::receivedHIDReport(const uint8_t* data, size_t length, HIDRepo
             m_report.rumble.rightDuration = 0;
             m_report.rumble.rightOn = false;
         }
-        sendHIDReport(m_report.buf, sizeof(m_report), HIDReportType::Output, 0x0201);
+        sendHIDReport(m_report.buf, sizeof(m_report), HIDReportType::Output, 0x01);
         m_rumbleState = m_rumbleRequest;
     }
     else

@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setFixedSize(600, 550);
     startTimer(20);
+    m_devFinder.startScanning();
 }
 
 void MainWindow::timerEvent(QTimerEvent*)
@@ -82,7 +83,7 @@ void MainWindow::axisLeftXChanged(double)
 
 void MainWindow::axisLeftYChanged(double value)
 {
-    printf("left y %f\n", -value);
+    //printf("left y %f\n", -value);
     if (std::fabs(value) > 0.1f)
         m_commandData.leftThrottle = std::max(-1023, std::min(1023, int(-value * 1023.f)));
     else
@@ -96,7 +97,7 @@ void MainWindow::axisRightXChanged(double)
 
 void MainWindow::axisRightYChanged(double value)
 {
-    printf("right y %f\n", -value);
+    //printf("right y %f\n", -value);
     if (std::fabs(value) > 0.1f)
         m_commandData.rightThrottle = std::max(-1023, std::min(1023, int(-value * 1023.f)));
     else
