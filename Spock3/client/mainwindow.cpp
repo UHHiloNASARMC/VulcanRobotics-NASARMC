@@ -9,6 +9,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->connectionLabel->setText("Connecting to raspberrypi.local");
+
+    connect(&m_devFinder, SIGNAL(gamepadConnected()), this, SLOT(gamepadConnected()));
+    connect(&m_devFinder, SIGNAL(gamepadDisconnected()), this, SLOT(gamepadDisconnected()));
+    connect(&m_devFinder, SIGNAL(axisLeftXChanged(double)), this, SLOT(axisLeftXChanged(double)));
+    connect(&m_devFinder, SIGNAL(axisLeftYChanged(double)), this, SLOT(axisLeftYChanged(double)));
+    connect(&m_devFinder, SIGNAL(axisRightXChanged(double)), this, SLOT(axisRightXChanged(double)));
+    connect(&m_devFinder, SIGNAL(axisRightYChanged(double)), this, SLOT(axisRightYChanged(double)));
+
     setFixedSize(600, 550);
     startTimer(20);
 }
@@ -55,6 +63,44 @@ void MainWindow::driveRelease(SpockDriveTrackpad*, QMouseEvent*)
     //printf("release %f %f\n", ev->x() / float(sender->width()), ev->y() / float(sender->height()));
     m_commandData.leftThrottle = 0;
     m_commandData.rightThrottle = 0;
+}
+
+void MainWindow::gamepadConnected()
+{
+    //printf("Connected\n");
+}
+
+void MainWindow::gamepadDisconnected()
+{
+    //printf("Disconnected\n");
+}
+
+void MainWindow::axisLeftXChanged(double)
+{
+    //printf("left x %f\n", value);
+}
+
+void MainWindow::axisLeftYChanged(double value)
+{
+    printf("left y %f\n", -value);
+    if (std::fabs(value) > 0.1f)
+        m_commandData.leftThrottle = std::max(-1023, std::min(1023, int(-value * 1023.f)));
+    else
+        m_commandData.leftThrottle = 0;
+}
+
+void MainWindow::axisRightXChanged(double)
+{
+    //printf("right x %f\n", value);
+}
+
+void MainWindow::axisRightYChanged(double value)
+{
+    printf("right y %f\n", -value);
+    if (std::fabs(value) > 0.1f)
+        m_commandData.rightThrottle = std::max(-1023, std::min(1023, int(-value * 1023.f)));
+    else
+        m_commandData.rightThrottle = 0;
 }
 
 void MainWindow::connectionEstablished()

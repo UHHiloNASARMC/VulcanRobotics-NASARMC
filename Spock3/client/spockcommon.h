@@ -9,7 +9,8 @@ enum class ESpockBucketState : quint8
     Invalid,
     Scooping,
     Driving,
-    Dumping
+    Dumping,
+    Weighing
 };
 
 struct SpockMotorStatusData
@@ -44,6 +45,7 @@ struct SpockStatusData
     SpockMotorStatusData bucketMotorStatus;
     quint16 armPot = 0;
     quint16 bucketPot = 0;
+    quint8 limitSwitches = 0;
     ESpockBucketState sensedBucketState = ESpockBucketState::Invalid;
 
     void read(QDataStream& s)
@@ -58,6 +60,7 @@ struct SpockStatusData
         s >> armPot;
         s >> bucketPot;
         s >> reinterpret_cast<quint8&>(sensedBucketState);
+        s >> limitSwitches;
     }
 
     void write(QDataStream& s) const
@@ -72,6 +75,7 @@ struct SpockStatusData
         s << armPot;
         s << bucketPot;
         s << reinterpret_cast<const quint8&>(sensedBucketState);
+        s << limitSwitches;
     }
 };
 

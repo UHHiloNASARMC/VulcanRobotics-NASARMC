@@ -10,6 +10,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = spock_gui
 TEMPLATE = app
+CONFIG += c++14
+macx {
+LIBS += -framework CoreFoundation
+}
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -28,14 +32,35 @@ SOURCES += main.cpp\
     spockmotorstatusbox.cpp \
     spockdrivetrackpad.cpp \
     spockmotorslider.cpp \
-    spocktcpsocket.cpp
+    spocktcpsocket.cpp \
+    inputdev/DeviceBase.cpp \
+    inputdev/DeviceFinder.cpp \
+    inputdev/DeviceSignature.cpp \
+    inputdev/DualshockPad.cpp \
+    inputdev/GenericPad.cpp \
+    inputdev/inputDeviceClasses.cpp
 
 HEADERS  += mainwindow.h \
     spockmotorstatusbox.h \
     spockcommon.h \
     spockdrivetrackpad.h \
     spockmotorslider.h \
-    spocktcpsocket.h
+    spocktcpsocket.h \
+    inputdev/DeviceBase.hpp \
+    inputdev/DeviceFinder.hpp \
+    inputdev/DeviceSignature.hpp \
+    inputdev/DeviceToken.hpp \
+    inputdev/DualshockPad.hpp \
+    inputdev/IHIDDevice.hpp \
+    inputdev/IHIDListener.hpp \
+    inputdev/GenericPad.hpp
+
+macx {
+SOURCES += inputdev/HIDDeviceIOKit.cpp \
+    inputdev/HIDListenerIOKit.cpp
+HEADERS  += inputdev/CFPointer.hpp \
+    inputdev/IOKitPointer.hpp
+}
 
 FORMS    += mainwindow.ui \
     spockmotorstatusbox.ui

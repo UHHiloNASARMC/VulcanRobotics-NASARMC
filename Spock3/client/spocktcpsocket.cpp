@@ -5,7 +5,7 @@
 SpockTCPSocket::SpockTCPSocket(const std::string& hostname, MainWindow* mainWindow)
 : m_hostname(hostname)
 {
-    setSocketOption(ReceiveBufferSizeSocketOption, 61);
+    setSocketOption(ReceiveBufferSizeSocketOption, 128);
     connect(this, SIGNAL(connected()), mainWindow, SLOT(connectionEstablished()));
     connect(this, SIGNAL(disconnected()), mainWindow, SLOT(connectionLost()));
     reestablishConnection();
@@ -13,36 +13,51 @@ SpockTCPSocket::SpockTCPSocket(const std::string& hostname, MainWindow* mainWind
 
 void SpockTCPSocket::reestablishConnection()
 {
-    if (state() != ConnectedState && state() != ConnectingState)
+    //printf("state: %d\n", state());
+    //fflush(stdout);
+    if (!m_doingDns && state() != ConnectedState && state() != ConnectingState)
     {
-        QHostInfo nsLookup = QHostInfo::fromName(m_hostname.c_str());
-        for (const QHostAddress& addr : nsLookup.addresses())
+        QHostInfo::lookupHost(m_hostname.c_str(), this, SLOT(dnsHostFound(QHostInfo)));
+        m_doingDns = true;
+    }
+}
+
+void SpockTCPSocket::dnsHostFound(const QHostInfo& host)
+{
+    m_doingDns = false;
+    for (const QHostAddress& addr : host.addresses())
+    {
+        if (addr.protocol() == IPv4Protocol)
         {
-            if (addr.protocol() == IPv4Protocol)
-            {
-                connectToHost(addr, 5555);
-                break;
-            }
+            connectToHost(addr, 5555);
+            break;
         }
     }
 }
 
 SpockStatusData SpockTCPSocket::getStatusData()
 {
-    while (bytesAvailable() >= 61)
+    qint64 avail = bytesAvailable();
+    //printf("avail %lld\n", avail);
+    //fflush(stdout);
+    while (avail >= 62)
     {
-        QByteArray bytes = read(61);
-        QDataStream s(bytes);
-        char magic[8];
-        s.readRawData(magic, 8);
-        quint64 timestamp, packetCount;
-        s >> timestamp;
-        s >> packetCount;
-        if (!memcmp(magic, "RoboStat", 8))
+        QByteArray bytes = read(62);
+        if (bytes.size() >= 62)
         {
-            m_lastReceivedPacket = packetCount;
-            m_cachedData.read(s);
+            QDataStream s(bytes);
+            char magic[8];
+            s.readRawData(magic, 8);
+            quint64 timestamp, packetCount;
+            s >> timestamp;
+            s >> packetCount;
+            if (!memcmp(magic, "RoboStat", 8))
+            {
+                m_lastReceivedPacket = packetCount;
+                m_cachedData.read(s);
+            }
         }
+        avail = bytesAvailable();
     }
 
     return m_cachedData;
