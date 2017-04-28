@@ -23,6 +23,7 @@ class TalonCANInterface:
         self._status10Bufs = {}
         self._control1Msgs = {}
         self._control5Msgs = {}
+        self._paramSetMsgs = []
         self._t.start()
 
     def __del__(self):
@@ -54,6 +55,11 @@ class TalonCANInterface:
 
                 message = self._bus.recv(timeout=0)
 
+            # Param set messages
+            for msg in self._paramSetMsgs:
+                self._bus.send(msg)
+                #print('PARAMSET', msg)
+            self._paramSetMsgs.clear()
             # 50ms CONTROL_1 update
             if not cycle_counter % 5:
                 for msg in self._control1Msgs:
@@ -86,6 +92,15 @@ class TalonCANInterface:
         self._control5Msgs[deviceNo] = msg
         self._l.release()
         #print('Control 5', msg)
+
+    # Set param register
+    def sendParamSet(self, deviceNo, data):
+        print('PSET', data)
+        msg = can.Message(arbitration_id=0x02041880 | deviceNo,
+                  data=struct.pack('<Q', data), extended_id=True)
+        self._l.acquire()
+        self._paramSetMsgs.append(msg)
+        self._l.release()
 
     # Get faults register
     def getStatus1(self, deviceNo):
@@ -150,6 +165,18 @@ class TalonSrxProtocol:
     kBrakeOverride_OverrideCoast = 1
     kBrakeOverride_OverrideBrake = 2
 
+    # Parameters for talon settings
+    eProfileParamSlot0_P = 1
+    eProfileParamSlot0_I = 2
+    eProfileParamSlot0_D = 3
+    eProfileParamSlot0_CloseLoopRampRate = 6
+    ePeakPosOutput = 104
+    eNominalPosOutput = 105
+    ePeakNegOutput = 106
+    eNominalNegOutput = 107
+    eProfileParamSlot0_AllowableClosedLoopErr = 111
+    eProfileParamVcompRate = 116
+
     # Constructor initializes Talon to idle
     def __init__(self, canIntf, deviceNo):
         self._cache = 0
@@ -158,13 +185,20 @@ class TalonSrxProtocol:
         canIntf.sendControl1(deviceNo, 0)
         canIntf.sendControl5(deviceNo, 0)
         self.setOverrideLimitSwitchEn(TalonSrxProtocol.kLimitSwitchOverride_UseDefaultsFromFlash)
+        self.setFeedbackDevice(TalonSrxProtocol.kFeedbackDevice_AnalogPot)
+        self.setCloseLoopRampRate(3.0)
 
     # Send primary control packet to Talon
     def sendControl5(self):
         self._canIntf.sendControl5(self._deviceNo, self._cache)
 
+    # Send param set to Talon
+    def sendParamSet(self, enum, value):
+        self._canIntf.sendParamSet(self._deviceNo, ((int(value) & 0xffffffff) << 8) | (enum & 0xff))
+
     # Set primary drive value and mode
     def setDemand(self, value, ctrlMode):
+        value = int(value)
         self._cache &= ~(0xff << 16)
         self._cache &= ~(0xff << 24)
         self._cache &= ~(0xff << 32)
@@ -212,7 +246,7 @@ class TalonSrxProtocol:
         self.sendControl5()
 
     # Set ramp throttle
-    def setProfileSlotSelect(self, rampThrottle):
+    def setRampThrottle(self, rampThrottle):
         self._cache &= ~(0xff << 56)
         self._cache |= (rampThrottle & 0xff) << 56
         self.sendControl5()
@@ -223,9 +257,43 @@ class TalonSrxProtocol:
         self._cache |= (reverse & 0x1) << 48
         self.sendControl5()
 
-    # Read current potentiometer value [1,1023]
+    # Set close loop ramp rate (V/s)
+    def setCloseLoopRampRate(self, rampRate):
+        self.sendParamSet(TalonSrxProtocol.eProfileParamSlot0_CloseLoopRampRate, int(rampRate * 1023.0 / 12.0 / 1000.0))
+
+    # Set P component of control loop
+    def setP(self, p):
+        self.sendParamSet(TalonSrxProtocol.eProfileParamSlot0_P, float(0x400000) * p)
+
+    # Set I component of control loop
+    def setI(self, i):
+        self.sendParamSet(TalonSrxProtocol.eProfileParamSlot0_I, float(0x400000) * i)
+
+    # Set I component of control loop
+    def setD(self, d):
+        self.sendParamSet(TalonSrxProtocol.eProfileParamSlot0_D, float(0x400000) * d)
+
+    # Set peak throttle voltage [0,1023]
+    def setPeakThrottle(self, throttle):
+        self.sendParamSet(TalonSrxProtocol.ePeakPosOutput, throttle)
+        self.sendParamSet(TalonSrxProtocol.ePeakNegOutput, -throttle)
+
+    # Set peak throttle voltage [0,1023]
+    def setNominalThrottle(self, throttle):
+        self.sendParamSet(TalonSrxProtocol.eNominalPosOutput, throttle)
+        self.sendParamSet(TalonSrxProtocol.eNominalNegOutput, -throttle)
+
+    # Set allowable closed loop error [0,1023]
+    def setAllowableClosedLoopError(self, error):
+        self.sendParamSet(TalonSrxProtocol.eProfileParamSlot0_AllowableClosedLoopErr, error)
+
+    # Set vcomp rate [1,255]
+    def setVCompRate(self, rate):
+        self.sendParamSet(TalonSrxProtocol.eProfileParamVcompRate, rate)
+
+    # Read current potentiometer value [0,1023]
     def getPotValue(self):
-        status2 = self._canIntf.getStatus4(self._deviceNo)
+        status2 = self._canIntf.getStatus2(self._deviceNo)
         if status2 is None:
             return 0
         return sign_extend_24(((status2 & 0xff) << 16) | (status2 & 0xff00) | ((status2 & 0xff0000) >> 16))
