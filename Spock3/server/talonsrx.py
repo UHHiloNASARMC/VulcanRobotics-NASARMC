@@ -176,6 +176,8 @@ class TalonSrxProtocol:
     eNominalNegOutput = 107
     eProfileParamSlot0_AllowableClosedLoopErr = 111
     eProfileParamVcompRate = 116
+    eMotMag_Accel = 122
+    eMotMag_VelCruise = 123
 
     # Constructor initializes Talon to idle
     def __init__(self, canIntf, deviceNo):
@@ -290,6 +292,14 @@ class TalonSrxProtocol:
     # Set vcomp rate [1,255]
     def setVCompRate(self, rate):
         self.sendParamSet(TalonSrxProtocol.eProfileParamVcompRate, rate)
+
+    # Set motion magic acceleration
+    def setMotionMagicAccel(self, accel):
+        self.sendParamSet(TalonSrxProtocol.eMotMag_Accel, rate)
+
+    # Set motion magic cruise velocity
+    def setMotionMagicCruiseVel(self, vel):
+        self.sendParamSet(TalonSrxProtocol.eMotMag_VelCruise, vel)
 
     # Read current potentiometer value [0,1023]
     def getPotValue(self):

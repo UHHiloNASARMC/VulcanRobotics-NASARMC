@@ -16,10 +16,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_devFinder, SIGNAL(axisLeftYChanged(double)), this, SLOT(axisLeftYChanged(double)));
     connect(&m_devFinder, SIGNAL(axisRightXChanged(double)), this, SLOT(axisRightXChanged(double)));
     connect(&m_devFinder, SIGNAL(axisRightYChanged(double)), this, SLOT(axisRightYChanged(double)));
+    connect(&m_devFinder, SIGNAL(buttonsChanged(int)), this, SLOT(buttonsChanged(int)));
 
-    setFixedSize(600, 550);
+    setFixedSize(870, 550);
     startTimer(20);
     m_devFinder.startScanning();
+
+    m_cam0.setVideoOutput(ui->forwardVideo);
+    m_cam0.setMedia(QUrl("udp://@127.0.0.1:48550"));
+    m_cam0.play();
 }
 
 void MainWindow::timerEvent(QTimerEvent*)
@@ -27,12 +32,32 @@ void MainWindow::timerEvent(QTimerEvent*)
     m_socket.reestablishConnection();
     sendCommandPacket();
     SpockStatusData data = m_socket.getStatusData();
+    if (data.limitSwitches & 0x1)
+        ui->armLimitLabel->setText("⬆");
+    if (data.limitSwitches & 0x2)
+        ui->armLimitLabel->setText("⬇");
+    if (!data.limitSwitches)
+        ui->armLimitLabel->setText("");
     ui->flMotorStat->setStatusData(data.frontLeftMotorStatus);
     ui->frMotorStat->setStatusData(data.frontRightMotorStatus);
     ui->blMotorStat->setStatusData(data.rearLeftMotorStatus);
     ui->brMotorStat->setStatusData(data.rearRightMotorStatus);
     ui->armMotorStat->setStatusData(data.armMotorStatus);
     ui->bucketMotorStat->setStatusData(data.bucketMotorStatus);
+
+    printf("%d\n", m_cam0.mediaStatus());
+}
+
+void MainWindow::changeLeftThrottle(double value)
+{
+    m_commandData.leftThrottle = std::max(-1023, std::min(1023, int(value * 1023.f)));
+    ui->leftThrottleLine->move(400, 170 - value * 140.0);
+}
+
+void MainWindow::changeRightThrottle(double value)
+{
+    m_commandData.rightThrottle = std::max(-1023, std::min(1023, int(value * 1023.f)));
+    ui->rightThrottleLine->move(580, 170 - value * 140.0);
 }
 
 void MainWindow::armSliderChanged(int value)
@@ -54,16 +79,53 @@ void MainWindow::driveMove(SpockDriveTrackpad* sender, QMouseEvent* ev)
     float y = std::max(0.f, std::min(ev->y() / float(sender->height()), 1.f)) * 2.f - 1.f;
     float leftMul = std::max(0.f, std::min(1.f - x, 1.f));
     float rightMul = std::max(0.f, std::min(x + 1.f, 1.f));
-    m_commandData.leftThrottle = leftMul * -y * 1023.f;
-    m_commandData.rightThrottle = rightMul * -y * 1023.f;
+    changeLeftThrottle(leftMul * -y);
+    changeRightThrottle(rightMul * -y);
+    m_moveDragging = true;
     //printf("%d %d\n", m_commandData.leftThrottle, m_commandData.rightThrottle);
 }
 
 void MainWindow::driveRelease(SpockDriveTrackpad*, QMouseEvent*)
 {
     //printf("release %f %f\n", ev->x() / float(sender->width()), ev->y() / float(sender->height()));
-    m_commandData.leftThrottle = 0;
-    m_commandData.rightThrottle = 0;
+    changeLeftThrottle(0.0);
+    changeRightThrottle(0.0);
+    m_moveDragging = false;
+}
+
+void MainWindow::resetBucketButtons()
+{
+    ui->driveRadio->setDown(false);
+    ui->driveRadio->setChecked(false);
+    ui->scoopRadio->setDown(false);
+    ui->scoopRadio->setChecked(false);
+    ui->dumpRadio->setDown(false);
+    ui->dumpRadio->setChecked(false);
+    ui->weighButton->setDown(false);
+}
+
+void MainWindow::bucketDrive()
+{
+    resetBucketButtons();
+    ui->driveRadio->setDown(true);
+}
+
+void MainWindow::bucketScoop()
+{
+    resetBucketButtons();
+    ui->scoopRadio->setDown(true);
+}
+
+void MainWindow::bucketDump()
+{
+    resetBucketButtons();
+    ui->dumpRadio->setDown(true);
+}
+
+void MainWindow::bucketWeigh()
+{
+    resetBucketButtons();
+    ui->weighButton->setDown(true);
 }
 
 void MainWindow::gamepadConnected()
@@ -83,11 +145,14 @@ void MainWindow::axisLeftXChanged(double)
 
 void MainWindow::axisLeftYChanged(double value)
 {
+    if (m_moveDragging)
+        return;
     //printf("left y %f\n", -value);
     if (std::fabs(value) > 0.1f)
-        m_commandData.leftThrottle = std::max(-1023, std::min(1023, int(-value * 1023.f)));
+        changeLeftThrottle(-value);
     else
-        m_commandData.leftThrottle = 0;
+        changeLeftThrottle(0.0);
+
 }
 
 void MainWindow::axisRightXChanged(double)
@@ -97,11 +162,27 @@ void MainWindow::axisRightXChanged(double)
 
 void MainWindow::axisRightYChanged(double value)
 {
+    if (m_moveDragging)
+        return;
     //printf("right y %f\n", -value);
     if (std::fabs(value) > 0.1f)
-        m_commandData.rightThrottle = std::max(-1023, std::min(1023, int(-value * 1023.f)));
+        changeRightThrottle(-value);
     else
-        m_commandData.rightThrottle = 0;
+        changeRightThrottle(0.0);
+}
+
+void MainWindow::buttonsChanged(int buttons)
+{
+    if ((m_lastButtons & 0x1000) == 0 && (buttons & 0x1000))
+        ui->dumpRadio->click();
+    if ((m_lastButtons & 0x4000) == 0 && (buttons & 0x4000))
+        ui->scoopRadio->click();
+    if ((m_lastButtons & 0x8000) == 0 && (buttons & 0x8000))
+        ui->driveRadio->click();
+    if ((m_lastButtons & 0x800) == 0 && (buttons & 0x800))
+        ui->weighButton->click();
+    m_lastButtons = buttons;
+    //printf("%04X\n", buttons);
 }
 
 void MainWindow::connectionEstablished()

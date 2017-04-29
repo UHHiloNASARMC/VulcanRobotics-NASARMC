@@ -6,10 +6,12 @@ proto = TalonSrxProtocol(intf, 3)
 proto.setPeakThrottle(512)
 proto.setNominalThrottle(512)
 proto.setP(0.03)
-proto.setRevFeedbackSensor(1)
+proto.setRevFeedbackSensor(0)
 #proto.setAllowableClosedLoopError(1)
 #proto.setCloseLoopRampRate(10)
 proto.setRampThrottle(10)
+proto.setMotionMagicAccel(100)
+proto.setMotionMagicCruiseVel(100)
 
 cycle_count = 0
 setpoint = 256
@@ -34,7 +36,7 @@ while True:
     #    setpoint = full_span + start
     #    proto.setDemand(-setpoint, TalonSrxProtocol.kPositionMode)
     setpoint = full_span * 0.5 + start
-    proto.setDemand(-setpoint, TalonSrxProtocol.kPositionMode)
+    proto.setDemand(setpoint, TalonSrxProtocol.kMotionMagic)
 
     # Scan pot value
     curpoint = proto.getPotValue()

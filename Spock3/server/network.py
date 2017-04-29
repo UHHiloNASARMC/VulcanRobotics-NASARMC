@@ -32,6 +32,7 @@ class SpockSocket:
         self._armPot = 0
         self._bucketPot = 0
         self._bucketState = 0
+        self._limitSwitches = 0
 
         self._lastRecvTime = None
         self._lastRecvPacket = 0
@@ -101,23 +102,37 @@ def ArmDegreesToCounts(degrees):
 def ArmCountsToDegrees(counts):
     return counts // 4
 
-class ArmDriveToPosition:
-    def __init__(self, angle, threshold):
-        self._counts = ArmDegreesToCounts(angle)
-        self._threshold = ArmDegreesToCounts(threshold)
-        
-    def update(self, ctrl):
-        pot = ctrl._arm.getPotValue()
+##################
+## Bucket Tasks ##
+##################
 
-class BucketDriveToPosition:
-    def __init__(self, angle):
-        self._ctrl = control_loop
+class ArmToActiveDrivePosition:
+    "Drive arm to active drive setpoint (just above resting position)"
+    def __init__(self, ctrl):
+        self._ctrl = ctrl
+
+class ArmRampDownThrottleRest:
+    "Ramp down arm throttle to land on rest position"
+    def __init__(self, ctrl):
+        self._ctrl = ctrl
+
+class ArmToWeighPosition:
+    "Drive arm to weigh position"
+    def __init__(self, ctrl):
+        self._ctrl = ctrl
+
+class ArmWeigh:
+    "Perform weigh"
+    def __init__(self, ctrl):
+        self._ctrl = ctrl
+
+class ArmToScoopPosition:
+    "Drive arm to scoop position"
+
+class ArmToDumpPosition:
+    "Drive arm to dump position"
 
 class ArmControlLoop:
-    # Physical limits to enforce with utmost priority
-    kMaxArmCountsPerSec = ArmDegreesToCounts(75)
-    kMaxArmThrottleCountsPerSec = 2048
-
     def __init__(self, arm_talon, bucket_talon):
         self._arm = arm_talon
         self._bucket = bucket_talon
@@ -127,10 +142,7 @@ class ArmControlLoop:
         self._armPot = None
         self._armSetPoint = None
         self._armThrottle = None
-        self._lastArmPot = None
-        self._lastBucketTime = None
         self._bucketPot = None
-        self._lastBucketPot = None
         self._state = 0
         self._taskList = []
 
@@ -139,6 +151,7 @@ class ArmControlLoop:
         if state == 0:
             self._arm.setDemand(0, kDisabled)
         elif state == 1:
+            self._arm.setDemand()
             
         self._state = state
 
@@ -149,67 +162,18 @@ class ArmControlLoop:
 
     def update(self):
         # Scan present states
-        self._armPot, armPotNew = self._arm.getPotValue()
-        self._bucketPot, bucketPotNew = self._bucket.getPotValue()
-        curTime = time.time()
+        self._armPot = self._arm.getPotValue()
+        self._bucketPot = self._bucket.getPotValue()
 
-        if self._lastTime is None:
-            # Initialize temporal states
-            self._lastTime = curTime
-            self._armVelocity = 0
-            self._lastArmPot = self._armPot
-            self._lastBucketPot = self._bucketPot
-        else:
-            # Advance temporal states
-            dt = curTime - self._lastTime
-            self._lastTime = curTime
-            maxArmThrottleDelta = kMaxArmThrottleCountsPerSec * dt
-            
-            if armPotNew:
-                armDt = curTime - self._lastArmTime
-                self._lastArmTime = curTime
-                deltaAng = self._armPot - self._lastArmPot
-                self._armVelocity = deltaAng / armDt
-                self._lastArmPot = self._armPot
+        # Update current task
+        if len(self._taskList):
+            if self._taskList[0].update(self):
+                # Task complete
+                self._taskList.pop(0)
 
-            if bucketPotNew:
-                bucketDt = curTime - self._lastBucketTime
-                self._lastBucketTime = curTime
-                deltaAng = self._bucketPot - self._lastBucketPot
-                self._bucketVelocity = deltaAng / bucketDt
-                self._lastBucketPot = self._bucketPot
+        # Talon-hosted control loop
+        self._arm.setDemand(self._armSetPoint, kPosition)
 
-            # Update current task
-            if len(self._taskList):
-                if self._taskList[0].update(self):
-                    # Task complete
-                    self._taskList.pop(0)
-
-            if False:
-                # Update arm set velocity
-                armError = abs(self._armSetPoint - self._armPot)
-                if armError < 30:
-                    armSetVelocity = 0
-                elif armError < 230:
-                    armSetVelocity = kMaxArmCountsPerSec * ((armError - 30) / 200)
-                else:
-                    armSetVelocity = kMaxArmCountsPerSec
-                    
-                if self._armSetPoint < self._armPot:
-                    armSetVelocity *= -1.0
-
-                # Update arm throttle
-                if armSetVelocity < self._armVelocity:
-                    self._armThrottle -= maxArmThrottleDelta
-                elif armSetVelocity > self._armVelocity:
-                    self._armThrottle += maxArmThrottleDelta
-                self._arm.setDemand(self._armThrottle, kThrottle)
-            else:
-                # Talon-hosted control loop
-                self._arm.setDemand(self._armSetPoint, kPosition)
-
-        
-            
 
 # Setup talon interface
 intf = talonsrx.TalonCANInterface()

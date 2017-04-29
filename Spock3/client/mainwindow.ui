@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>882</width>
     <height>569</height>
    </rect>
   </property>
@@ -93,7 +93,7 @@ color: rgb(255, 255, 255);</string>
       <x>400</x>
       <y>10</y>
       <width>181</width>
-      <height>361</height>
+      <height>301</height>
      </rect>
     </property>
     <property name="title">
@@ -103,10 +103,10 @@ color: rgb(255, 255, 255);</string>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>400</x>
-      <y>390</y>
+      <x>410</x>
+      <y>330</y>
       <width>171</width>
-      <height>51</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="title">
@@ -137,14 +137,45 @@ color: rgb(255, 255, 255);</string>
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
+    <widget class="QLCDNumber" name="armAngleNumber">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>111</width>
+       <height>23</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="armLimitLabel">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>50</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>⬆︎</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>400</x>
-      <y>450</y>
+      <x>410</x>
+      <y>430</y>
       <width>171</width>
-      <height>51</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="title">
@@ -175,6 +206,16 @@ color: rgb(255, 255, 255);</string>
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
+    <widget class="QLCDNumber" name="bucketAngleNumber">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>111</width>
+       <height>23</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QLabel" name="connectionLabel">
     <property name="geometry">
@@ -189,13 +230,212 @@ color: rgb(255, 255, 255);</string>
      <string/>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>9</y>
+      <width>261</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Forward View</string>
+    </property>
+    <widget class="QVideoWidget" name="forwardVideo" native="true">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>20</y>
+       <width>261</width>
+       <height>161</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>200</y>
+      <width>261</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Reverse View</string>
+    </property>
+    <widget class="QVideoWidget" name="forwardVideo_2" native="true">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>20</y>
+       <width>261</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_5">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>400</y>
+      <width>261</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Bucket Controls</string>
+    </property>
+    <widget class="QRadioButton" name="driveRadio">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Drive</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/PlayStation_button_S.svg</normaloff>:/icons/PlayStation_button_S.svg</iconset>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="scoopRadio">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>30</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Scoop</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/PlayStation_button_X.svg</normaloff>:/icons/PlayStation_button_X.svg</iconset>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="dumpRadio">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>30</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Dump</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/PlayStation_button_T.svg</normaloff>:/icons/PlayStation_button_T.svg</iconset>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLCDNumber" name="weightNumber">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>60</y>
+       <width>121</width>
+       <height>41</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="weighButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>91</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Weigh</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/PlayStation_button_R1.svg</normaloff>:/icons/PlayStation_button_R1.svg</iconset>
+     </property>
+    </widget>
+   </widget>
+   <widget class="Line" name="leftThrottleLine">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>170</y>
+      <width>4</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="rightThrottleLine">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>170</y>
+      <width>4</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>882</width>
      <height>22</height>
     </rect>
    </property>
@@ -225,8 +465,16 @@ color: rgb(255, 255, 255);</string>
    <extends>QSlider</extends>
    <header>spockmotorslider.h</header>
   </customwidget>
+  <customwidget>
+   <class>QVideoWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QVideoWidget</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>armSlider</sender>
@@ -308,11 +556,79 @@ color: rgb(255, 255, 255);</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>driveRadio</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>bucketDrive()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>650</x>
+     <y>462</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>440</x>
+     <y>284</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scoopRadio</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>bucketScoop()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>730</x>
+     <y>462</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>440</x>
+     <y>284</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dumpRadio</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>bucketDump()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>810</x>
+     <y>462</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>440</x>
+     <y>284</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>weighButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>bucketWeigh()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>655</x>
+     <y>502</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>440</x>
+     <y>284</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>armSliderChanged(int)</slot>
   <slot>bucketSliderChanged(int)</slot>
   <slot>driveMove(SpockDriveTrackpad*,QMouseEvent*)</slot>
   <slot>driveRelease(SpockDriveTrackpad*,QMouseEvent*)</slot>
+  <slot>bucketDrive()</slot>
+  <slot>bucketScoop()</slot>
+  <slot>bucketDump()</slot>
+  <slot>bucketWeigh()</slot>
  </slots>
 </ui>

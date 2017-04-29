@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>PlayStation_button_C.svg</file>
+        <file>PlayStation_button_R1.svg</file>
+        <file>PlayStation_button_S.svg</file>
+        <file>PlayStation_button_T.svg</file>
+        <file>PlayStation_button_X.svg</file>
+    </qresource>
+</RCC>

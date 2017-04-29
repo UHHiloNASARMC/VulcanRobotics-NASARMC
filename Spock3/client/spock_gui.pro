@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -64,3 +64,6 @@ HEADERS  += inputdev/CFPointer.hpp \
 
 FORMS    += mainwindow.ui \
     spockmotorstatusbox.ui
+
+RESOURCES += \
+    resources.qrc
