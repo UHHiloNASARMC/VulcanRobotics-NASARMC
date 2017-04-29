@@ -1,17 +1,21 @@
 import talonsrx, time
+from RPi import GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(24, GPIO.OUT)
+GPIO.output(24, GPIO.HIGH)
 
 intf = talonsrx.TalonCANInterface()
 TalonSrxProtocol = talonsrx.TalonSrxProtocol
 proto = TalonSrxProtocol(intf, 3)
 proto.setPeakThrottle(512)
 proto.setNominalThrottle(512)
-proto.setP(0.03)
-proto.setRevFeedbackSensor(0)
+proto.setP(0.1)
+proto.setRevFeedbackSensor(1)
 #proto.setAllowableClosedLoopError(1)
 #proto.setCloseLoopRampRate(10)
 proto.setRampThrottle(10)
-proto.setMotionMagicAccel(100)
-proto.setMotionMagicCruiseVel(100)
+proto.setMotionMagicAccel(1)
+proto.setMotionMagicCruiseVel(1)
 
 cycle_count = 0
 setpoint = 256
@@ -35,12 +39,16 @@ while True:
     #    print('Running to 100%')
     #    setpoint = full_span + start
     #    proto.setDemand(-setpoint, TalonSrxProtocol.kPositionMode)
-    setpoint = full_span * 0.5 + start
-    proto.setDemand(setpoint, TalonSrxProtocol.kMotionMagic)
+    #setpoint = full_span * 0.5 + start
+    #setpoint = 900
+    proto.setDemand(-900, TalonSrxProtocol.kMotionMagic)
 
     # Scan pot value
     curpoint = proto.getPotValue()
-    print('Value', curpoint)
+    forward_lim = proto.getForwardLimitSwitch()
+    rev_lim = proto.getReverseLimitSwitch()
+    throttle = proto.getAppliedThrottle()
+    print('Value', curpoint, 'Fwd', forward_lim, 'Rev', rev_lim, 'Throttle', throttle)
 
     #if curpoint < setpoint - tolerance:
         # Drive forward
