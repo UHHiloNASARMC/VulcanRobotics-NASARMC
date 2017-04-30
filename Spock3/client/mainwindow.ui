@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>882</width>
-    <height>569</height>
+    <width>977</width>
+    <height>577</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -93,7 +93,7 @@ color: rgb(255, 255, 255);</string>
       <x>400</x>
       <y>10</y>
       <width>181</width>
-      <height>301</height>
+      <height>181</height>
      </rect>
     </property>
     <property name="title">
@@ -103,9 +103,9 @@ color: rgb(255, 255, 255);</string>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>330</y>
-      <width>171</width>
+      <x>400</x>
+      <y>200</y>
+      <width>181</width>
       <height>81</height>
      </rect>
     </property>
@@ -117,7 +117,7 @@ color: rgb(255, 255, 255);</string>
       <rect>
        <x>19</x>
        <y>30</y>
-       <width>131</width>
+       <width>141</width>
        <height>20</height>
       </rect>
      </property>
@@ -172,9 +172,9 @@ color: rgb(255, 255, 255);</string>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>430</y>
-      <width>171</width>
+      <x>400</x>
+      <y>290</y>
+      <width>181</width>
       <height>81</height>
      </rect>
     </property>
@@ -186,7 +186,7 @@ color: rgb(255, 255, 255);</string>
       <rect>
        <x>19</x>
        <y>30</y>
-       <width>131</width>
+       <width>141</width>
        <height>20</height>
       </rect>
      </property>
@@ -235,27 +235,27 @@ color: rgb(255, 255, 255);</string>
      <rect>
       <x>600</x>
       <y>9</y>
-      <width>261</width>
-      <height>181</height>
+      <width>321</width>
+      <height>261</height>
      </rect>
     </property>
     <property name="title">
      <string>Forward View</string>
     </property>
-    <widget class="QVideoWidget" name="forwardVideo" native="true">
+    <widget class="VlcWidgetVideo" name="forwardVideo">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>20</y>
-       <width>261</width>
-       <height>161</height>
+       <width>321</width>
+       <height>241</height>
       </rect>
      </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
      </property>
     </widget>
    </widget>
@@ -263,38 +263,38 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>600</x>
-      <y>200</y>
-      <width>261</width>
-      <height>191</height>
+      <y>280</y>
+      <width>321</width>
+      <height>261</height>
      </rect>
     </property>
     <property name="title">
      <string>Reverse View</string>
     </property>
-    <widget class="QVideoWidget" name="forwardVideo_2" native="true">
+    <widget class="VlcWidgetVideo" name="reverseVideo">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>20</y>
-       <width>261</width>
-       <height>171</height>
+       <width>321</width>
+       <height>241</height>
       </rect>
      </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>600</x>
-      <y>400</y>
-      <width>261</width>
-      <height>111</height>
+      <x>400</x>
+      <y>380</y>
+      <width>181</width>
+      <height>161</height>
      </rect>
     </property>
     <property name="title">
@@ -304,7 +304,7 @@ color: rgb(255, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>30</y>
+       <y>60</y>
        <width>81</width>
        <height>22</height>
       </rect>
@@ -317,7 +317,7 @@ color: rgb(255, 255, 255);</string>
        <normaloff>:/icons/PlayStation_button_S.svg</normaloff>:/icons/PlayStation_button_S.svg</iconset>
      </property>
      <property name="checkable">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="autoExclusive">
       <bool>false</bool>
@@ -326,8 +326,8 @@ color: rgb(255, 255, 255);</string>
     <widget class="QRadioButton" name="scoopRadio">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>30</y>
+       <x>10</x>
+       <y>90</y>
        <width>81</width>
        <height>22</height>
       </rect>
@@ -340,7 +340,7 @@ color: rgb(255, 255, 255);</string>
        <normaloff>:/icons/PlayStation_button_X.svg</normaloff>:/icons/PlayStation_button_X.svg</iconset>
      </property>
      <property name="checkable">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="autoExclusive">
       <bool>false</bool>
@@ -349,7 +349,7 @@ color: rgb(255, 255, 255);</string>
     <widget class="QRadioButton" name="dumpRadio">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>10</x>
        <y>30</y>
        <width>81</width>
        <height>22</height>
@@ -363,7 +363,7 @@ color: rgb(255, 255, 255);</string>
        <normaloff>:/icons/PlayStation_button_T.svg</normaloff>:/icons/PlayStation_button_T.svg</iconset>
      </property>
      <property name="checkable">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="autoExclusive">
       <bool>false</bool>
@@ -372,10 +372,10 @@ color: rgb(255, 255, 255);</string>
     <widget class="QLCDNumber" name="weightNumber">
      <property name="geometry">
       <rect>
-       <x>120</x>
-       <y>60</y>
-       <width>121</width>
-       <height>41</height>
+       <x>100</x>
+       <y>120</y>
+       <width>71</width>
+       <height>31</height>
       </rect>
      </property>
     </widget>
@@ -383,9 +383,9 @@ color: rgb(255, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
-       <width>91</width>
-       <height>41</height>
+       <y>120</y>
+       <width>81</width>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
@@ -396,12 +396,32 @@ color: rgb(255, 255, 255);</string>
        <normaloff>:/icons/PlayStation_button_R1.svg</normaloff>:/icons/PlayStation_button_R1.svg</iconset>
      </property>
     </widget>
+    <widget class="QPushButton" name="panicButton">
+     <property name="geometry">
+      <rect>
+       <x>99</x>
+       <y>30</y>
+       <width>71</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string>PANIC</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/PlayStation_button_C.svg</normaloff>:/icons/PlayStation_button_C.svg</iconset>
+     </property>
+    </widget>
    </widget>
    <widget class="Line" name="leftThrottleLine">
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>170</y>
+      <y>100</y>
       <width>4</width>
       <height>16</height>
      </rect>
@@ -417,7 +437,7 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>580</x>
-      <y>170</y>
+      <y>100</y>
       <width>4</width>
       <height>16</height>
      </rect>
@@ -435,7 +455,7 @@ color: rgb(255, 255, 255);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>882</width>
+     <width>977</width>
      <height>22</height>
     </rect>
    </property>
@@ -466,9 +486,9 @@ color: rgb(255, 255, 255);</string>
    <header>spockmotorslider.h</header>
   </customwidget>
   <customwidget>
-   <class>QVideoWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QVideoWidget</header>
+   <class>VlcWidgetVideo</class>
+   <extends>QFrame</extends>
+   <header location="global">VLCQtWidgets/WidgetVideo.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -620,6 +640,22 @@ color: rgb(255, 255, 255);</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>panicButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>bucketPanic()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>534</x>
+     <y>472</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>488</x>
+     <y>288</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>armSliderChanged(int)</slot>
@@ -630,5 +666,6 @@ color: rgb(255, 255, 255);</string>
   <slot>bucketScoop()</slot>
   <slot>bucketDump()</slot>
   <slot>bucketWeigh()</slot>
+  <slot>bucketPanic()</slot>
  </slots>
 </ui>

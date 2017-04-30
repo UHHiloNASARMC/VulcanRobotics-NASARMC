@@ -1,14 +1,18 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMouseEvent>
+#include <VLCQtCore/Common.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_socket("raspberrypi.local", this)
+    m_socket("spock.local", this),
+    m_vlcInst(VlcCommon::args(), this),
+    m_cam0Media("udp://@:48550", &m_vlcInst),
+    m_cam0(&m_vlcInst)
 {
     ui->setupUi(this);
-    ui->connectionLabel->setText("Connecting to raspberrypi.local");
+    ui->connectionLabel->setText("Connecting to spock.local");
 
     connect(&m_devFinder, SIGNAL(gamepadConnected()), this, SLOT(gamepadConnected()));
     connect(&m_devFinder, SIGNAL(gamepadDisconnected()), this, SLOT(gamepadDisconnected()));
@@ -18,13 +22,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_devFinder, SIGNAL(axisRightYChanged(double)), this, SLOT(axisRightYChanged(double)));
     connect(&m_devFinder, SIGNAL(buttonsChanged(int)), this, SLOT(buttonsChanged(int)));
 
-    setFixedSize(870, 550);
+    setFixedSize(940, 550);
     startTimer(20);
     m_devFinder.startScanning();
 
-    m_cam0.setVideoOutput(ui->forwardVideo);
-    m_cam0.setMedia(QUrl("udp://@127.0.0.1:48550"));
-    m_cam0.play();
+    m_cam0.setVideoWidget(ui->forwardVideo);
+    ui->forwardVideo->setMediaPlayer(&m_cam0);
+    m_cam0.open(&m_cam0Media);
 }
 
 void MainWindow::timerEvent(QTimerEvent*)
@@ -45,19 +49,37 @@ void MainWindow::timerEvent(QTimerEvent*)
     ui->armMotorStat->setStatusData(data.armMotorStatus);
     ui->bucketMotorStat->setStatusData(data.bucketMotorStatus);
 
-    printf("%d\n", m_cam0.mediaStatus());
+    //resetBucketButtons();
+    ui->scoopRadio->setChecked(false);
+    ui->driveRadio->setChecked(false);
+    ui->dumpRadio->setChecked(false);
+    switch (data.sensedBucketState)
+    {
+    case ESpockBucketState::Scooping:
+        ui->scoopRadio->setChecked(true);
+        break;
+    case ESpockBucketState::Driving:
+        ui->driveRadio->setChecked(true);
+        break;
+    case ESpockBucketState::Dumping:
+        ui->dumpRadio->setChecked(true);
+        break;
+    case ESpockBucketState::Weighing:
+    default:
+        break;
+    }
 }
 
 void MainWindow::changeLeftThrottle(double value)
 {
     m_commandData.leftThrottle = std::max(-1023, std::min(1023, int(value * 1023.f)));
-    ui->leftThrottleLine->move(400, 170 - value * 140.0);
+    ui->leftThrottleLine->move(400, 100 - value * 70.0);
 }
 
 void MainWindow::changeRightThrottle(double value)
 {
     m_commandData.rightThrottle = std::max(-1023, std::min(1023, int(value * 1023.f)));
-    ui->rightThrottleLine->move(580, 170 - value * 140.0);
+    ui->rightThrottleLine->move(580, 100 - value * 70.0);
 }
 
 void MainWindow::armSliderChanged(int value)
@@ -77,8 +99,8 @@ void MainWindow::driveMove(SpockDriveTrackpad* sender, QMouseEvent* ev)
     //printf("move %f %f\n", ev->x() / float(sender->width()), ev->y() / float(sender->height()));
     float x = ev->x() / float(sender->width()) * 2.f - 1.f;
     float y = std::max(0.f, std::min(ev->y() / float(sender->height()), 1.f)) * 2.f - 1.f;
-    float leftMul = std::max(0.f, std::min(1.f - x, 1.f));
-    float rightMul = std::max(0.f, std::min(x + 1.f, 1.f));
+    float leftMul = std::max(0.f, std::min(1.f - x, 1.f)) * 2.f - 1.f;
+    float rightMul = std::max(0.f, std::min(x + 1.f, 1.f)) * 2.f - 1.f;
     changeLeftThrottle(leftMul * -y);
     changeRightThrottle(rightMul * -y);
     m_moveDragging = true;
@@ -108,24 +130,33 @@ void MainWindow::bucketDrive()
 {
     resetBucketButtons();
     ui->driveRadio->setDown(true);
+    m_commandData.bucketState = ESpockBucketState::Driving;
 }
 
 void MainWindow::bucketScoop()
 {
     resetBucketButtons();
     ui->scoopRadio->setDown(true);
+    m_commandData.bucketState = ESpockBucketState::Scooping;
 }
 
 void MainWindow::bucketDump()
 {
     resetBucketButtons();
     ui->dumpRadio->setDown(true);
+    m_commandData.bucketState = ESpockBucketState::Dumping;
 }
 
 void MainWindow::bucketWeigh()
 {
     resetBucketButtons();
     ui->weighButton->setDown(true);
+}
+
+void MainWindow::bucketPanic()
+{
+    resetBucketButtons();
+    m_commandData.bucketState = ESpockBucketState::Invalid;
 }
 
 void MainWindow::gamepadConnected()
@@ -175,6 +206,8 @@ void MainWindow::buttonsChanged(int buttons)
 {
     if ((m_lastButtons & 0x1000) == 0 && (buttons & 0x1000))
         ui->dumpRadio->click();
+    if ((m_lastButtons & 0x2000) == 0 && (buttons & 0x2000))
+        ui->panicButton->click();
     if ((m_lastButtons & 0x4000) == 0 && (buttons & 0x4000))
         ui->scoopRadio->click();
     if ((m_lastButtons & 0x8000) == 0 && (buttons & 0x8000))
@@ -192,7 +225,7 @@ void MainWindow::connectionEstablished()
 
 void MainWindow::connectionLost()
 {
-    ui->connectionLabel->setText("Disconnected; reestablishing connection to raspberrypi.local");
+    ui->connectionLabel->setText("Disconnected; reestablishing connection to spock.local");
 }
 
 void MainWindow::sendCommandPacket()
@@ -202,4 +235,8 @@ void MainWindow::sendCommandPacket()
 
 MainWindow::~MainWindow()
 {
+    m_cam0.stop();
+    layout()->removeWidget(ui->forwardVideo);
+    delete ui->forwardVideo;
+    ui->forwardVideo = nullptr;
 }

@@ -2,10 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMediaPlayer>
 #include "spocktcpsocket.h"
 #include "inputdev/DeviceFinder.hpp"
 #include "inputdev/DualshockPad.hpp"
+#include <VLCQtCore/Media.h>
+#include <VLCQtCore/Instance.h>
+#include <VLCQtCore/MediaPlayer.h>
 
 namespace Ui {
 class MainWindow;
@@ -87,6 +89,7 @@ public slots:
     void bucketScoop();
     void bucketDump();
     void bucketWeigh();
+    void bucketPanic();
     void gamepadConnected();
     void gamepadDisconnected();
     void axisLeftXChanged(double value);
@@ -103,9 +106,11 @@ private:
     SpockTCPSocket m_socket;
     SpockCommandData m_commandData;
     DeviceFinder m_devFinder;
-    QMediaPlayer m_cam0;
     bool m_moveDragging = false;
     int m_lastButtons = 0;
+    VlcInstance m_vlcInst;
+    VlcMedia m_cam0Media;
+    VlcMediaPlayer m_cam0;
 };
 
 #endif // MAINWINDOW_H

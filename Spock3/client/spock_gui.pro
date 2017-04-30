@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network multimediawidgets
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,7 +13,10 @@ TEMPLATE = app
 CONFIG += c++14
 macx {
 LIBS += -framework CoreFoundation
+LIBS += -F$${PWD}/vlc-qt/lib -framework VLCQtCore -framework VLCQtWidgets
+QMAKE_CXXFLAGS += -F$${PWD}/vlc-qt/lib
 }
+
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings

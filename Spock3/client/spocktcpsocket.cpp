@@ -74,7 +74,8 @@ void SpockTCPSocket::sendPacket(const SpockCommandData& data)
         s << quint64(time(nullptr));
         s << ++m_lastPacketSent;
         data.write(s);
-        write(bytes);
+        qint64 written = write(bytes);
+        printf("%lld %lld\n", written, m_lastPacketSent);
     }
 }
 

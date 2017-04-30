@@ -6,6 +6,11 @@ def sign_extend_24(value):
     sign_bit = 1 << 23
     return (value & (sign_bit - 1)) - (value & sign_bit)
 
+# 11-bit 2's compliment sign extension
+def sign_extend_11(value):
+    sign_bit = 1 << 10
+    return (value & (sign_bit - 1)) - (value & sign_bit)
+
 # Talon CAN interface class
 class TalonCANInterface:
     def __init__(self):
@@ -120,12 +125,19 @@ class TalonCANInterface:
         self._l.release()
         return ret
 
-        # Get analog in register
+    # Get analog in register
     def getStatus4(self, deviceNo):
         self._l.acquire()
         ret = None
         if deviceNo in self._status4Bufs:
             ret = struct.unpack('<Q', self._status4Bufs[deviceNo])[0]
+        self._l.release()
+        return ret
+
+    # Has valid data
+    def hasData(self, deviceNo):
+        self._l.acquire()
+        ret = deviceNo in self._status1Bufs and deviceNo in self._status2Bufs and deviceNo in self._status4Bufs
         self._l.release()
         return ret
 
@@ -295,11 +307,25 @@ class TalonSrxProtocol:
 
     # Set motion magic acceleration
     def setMotionMagicAccel(self, accel):
-        self.sendParamSet(TalonSrxProtocol.eMotMag_Accel, rate)
+        self.sendParamSet(TalonSrxProtocol.eMotMag_Accel, accel)
 
     # Set motion magic cruise velocity
     def setMotionMagicCruiseVel(self, vel):
         self.sendParamSet(TalonSrxProtocol.eMotMag_VelCruise, vel)
+
+    # Read forward limit switch
+    def getForwardLimitSwitch(self):
+        status1 = self._canIntf.getStatus1(self._deviceNo)
+        if status1 is None:
+            return False
+        return bool((status1 >> 31) & 0x1)
+
+    # Read reverse limit switch
+    def getReverseLimitSwitch(self):
+        status1 = self._canIntf.getStatus1(self._deviceNo)
+        if status1 is None:
+            return False
+        return bool((status1 >> 30) & 0x1)
 
     # Read current potentiometer value [0,1023]
     def getPotValue(self):
@@ -317,6 +343,15 @@ class TalonSrxProtocol:
         low = (status2 >> 48) & 0xc0
         return ((high << 8) | low) >> 6
 
+    # Read applied throttle
+    def getAppliedThrottle(self):
+        status1 = self._canIntf.getStatus1(self._deviceNo)
+        if status1 is None:
+            return 0
+        high = (status1 >> 24) & 0x7
+        low = (status1 >> 32) & 0xff
+        return sign_extend_11((high << 8) | low)
+
     # Read battery voltage
     def getBattV(self):
         status4 = self._canIntf.getStatus4(self._deviceNo)
@@ -330,4 +365,8 @@ class TalonSrxProtocol:
         if status4 is None:
             return 0
         return (status4 >> 40) & 0xff
-         
+
+    # Has valid feedback data
+    def hasData(self):
+        return self._canIntf.hasData(self._deviceNo)
+
