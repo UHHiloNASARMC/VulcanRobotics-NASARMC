@@ -79,7 +79,12 @@ public:
         buttons |= state.wButtons & 0x1000 ? 0x4000 : 0;
         buttons |= state.wButtons & 0x4000 ? 0x8000 : 0;
         buttons |= state.wButtons & 0x200 ? 0x800 : 0;
+        buttons |= state.wButtons & 0x100 ? 0x100 : 0;
+        buttons |= state.bLeftTrigger > 127 ? 0x400 : 0;
         emit buttonsChanged(buttons);
+
+        emit shoulderLeftChanged(state.bLeftTrigger);
+        emit shoulderRightChanged(state.bRightTrigger);
     }
 
 signals:

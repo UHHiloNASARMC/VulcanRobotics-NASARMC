@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMouseEvent>
