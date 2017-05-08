@@ -49,14 +49,14 @@ void DualshockPad::deviceDisconnected()
 
 void DualshockPad::initialCycle()
 {
-    uint8_t setupCommand[4] = {0x42, 0x0c, 0x00, 0x00}; //Tells controller to start sending changes on in pipe
-    if (!sendHIDReport(setupCommand, sizeof(setupCommand), HIDReportType::Feature, 0xF4))
-    {
-        deviceError("Unable to send complete packet! Request size %x\n", sizeof(setupCommand));
-        return;
-    }
+    uint8_t setupCommand[5] = {0xF4, 0x42, 0x0c, 0x00, 0x00}; //Tells controller to start sending changes on in pipe
+    //if (!sendHIDReport(setupCommand, 4, HIDReportType::Feature, 0xF4))
+    //{
+    //    deviceError("Unable to send complete packet! Request size %x\n", sizeof(setupCommand));
+    //    return;
+    //}
     uint8_t btAddr[8];
-    receiveHIDReport(btAddr, sizeof(btAddr), HIDReportType::Feature, 0xF5);
+    //receiveHIDReport(btAddr, sizeof(btAddr), HIDReportType::Feature, 0xF5);
     for (int i = 0; i < 6; i++)
         m_btAddress[5 - i] = btAddr[i + 2]; // Copy into buffer reversed, so it is LSB first
 }

@@ -12,11 +12,11 @@ TARGET = spock_gui
 TEMPLATE = app
 CONFIG += c++14
 macx {
-LIBS += -framework CoreFoundation
-LIBS += -F$${PWD}/vlc-qt/lib -framework VLCQtCore -framework VLCQtWidgets
-QMAKE_CXXFLAGS += -F$${PWD}/vlc-qt/lib
+LIBS += -framework VLCQtCore -framework VLCQtWidgets -framework CoreFoundation
 }
-
+win32 {
+LIBS += VLCQtCore.lib VLCQtWidgets.lib Winusb.lib Hid.lib Setupapi.lib User32.lib Xinput.lib
+}
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -56,13 +56,18 @@ HEADERS  += mainwindow.h \
     inputdev/DualshockPad.hpp \
     inputdev/IHIDDevice.hpp \
     inputdev/IHIDListener.hpp \
-    inputdev/GenericPad.hpp
+    inputdev/GenericPad.hpp \
+    inputdev/XInputPad.hpp
 
 macx {
 SOURCES += inputdev/HIDDeviceIOKit.cpp \
     inputdev/HIDListenerIOKit.cpp
 HEADERS  += inputdev/CFPointer.hpp \
     inputdev/IOKitPointer.hpp
+}
+win32 {
+SOURCES += inputdev/HIDDeviceWinUSB.cpp \
+    inputdev/HIDListenerWinUSB.cpp
 }
 
 FORMS    += mainwindow.ui \

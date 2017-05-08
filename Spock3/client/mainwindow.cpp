@@ -3,16 +3,19 @@
 #include <QMouseEvent>
 #include <VLCQtCore/Common.h>
 
+#undef min
+#undef max
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_socket("spock.local", this),
+    m_socket(QStringLiteral("spock.local"), this),
     m_vlcInst(VlcCommon::args(), this),
-    m_cam0Media("udp://@:48550", &m_vlcInst),
+    m_cam0Media(QStringLiteral("udp://@:48550"), &m_vlcInst),
     m_cam0(&m_vlcInst)
 {
     ui->setupUi(this);
-    ui->connectionLabel->setText("Connecting to spock.local");
+    ui->connectionLabel->setText(QStringLiteral("Connecting to spock.local"));
 
     connect(&m_devFinder, SIGNAL(gamepadConnected()), this, SLOT(gamepadConnected()));
     connect(&m_devFinder, SIGNAL(gamepadDisconnected()), this, SLOT(gamepadDisconnected()));
@@ -162,11 +165,13 @@ void MainWindow::bucketPanic()
 void MainWindow::gamepadConnected()
 {
     //printf("Connected\n");
+    ui->connectionLabel->setText(QStringLiteral("Connected"));
 }
 
 void MainWindow::gamepadDisconnected()
 {
     //printf("Disconnected\n");
+    ui->connectionLabel->setText(QStringLiteral("Disconnected"));
 }
 
 void MainWindow::axisLeftXChanged(double)

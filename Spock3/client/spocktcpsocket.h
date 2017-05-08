@@ -15,7 +15,7 @@ class SpockTCPSocket : public QTcpSocket
     quint64 m_lastPacketSent = 0;
     bool m_doingDns = false;
 public:
-    SpockTCPSocket(const std::string& hostname, MainWindow* mainWindow);
+    SpockTCPSocket(const QString& hostname, MainWindow* mainWindow);
     void reestablishConnection();
     SpockStatusData getStatusData();
     void sendPacket(const SpockCommandData& data);
@@ -23,7 +23,7 @@ public:
 public slots:
     void dnsHostFound(const QHostInfo& host);
 private:
-    std::string m_hostname;
+    QString m_hostname;
 };
 
 #endif // SPOCKTCPSOCKET_H

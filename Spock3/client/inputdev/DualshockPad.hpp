@@ -147,7 +147,6 @@ struct DualshockPadState
 class DualshockPad;
 struct IDualshockPadCallback
 {
-    DualshockPad* ctrl = nullptr;
     virtual void controllerDisconnected() {}
     virtual void controllerUpdate(const DualshockPadState&) {}
 };
@@ -171,8 +170,7 @@ public:
     DualshockPad(DeviceToken* token);
     ~DualshockPad();
 
-    void setCallback(IDualshockPadCallback* cb)
-    { m_callback = cb; if (m_callback) m_callback->ctrl = this; }
+    void setCallback(IDualshockPadCallback* cb) { m_callback = cb; }
 
     void startRumble(EDualshockMotor motor, uint8_t duration = 254, uint8_t intensity=255)
     {

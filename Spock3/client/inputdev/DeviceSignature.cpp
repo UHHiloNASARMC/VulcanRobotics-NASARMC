@@ -1,6 +1,7 @@
 #include "DeviceSignature.hpp"
 #include "DeviceToken.hpp"
 #include "GenericPad.hpp"
+#include "XInputPad.hpp"
 #include "IHIDDevice.hpp"
 
 namespace boo
@@ -11,19 +12,10 @@ extern const DeviceSignature BOO_DEVICE_SIGS[];
 
 bool DeviceSignature::DeviceMatchToken(const DeviceToken& token, const TDeviceSignatureSet& sigSet)
 {
-    if (token.getDeviceType() == DeviceType::HID)
-    {
-        for (const DeviceSignature* sig : sigSet)
-        {
-            if (sig->m_vid == token.getVendorId() && sig->m_pid == token.getProductId() &&
-                sig->m_type != DeviceType::HID)
-                return false;
-        }
-        return true;
-    }
     for (const DeviceSignature* sig : sigSet)
     {
-        if (sig->m_vid == token.getVendorId() && sig->m_pid == token.getProductId())
+        if (sig->m_vid == token.getVendorId() && sig->m_pid == token.getProductId() &&
+            sig->m_type == token.getDeviceType())
             return true;
     }
     return false;
@@ -32,6 +24,10 @@ bool DeviceSignature::DeviceMatchToken(const DeviceToken& token, const TDeviceSi
 std::unique_ptr<IHIDDevice> IHIDDeviceNew(DeviceToken& token, DeviceBase& devImp);
 std::shared_ptr<DeviceBase> DeviceSignature::DeviceNew(DeviceToken& token)
 {
+    /* Special handling for XInput */
+    if (token.getDeviceType() == DeviceType::XInput)
+        return std::make_shared<XInputPad>(&token);
+
     std::shared_ptr<DeviceBase> retval;
 
     /* Perform signature-matching to find the appropriate device-factory */
