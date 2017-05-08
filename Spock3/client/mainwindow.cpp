@@ -182,13 +182,11 @@ void MainWindow::bucketPanic()
 void MainWindow::gamepadConnected()
 {
     //printf("Connected\n");
-    ui->connectionLabel->setText(QStringLiteral("Connected"));
 }
 
 void MainWindow::gamepadDisconnected()
 {
     //printf("Disconnected\n");
-    ui->connectionLabel->setText(QStringLiteral("Disconnected"));
 }
 
 void MainWindow::axisLeftXChanged(double)
