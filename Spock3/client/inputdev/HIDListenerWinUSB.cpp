@@ -193,7 +193,19 @@ class HIDListenerWinUSB final : public IHIDListener
                         {
                             XInputPad& pad = static_cast<XInputPad&>(*tok.m_connectedDev);
                             if (pad.m_callback)
-                                pad.m_callback->controllerUpdate(ConvertXInputState(state.Gamepad));
+                                pad.m_callback->controllerUpdate(pad, ConvertXInputState(state.Gamepad));
+                        }
+                    }
+                    if (tok.m_connectedDev)
+                    {
+                        XInputPad& pad = static_cast<XInputPad&>(*tok.m_connectedDev);
+                        if (pad.m_rumbleRequest[0] != pad.m_rumbleState[0] ||
+                            pad.m_rumbleRequest[1] != pad.m_rumbleState[1])
+                        {
+                            pad.m_rumbleState[0] = pad.m_rumbleRequest[0];
+                            pad.m_rumbleState[1] = pad.m_rumbleRequest[1];
+                            XINPUT_VIBRATION vibe = {pad.m_rumbleRequest[0], pad.m_rumbleRequest[1]};
+                            XInputSetState(i, &vibe);
                         }
                     }
                 }

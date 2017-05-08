@@ -55,7 +55,7 @@ public:
         }
     }
 
-    void controllerUpdate(const boo::DualshockPadState& state)
+    void controllerUpdate(boo::DualshockPad&, const boo::DualshockPadState& state)
     {
         emit axisLeftXChanged(state.m_leftStick[0] / 127.f - 1.f);
         emit axisLeftYChanged(state.m_leftStick[1] / 127.f - 1.f);
@@ -64,7 +64,7 @@ public:
         emit buttonsChanged(state.m_buttonState);
     }
 
-    void controllerUpdate(const boo::XInputPadState& state)
+    void controllerUpdate(boo::XInputPad&, const boo::XInputPadState& state)
     {
         emit axisLeftXChanged(state.sThumbLX / 32768.f);
         emit axisLeftYChanged(-state.sThumbLY / 32768.f);
