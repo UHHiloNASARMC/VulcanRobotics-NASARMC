@@ -56,6 +56,8 @@ public:
         emit axisRightXChanged(state.m_rightStick[0] / 127.f - 1.f);
         emit axisRightYChanged(state.m_rightStick[1] / 127.f - 1.f);
         emit buttonsChanged(state.m_buttonState);
+        emit shoulderLeftChanged(state.m_pressureL2);
+        emit shoulderRightChanged(state.m_pressureR2);
     }
 
 signals:
@@ -65,6 +67,8 @@ signals:
     void axisLeftYChanged(double val);
     void axisRightXChanged(double val);
     void axisRightYChanged(double val);
+    void shoulderLeftChanged(double val);
+    void shoulderRightChanged(double val);
     void buttonsChanged(int val);
 };
 
@@ -96,9 +100,12 @@ public slots:
     void axisLeftYChanged(double value);
     void axisRightXChanged(double value);
     void axisRightYChanged(double value);
+    void shoulderLeftChanged(double value);
+    void shoulderRightChanged(double value);
     void buttonsChanged(int buttons);
     void connectionEstablished();
     void connectionLost();
+    void doReconnect();
     void sendCommandPacket();
 
 private:
@@ -108,9 +115,12 @@ private:
     DeviceFinder m_devFinder;
     bool m_moveDragging = false;
     int m_lastButtons = 0;
+    bool m_canSend = false;
     VlcInstance m_vlcInst;
     VlcMedia m_cam0Media;
     VlcMediaPlayer m_cam0;
+    VlcMedia m_cam1Media;
+    VlcMediaPlayer m_cam1;
 };
 
 #endif // MAINWINDOW_H

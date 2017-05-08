@@ -222,7 +222,7 @@ color: rgb(255, 255, 255);</string>
      <rect>
       <x>20</x>
       <y>520</y>
-      <width>561</width>
+      <width>271</width>
       <height>16</height>
      </rect>
     </property>
@@ -449,6 +449,19 @@ color: rgb(255, 255, 255);</string>
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
+   <widget class="QPushButton" name="reconnectButton">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>520</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reconnect</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -656,6 +669,22 @@ color: rgb(255, 255, 255);</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>reconnectButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>doReconnect()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>339</x>
+     <y>553</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>488</x>
+     <y>288</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>armSliderChanged(int)</slot>
@@ -667,5 +696,6 @@ color: rgb(255, 255, 255);</string>
   <slot>bucketDump()</slot>
   <slot>bucketWeigh()</slot>
   <slot>bucketPanic()</slot>
+  <slot>doReconnect()</slot>
  </slots>
 </ui>

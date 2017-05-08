@@ -5,7 +5,7 @@
 SpockTCPSocket::SpockTCPSocket(const std::string& hostname, MainWindow* mainWindow)
 : m_hostname(hostname)
 {
-    setSocketOption(ReceiveBufferSizeSocketOption, 128);
+    setSocketOption(ReceiveBufferSizeSocketOption, 64);
     connect(this, SIGNAL(connected()), mainWindow, SLOT(connectionEstablished()));
     connect(this, SIGNAL(disconnected()), mainWindow, SLOT(connectionLost()));
     reestablishConnection();
@@ -15,10 +15,11 @@ void SpockTCPSocket::reestablishConnection()
 {
     //printf("state: %d\n", state());
     //fflush(stdout);
-    if (!m_doingDns && state() != ConnectedState && state() != ConnectingState)
+    if (!m_doingDns && (m_forceReconnect || (state() != ConnectedState && state() != ConnectingState)))
     {
         QHostInfo::lookupHost(m_hostname.c_str(), this, SLOT(dnsHostFound(QHostInfo)));
         m_doingDns = true;
+        m_forceReconnect = false;
     }
 }
 
@@ -29,21 +30,26 @@ void SpockTCPSocket::dnsHostFound(const QHostInfo& host)
     {
         if (addr.protocol() == IPv4Protocol)
         {
+            disconnectFromHost();
+            waitForDisconnected(1000);
             connectToHost(addr, 5555);
+            //printf("CONNECT\n");
             break;
         }
     }
 }
 
-SpockStatusData SpockTCPSocket::getStatusData()
+std::pair<SpockStatusData, bool> SpockTCPSocket::getStatusData()
 {
+    //waitForReadyRead(1000);
     qint64 avail = bytesAvailable();
     //printf("avail %lld\n", avail);
     //fflush(stdout);
-    while (avail >= 62)
+    bool received = false;
+    while (avail >= 64)
     {
-        QByteArray bytes = read(62);
-        if (bytes.size() >= 62)
+        QByteArray bytes = read(64);
+        if (bytes.size() >= 64)
         {
             QDataStream s(bytes);
             char magic[8];
@@ -56,11 +62,13 @@ SpockStatusData SpockTCPSocket::getStatusData()
                 m_lastReceivedPacket = packetCount;
                 m_cachedData.read(s);
             }
+            received = true;
+            //printf("Received %lld\n", packetCount);
         }
         avail = bytesAvailable();
     }
 
-    return m_cachedData;
+    return {m_cachedData, received};
 }
 
 void SpockTCPSocket::sendPacket(const SpockCommandData& data)
@@ -68,14 +76,15 @@ void SpockTCPSocket::sendPacket(const SpockCommandData& data)
     if (state() == ConnectedState)
     {
         QByteArray bytes;
-        bytes.reserve(35);
+        bytes.reserve(64);
         QDataStream s(&bytes, WriteOnly);
         s.writeRawData("RoboComm", 8);
         s << quint64(time(nullptr));
         s << ++m_lastPacketSent;
         data.write(s);
-        qint64 written = write(bytes);
-        printf("%lld %lld\n", written, m_lastPacketSent);
+        bytes.append(29, '\0');
+        size_t written = write(bytes);
+        //printf("Send %lld %lld\n", written, m_lastPacketSent);
     }
 }
 

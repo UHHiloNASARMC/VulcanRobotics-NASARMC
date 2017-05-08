@@ -7,9 +7,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_socket("spock.local", this),
-    m_vlcInst(VlcCommon::args(), this),
-    m_cam0Media("udp://@:48550", &m_vlcInst),
-    m_cam0(&m_vlcInst)
+    m_vlcInst(QStringList({"--network-caching=100", "--udp-buffer=0"}), this),
+    m_cam0Media("udp://@:5556", &m_vlcInst),
+    m_cam0(&m_vlcInst),
+    m_cam1Media("udp://@:5557", &m_vlcInst),
+    m_cam1(&m_vlcInst)
 {
     ui->setupUi(this);
     ui->connectionLabel->setText("Connecting to spock.local");
@@ -20,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_devFinder, SIGNAL(axisLeftYChanged(double)), this, SLOT(axisLeftYChanged(double)));
     connect(&m_devFinder, SIGNAL(axisRightXChanged(double)), this, SLOT(axisRightXChanged(double)));
     connect(&m_devFinder, SIGNAL(axisRightYChanged(double)), this, SLOT(axisRightYChanged(double)));
+    connect(&m_devFinder, SIGNAL(shoulderLeftChanged(double)), this, SLOT(shoulderLeftChanged(double)));
+    connect(&m_devFinder, SIGNAL(shoulderRightChanged(double)), this, SLOT(shoulderRightChanged(double)));
     connect(&m_devFinder, SIGNAL(buttonsChanged(int)), this, SLOT(buttonsChanged(int)));
 
     setFixedSize(940, 550);
@@ -29,13 +33,24 @@ MainWindow::MainWindow(QWidget *parent) :
     m_cam0.setVideoWidget(ui->forwardVideo);
     ui->forwardVideo->setMediaPlayer(&m_cam0);
     m_cam0.open(&m_cam0Media);
+
+    m_cam1.setVideoWidget(ui->reverseVideo);
+    ui->reverseVideo->setMediaPlayer(&m_cam1);
+    m_cam1.open(&m_cam1Media);
+}
+
+static double PotCountsToRadians(int counts)
+{
+    return (-counts + 590.0) * M_PI / 700.0;
 }
 
 void MainWindow::timerEvent(QTimerEvent*)
 {
     m_socket.reestablishConnection();
-    sendCommandPacket();
-    SpockStatusData data = m_socket.getStatusData();
+    if (m_canSend)
+        sendCommandPacket();
+    SpockStatusData data;
+    std::tie(data, m_canSend) = m_socket.getStatusData();
     if (data.limitSwitches & 0x1)
         ui->armLimitLabel->setText("⬆");
     if (data.limitSwitches & 0x2)
@@ -48,6 +63,8 @@ void MainWindow::timerEvent(QTimerEvent*)
     ui->brMotorStat->setStatusData(data.rearRightMotorStatus);
     ui->armMotorStat->setStatusData(data.armMotorStatus);
     ui->bucketMotorStat->setStatusData(data.bucketMotorStatus);
+    ui->armAngleNumber->display(PotCountsToRadians(data.armPot));
+    ui->bucketAngleNumber->display(data.bucketPot);
 
     //resetBucketButtons();
     ui->scoopRadio->setChecked(false);
@@ -202,6 +219,18 @@ void MainWindow::axisRightYChanged(double value)
         changeRightThrottle(0.0);
 }
 
+void MainWindow::shoulderLeftChanged(double value)
+{
+    //printf("Left Moved %f\n", value);
+}
+
+void MainWindow::shoulderRightChanged(double value)
+{
+    if (!ui->armSlider->isSliderDown())
+        ui->armSlider->setValue(int(value) * 2);
+    //printf("Right Moved %f\n", value);
+}
+
 void MainWindow::buttonsChanged(int buttons)
 {
     if ((m_lastButtons & 0x1000) == 0 && (buttons & 0x1000))
@@ -214,6 +243,15 @@ void MainWindow::buttonsChanged(int buttons)
         ui->driveRadio->click();
     if ((m_lastButtons & 0x800) == 0 && (buttons & 0x800))
         ui->weighButton->click();
+    if (!ui->bucketSlider->isSliderDown())
+    {
+        if (buttons & 0x0100)
+            ui->bucketSlider->setValue(-512);
+        if (buttons & 0x0400)
+            ui->bucketSlider->setValue(512);
+        if ((buttons & 0x0500) == 0 || (buttons & 0x0500) == 0x0500)
+            ui->bucketSlider->setValue(0);
+    }
     m_lastButtons = buttons;
     //printf("%04X\n", buttons);
 }
@@ -221,11 +259,19 @@ void MainWindow::buttonsChanged(int buttons)
 void MainWindow::connectionEstablished()
 {
     ui->connectionLabel->setText("Connected to " + m_socket.getHostAddress());
+    m_canSend = true;
 }
 
 void MainWindow::connectionLost()
 {
     ui->connectionLabel->setText("Disconnected; reestablishing connection to spock.local");
+    m_canSend = false;
+}
+
+void MainWindow::doReconnect()
+{
+    m_socket.forceReconnect();
+    m_canSend = true;
 }
 
 void MainWindow::sendCommandPacket()
@@ -239,4 +285,9 @@ MainWindow::~MainWindow()
     layout()->removeWidget(ui->forwardVideo);
     delete ui->forwardVideo;
     ui->forwardVideo = nullptr;
+
+    m_cam1.stop();
+    layout()->removeWidget(ui->reverseVideo);
+    delete ui->reverseVideo;
+    ui->reverseVideo = nullptr;
 }

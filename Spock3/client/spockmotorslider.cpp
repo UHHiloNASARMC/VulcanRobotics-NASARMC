@@ -9,4 +9,5 @@ SpockMotorSlider::SpockMotorSlider(QWidget *parent)
 void SpockMotorSlider::mouseReleaseEvent(QMouseEvent *)
 {
     setValue(0);
+    setSliderDown(false);
 }

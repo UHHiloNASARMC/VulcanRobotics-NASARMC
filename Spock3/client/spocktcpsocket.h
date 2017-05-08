@@ -14,10 +14,12 @@ class SpockTCPSocket : public QTcpSocket
     quint64 m_lastReceivedPacket = 0;
     quint64 m_lastPacketSent = 0;
     bool m_doingDns = false;
+    bool m_forceReconnect = false;
 public:
     SpockTCPSocket(const std::string& hostname, MainWindow* mainWindow);
     void reestablishConnection();
-    SpockStatusData getStatusData();
+    void forceReconnect() { m_forceReconnect = true; }
+    std::pair<SpockStatusData, bool> getStatusData();
     void sendPacket(const SpockCommandData& data);
     QString getHostAddress() const;
 public slots:
