@@ -116,7 +116,7 @@ color: rgb(255, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>19</x>
-       <y>30</y>
+       <y>25</y>
        <width>141</width>
        <height>20</height>
       </rect>
@@ -185,7 +185,7 @@ color: rgb(255, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>19</x>
-       <y>30</y>
+       <y>25</y>
        <width>141</width>
        <height>20</height>
       </rect>
@@ -243,6 +243,9 @@ color: rgb(255, 255, 255);</string>
      <string>Forward View</string>
     </property>
     <widget class="VlcWidgetVideo" name="forwardVideo">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -272,6 +275,9 @@ color: rgb(255, 255, 255);</string>
      <string>Reverse View</string>
     </property>
     <widget class="VlcWidgetVideo" name="reverseVideo">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>0</x>

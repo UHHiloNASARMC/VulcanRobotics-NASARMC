@@ -2,6 +2,7 @@
 #define SPOCKMOTORSTATUSBOX_H
 
 #include <QGroupBox>
+#include <memory>
 #include "spockcommon.h"
 
 namespace Ui {

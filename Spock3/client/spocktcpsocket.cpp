@@ -2,8 +2,8 @@
 #include "mainwindow.h"
 #include <QHostInfo>
 
-SpockTCPSocket::SpockTCPSocket(const std::string& hostname, MainWindow* mainWindow)
-: m_hostname(hostname)
+SpockTCPSocket::SpockTCPSocket(const QString& hostname, MainWindow* mainWindow)
+: QTcpSocket(mainWindow), m_hostname(hostname)
 {
     setSocketOption(ReceiveBufferSizeSocketOption, 64);
     connect(this, SIGNAL(connected()), mainWindow, SLOT(connectionEstablished()));
@@ -17,7 +17,7 @@ void SpockTCPSocket::reestablishConnection()
     //fflush(stdout);
     if (!m_doingDns && (m_forceReconnect || (state() != ConnectedState && state() != ConnectingState)))
     {
-        QHostInfo::lookupHost(m_hostname.c_str(), this, SLOT(dnsHostFound(QHostInfo)));
+        QHostInfo::lookupHost(m_hostname, this, SLOT(dnsHostFound(QHostInfo)));
         m_doingDns = true;
         m_forceReconnect = false;
     }

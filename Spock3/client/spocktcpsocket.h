@@ -16,7 +16,7 @@ class SpockTCPSocket : public QTcpSocket
     bool m_doingDns = false;
     bool m_forceReconnect = false;
 public:
-    SpockTCPSocket(const std::string& hostname, MainWindow* mainWindow);
+    SpockTCPSocket(const QString& hostname, MainWindow* mainWindow);
     void reestablishConnection();
     void forceReconnect() { m_forceReconnect = true; }
     std::pair<SpockStatusData, bool> getStatusData();
@@ -25,7 +25,7 @@ public:
 public slots:
     void dnsHostFound(const QHostInfo& host);
 private:
-    std::string m_hostname;
+    QString m_hostname;
 };
 
 #endif // SPOCKTCPSOCKET_H

@@ -5,22 +5,25 @@
 #include "spocktcpsocket.h"
 #include "inputdev/DeviceFinder.hpp"
 #include "inputdev/DualshockPad.hpp"
+#include "inputdev/XInputPad.hpp"
 #include <VLCQtCore/Media.h>
 #include <VLCQtCore/Instance.h>
 #include <VLCQtCore/MediaPlayer.h>
+#include <VLCQtCore/Common.h>
 
 namespace Ui {
 class MainWindow;
 }
 class SpockDriveTrackpad;
 
-class DeviceFinder : public QObject, public boo::DeviceFinder, public boo::IDualshockPadCallback
+class DeviceFinder : public QObject, public boo::DeviceFinder,
+        public boo::IDualshockPadCallback, public boo::IXInputPadCallback
 {
     Q_OBJECT
     std::shared_ptr<boo::DeviceBase> m_device = nullptr;
 public:
     DeviceFinder()
-    : boo::DeviceFinder({typeid(boo::DualshockPad)})
+        : boo::DeviceFinder({typeid(boo::DualshockPad), typeid(boo::XInputPad)})
     {
     }
 
@@ -35,7 +38,10 @@ public:
         if (!m_device)
         {
             m_device = tok.openAndGetDevice();
-            static_cast<boo::DualshockPad*>(m_device.get())->setCallback(this);
+            if (boo::DualshockPad* pad = dynamic_cast<boo::DualshockPad*>(m_device.get()))
+                pad->setCallback(this);
+            else if (boo::XInputPad* pad = dynamic_cast<boo::XInputPad*>(m_device.get()))
+                pad->setCallback(this);
             gamepadConnected();
         }
     }
@@ -49,7 +55,7 @@ public:
         }
     }
 
-    void controllerUpdate(const boo::DualshockPadState& state)
+    void controllerUpdate(boo::DualshockPad&, const boo::DualshockPadState& state)
     {
         emit axisLeftXChanged(state.m_leftStick[0] / 127.f - 1.f);
         emit axisLeftYChanged(state.m_leftStick[1] / 127.f - 1.f);
@@ -58,6 +64,22 @@ public:
         emit buttonsChanged(state.m_buttonState);
         emit shoulderLeftChanged(state.m_pressureL2);
         emit shoulderRightChanged(state.m_pressureR2);
+    }
+
+    void controllerUpdate(boo::XInputPad&, const boo::XInputPadState& state)
+    {
+        emit axisLeftXChanged(state.sThumbLX / 32768.f);
+        emit axisLeftYChanged(-state.sThumbLY / 32768.f);
+        emit axisRightXChanged(state.sThumbRX / 32768.f);
+        emit axisRightYChanged(-state.sThumbRY / 32768.f);
+
+        int buttons = 0;
+        buttons |= state.wButtons & 0x8000 ? 0x1000 : 0;
+        buttons |= state.wButtons & 0x2000 ? 0x2000 : 0;
+        buttons |= state.wButtons & 0x1000 ? 0x4000 : 0;
+        buttons |= state.wButtons & 0x4000 ? 0x8000 : 0;
+        buttons |= state.wButtons & 0x200 ? 0x800 : 0;
+        emit buttonsChanged(buttons);
     }
 
 signals:
