@@ -17,6 +17,9 @@ LIBS += -framework VLCQtCore -framework VLCQtWidgets -framework CoreFoundation
 win32 {
 LIBS += VLCQtCore.lib VLCQtWidgets.lib Winusb.lib Hid.lib Setupapi.lib User32.lib Xinput.lib
 }
+linux {
+LIBS += -lVLCQtCore -lVLCQtWidgets -ludev
+}
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -41,7 +44,7 @@ SOURCES += main.cpp\
     inputdev/DeviceSignature.cpp \
     inputdev/DualshockPad.cpp \
     inputdev/GenericPad.cpp \
-    inputdev/inputDeviceClasses.cpp
+    inputdev/InputDeviceClasses.cpp
 
 HEADERS  += mainwindow.h \
     spockmotorstatusbox.h \
@@ -68,6 +71,10 @@ HEADERS  += inputdev/CFPointer.hpp \
 win32 {
 SOURCES += inputdev/HIDDeviceWinUSB.cpp \
     inputdev/HIDListenerWinUSB.cpp
+}
+linux {
+SOURCES += inputdev/HIDDeviceUdev.cpp \
+    inputdev/HIDListenerUdev.cpp
 }
 
 FORMS    += mainwindow.ui \

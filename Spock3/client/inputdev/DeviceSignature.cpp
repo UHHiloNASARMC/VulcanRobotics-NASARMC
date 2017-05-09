@@ -56,6 +56,7 @@ std::shared_ptr<DeviceBase> DeviceSignature::DeviceNew(DeviceToken& token)
             retval->m_hidDev = IHIDDeviceNew(token, *retval);
             if (!retval->m_hidDev)
                 return nullptr;
+            retval->m_hidDev->_startThread();
 
             return retval;
         }
@@ -72,6 +73,7 @@ std::shared_ptr<DeviceBase> DeviceSignature::DeviceNew(DeviceToken& token)
     retval->m_hidDev = IHIDDeviceNew(token, *retval);
     if (!retval->m_hidDev)
         return nullptr;
+    retval->m_hidDev->_startThread();
     
     return retval;
 }
