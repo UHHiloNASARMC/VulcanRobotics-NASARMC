@@ -12,9 +12,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     m_socket(QStringLiteral("spock.local"), this),
     m_vlcInst(QStringList({QStringLiteral("--network-caching=100"), QStringLiteral("--udp-buffer=0")}), this),
-    m_cam0Media(QStringLiteral("udp://@:5556"), &m_vlcInst),
+    m_cam0Media(QStringLiteral("udp://@239.0.0.10:5556"), &m_vlcInst),
     m_cam0(&m_vlcInst),
-    m_cam1Media(QStringLiteral("udp://@:5557"), &m_vlcInst),
+    m_cam1Media(QStringLiteral("udp://@239.0.0.10:5557"), &m_vlcInst),
     m_cam1(&m_vlcInst)
 {
     ui->setupUi(this);
