@@ -8,13 +8,15 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = spock_gui
+TARGET = "Spock"
 TEMPLATE = app
 CONFIG += c++14
 macx {
+ICON = Spock.icns
 LIBS += -framework VLCQtCore -framework VLCQtWidgets -framework CoreFoundation
 }
 win32 {
+ICON = Spock.ico
 LIBS += VLCQtCore.lib VLCQtWidgets.lib Winusb.lib Hid.lib Setupapi.lib User32.lib Xinput.lib
 }
 linux {

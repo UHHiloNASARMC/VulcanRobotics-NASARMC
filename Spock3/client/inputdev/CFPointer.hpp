@@ -44,6 +44,15 @@ public:
     }
     operator bool() const { return storage != nullptr; }
 
+    void reset()
+    {
+        if (storage)
+        {
+            CFRelease(storage);
+            storage = nullptr;
+        }
+    }
+
 private:
     CFTypeRef storage;
 

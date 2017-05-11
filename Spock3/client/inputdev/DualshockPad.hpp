@@ -18,6 +18,7 @@ struct DualshockLED
 
 struct DualshockRumble
 {
+    uint8_t padding;
     uint8_t rightDuration;
     bool    rightOn;
     uint8_t leftDuration;
@@ -37,7 +38,7 @@ union DualshockOutReport
         DualshockLED led[4];
         DualshockLED reserved;
     };
-    uint8_t buf[36];
+    uint8_t buf[49];
 };
 
 enum class EDualshockPadButtons
@@ -129,7 +130,6 @@ class DualshockPad final : public DeviceBase
     uint8_t m_rumbleIntensity[2];
     EDualshockLED m_led;
     DualshockOutReport m_report;
-    uint8_t m_btAddress[6];
     void deviceDisconnected();
     void initialCycle();
     void transferCycle();
@@ -179,7 +179,7 @@ public:
     void setRawLED(int led)
     {
         m_report.leds = led;
-        sendHIDReport(m_report.buf, sizeof(m_report), HIDReportType::Output, 0x0201);
+        sendHIDReport(m_report.buf, sizeof(m_report), HIDReportType::Output, 0x01);
     }
 
     size_t getInputBufferSize() const { return 49; }

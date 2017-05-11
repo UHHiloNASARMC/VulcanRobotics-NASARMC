@@ -11,7 +11,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_socket(QStringLiteral("spock.local"), this),
-    m_vlcInst(QStringList({QStringLiteral("--network-caching=100"), QStringLiteral("--udp-buffer=0")}), this),
+    m_vlcInst(QStringList({QStringLiteral("--network-caching=30"),
+                           QStringLiteral("--udp-buffer=0"),
+                           QStringLiteral("--clock-synchro=0")}), this),
     m_cam0Media(QStringLiteral("udp://@239.0.0.10:5556"), &m_vlcInst),
     m_cam0(&m_vlcInst),
     m_cam1Media(QStringLiteral("udp://@239.0.0.10:5557"), &m_vlcInst),
@@ -231,7 +233,7 @@ void MainWindow::shoulderLeftChanged(double value)
 void MainWindow::shoulderRightChanged(double value)
 {
     if (!ui->armSlider->isSliderDown())
-        ui->armSlider->setValue(int(value) * 2);
+        ui->armSlider->setValue(int(value) * 4);
     //printf("Right Moved %f\n", value);
 }
 

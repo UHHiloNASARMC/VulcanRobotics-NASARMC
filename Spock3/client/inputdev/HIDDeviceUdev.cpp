@@ -204,13 +204,20 @@ class HIDDeviceUdev final : public IHIDDevice
         device->m_devImp.initialCycle();
         while (device->m_runningTransferLoop)
         {
-            while (true)
+            fd_set readset;
+            FD_ZERO(&readset);
+            FD_SET(fd, &readset);
+            struct timeval timeout = {0, 10000};
+            if (select(fd + 1, &readset, nullptr, nullptr, &timeout) > 0)
             {
-                ssize_t sz = read(fd, readBuf.get(), readSz);
-                if (sz < 0)
-                    break;
-                device->m_devImp.receivedHIDReport(readBuf.get(), sz,
-                                                   HIDReportType::Input, readBuf[0]);
+                while (true)
+                {
+                    ssize_t sz = read(fd, readBuf.get(), readSz);
+                    if (sz < 0)
+                        break;
+                    device->m_devImp.receivedHIDReport(readBuf.get(), sz,
+                                                       HIDReportType::Input, readBuf[0]);
+                }
             }
             device->m_devImp.transferCycle();
         }
