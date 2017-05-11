@@ -12,11 +12,11 @@ TARGET = "Spock"
 TEMPLATE = app
 CONFIG += c++14
 macx {
-ICON = Spock.icns
+ICON = spock.icns
 LIBS += -framework VLCQtCore -framework VLCQtWidgets -framework CoreFoundation
 }
 win32 {
-ICON = Spock.ico
+RC_FILE = spock.rc
 LIBS += VLCQtCore.lib VLCQtWidgets.lib Winusb.lib Hid.lib Setupapi.lib User32.lib Xinput.lib
 }
 linux {
