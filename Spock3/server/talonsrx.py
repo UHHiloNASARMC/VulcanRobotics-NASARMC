@@ -1,6 +1,11 @@
 import struct, can, queue, time
 from threading import Thread, Lock
 
+# 32-bit 2's compliment sign extension
+def sign_extend_32(value):
+    sign_bit = 1 << 31
+    return (value & (sign_bit - 1)) - (value & sign_bit)
+
 # 24-bit 2's compliment sign extension
 def sign_extend_24(value):
     sign_bit = 1 << 23
@@ -54,6 +59,9 @@ class TalonCANInterface:
                 # STATUS_2
                 elif msgType == 0x02041440:
                     self._status2Bufs[deviceId] = message.data
+                # STATUS_3
+                elif msgType == 0x02041480:
+                    self._status3Bufs[deviceId] = message.data
                 # STATUS_4
                 elif msgType == 0x020414C0:
                     self._status4Bufs[deviceId] = message.data
@@ -77,7 +85,7 @@ class TalonCANInterface:
 
             self._l.release()
 
-            time.sleep(0.01)
+            time.sleep(0.008)
             cycle_counter += 1
 
     # Set enable register
@@ -100,7 +108,7 @@ class TalonCANInterface:
 
     # Set param register
     def sendParamSet(self, deviceNo, data):
-        print('PSET', data)
+        #print('PSET', data)
         msg = can.Message(arbitration_id=0x02041880 | deviceNo,
                   data=struct.pack('<Q', data), extended_id=True)
         self._l.acquire()
@@ -125,12 +133,28 @@ class TalonCANInterface:
         self._l.release()
         return ret
 
-        # Get analog in register
+    # Get logical feedback register
+    def getStatus3(self, deviceNo):
+        self._l.acquire()
+        ret = None
+        if deviceNo in self._status3Bufs:
+            ret = struct.unpack('<Q', self._status3Bufs[deviceNo])[0]
+        self._l.release()
+        return ret
+
+    # Get analog in register
     def getStatus4(self, deviceNo):
         self._l.acquire()
         ret = None
         if deviceNo in self._status4Bufs:
             ret = struct.unpack('<Q', self._status4Bufs[deviceNo])[0]
+        self._l.release()
+        return ret
+
+    # Has valid data
+    def hasData(self, deviceNo):
+        self._l.acquire()
+        ret = deviceNo in self._status1Bufs and deviceNo in self._status2Bufs and deviceNo in self._status4Bufs
         self._l.release()
         return ret
 
@@ -175,6 +199,7 @@ class TalonSrxProtocol:
     eProfileParamSlot0_I = 2
     eProfileParamSlot0_D = 3
     eProfileParamSlot0_CloseLoopRampRate = 6
+    eSensorPosition = 73
     ePeakPosOutput = 104
     eNominalPosOutput = 105
     ePeakNegOutput = 106
@@ -201,7 +226,7 @@ class TalonSrxProtocol:
 
     # Send param set to Talon
     def sendParamSet(self, enum, value):
-        self._canIntf.sendParamSet(self._deviceNo, ((int(value) & 0xffffffff) << 8) | (enum & 0xff))
+        self._canIntf.sendParamSet(self._deviceNo, ((sign_extend_32(int(value)) & 0xffffffff) << 8) | (enum & 0xff))
 
     # Set primary drive value and mode
     def setDemand(self, value, ctrlMode):
@@ -321,11 +346,29 @@ class TalonSrxProtocol:
         return bool((status1 >> 30) & 0x1)
 
     # Read current potentiometer value [0,1023]
-    def getPotValue(self):
+    def getSensorPosition(self):
         status2 = self._canIntf.getStatus2(self._deviceNo)
         if status2 is None:
             return 0
         return sign_extend_24(((status2 & 0xff) << 16) | (status2 & 0xff00) | ((status2 & 0xff0000) >> 16))
+
+    # Read Quadrature A pin state
+    def getQuadAState(self):
+        status3 = self._canIntf.getStatus3(self._deviceNo)
+        if status3 is None:
+            return 0
+        return (status3 >> 63) & 0x1 != 0
+
+    # Read Quadrature B pin state
+    def getQuadBState(self):
+        status3 = self._canIntf.getStatus3(self._deviceNo)
+        if status3 is None:
+            return 0
+        return (status3 >> 62) & 0x1 != 0
+
+    # Set sensor value (for zeroing quadrature encoder)
+    def setSensorPosition(self, val):
+        self.sendParamSet(TalonSrxProtocol.eSensorPosition, val) 
 
     # Read current consumption
     def getCurrent(self):
@@ -358,4 +401,8 @@ class TalonSrxProtocol:
         if status4 is None:
             return 0
         return (status4 >> 40) & 0xff
+
+    # Has valid feedback data
+    def hasData(self):
+        return self._canIntf.hasData(self._deviceNo)
          
