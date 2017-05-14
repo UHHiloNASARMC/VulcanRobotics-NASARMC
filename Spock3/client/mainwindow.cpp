@@ -2,22 +2,59 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMouseEvent>
-#include <VLCQtCore/Common.h>
+#include <QtAV/QtAV.h>
 
 #undef min
 #undef max
 
+// call this before loading the stream
+static void tuneForZeroLatencyLiveStream(QtAV::AVPlayer& player)
+{
+    QVariantHash settings;
+
+    // sets av_opt_set_xx and av_dict_set settings
+    QVariantHash avFormat;
+
+    {// these settings seem to have no impact on latency?
+        //avFormat["fpsprobesize"] = 32;
+        //avFormat["framerate"] = 100; // from: https://github.com/wang-bin/QtAV/issues/369
+        //avFormat["rtbufsize"] = 512 * 1024;
+        //avFormat["flush_packets"] = 1;
+        //avFormat["avioflags"] = "direct";
+        //avFormat["max_delay"] = 1000;
+        //avFormat["fflags"] = "nobuffer";
+        //avFormat["vprofile"] = "baseline";
+    }
+
+    avFormat["probesize"] = 1024; // great impact but how to calc the optimum?  // from: https://github.com/wang-bin/QtAV/wiki/FFmpeg-dict-opt-in-QtAV
+    avFormat["tune"] = "zerolatency,fastdecode";
+    {
+        // is what zerolatency does:
+        //  avFormat["bframes"] = 0;
+        //  avFormat["force-cfr"] = 1;
+        //  avFormat["no-mbtree"] = 1;
+        //  avFormat["sync-lookahead"] = 0;
+        //  avFormat["sliced-threads"] = 1;
+        //  avFormat["rc-lookahead"] = 0;
+    }
+
+    settings["avformat"] = avFormat;
+    player.setOptionsForFormat(avFormat);
+}
+
+static void startStream(QtAV::AVPlayer& player, QtAV::VideoRenderer* renderer, const char* url)
+{
+    player.masterClock()->setClockType(QtAV::AVClock::VideoClock);
+    player.setBufferValue(1);
+    tuneForZeroLatencyLiveStream(player);
+    player.setRenderer(renderer);
+    player.play(url);
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_socket(QStringLiteral("spock.local"), this),
-    m_vlcInst(QStringList({QStringLiteral("--network-caching=30"),
-                           QStringLiteral("--udp-buffer=0"),
-                           QStringLiteral("--clock-synchro=0")}), this),
-    m_cam0Media(QStringLiteral("udp://@239.0.0.10:5556"), &m_vlcInst),
-    m_cam0(&m_vlcInst),
-    m_cam1Media(QStringLiteral("udp://@239.0.0.10:5557"), &m_vlcInst),
-    m_cam1(&m_vlcInst)
+    m_socket(QStringLiteral("spock.local"), this)
 {
     ui->setupUi(this);
     ui->connectionLabel->setText(QStringLiteral("Connecting to spock.local"));
@@ -36,13 +73,11 @@ MainWindow::MainWindow(QWidget *parent) :
     startTimer(20);
     m_devFinder.startScanning();
 
-    m_cam0.setVideoWidget(ui->forwardVideo);
-    ui->forwardVideo->setMediaPlayer(&m_cam0);
-    m_cam0.open(&m_cam0Media);
-
-    m_cam1.setVideoWidget(ui->reverseVideo);
-    ui->reverseVideo->setMediaPlayer(&m_cam1);
-    m_cam1.open(&m_cam1Media);
+    startStream(m_cam0, ui->forwardVideo, "udp://@239.0.0.10:5556");
+    startStream(m_cam1, ui->reverseVideo, "udp://@239.0.0.10:5557");
+    startStream(m_cam2, ui->bucketVideo, "udp://@239.0.0.10:5558");
+    ui->forwardVideo->setVisible(true);
+    ui->reverseVideo->setVisible(false);
 }
 
 static double PotCountsToRadians(int counts)
@@ -90,6 +125,17 @@ void MainWindow::timerEvent(QTimerEvent*)
     case ESpockBucketState::Weighing:
     default:
         break;
+    }
+
+    if (m_commandData.leftThrottle + m_commandData.rightThrottle > 0)
+    {
+        ui->forwardVideo->setVisible(true);
+        ui->reverseVideo->setVisible(false);
+    }
+    if (m_commandData.leftThrottle + m_commandData.rightThrottle < 0)
+    {
+        ui->forwardVideo->setVisible(false);
+        ui->reverseVideo->setVisible(true);
     }
 }
 
@@ -288,12 +334,5 @@ void MainWindow::sendCommandPacket()
 MainWindow::~MainWindow()
 {
     m_cam0.stop();
-    layout()->removeWidget(ui->forwardVideo);
-    delete ui->forwardVideo;
-    ui->forwardVideo = nullptr;
-
     m_cam1.stop();
-    layout()->removeWidget(ui->reverseVideo);
-    delete ui->reverseVideo;
-    ui->reverseVideo = nullptr;
 }

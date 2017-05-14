@@ -13,14 +13,15 @@ TEMPLATE = app
 CONFIG += c++14
 macx {
 ICON = spock.icns
-LIBS += -framework VLCQtCore -framework VLCQtWidgets -framework CoreFoundation
+LIBS += -framework QtAV -framework QtAVWidgets -framework CoreFoundation
+INCLUDEPATH += $$[QT_INSTALL_PREFIX]/include
 }
 win32 {
 RC_FILE = spock.rc
-LIBS += VLCQtCore.lib VLCQtWidgets.lib Winusb.lib Hid.lib Setupapi.lib User32.lib Xinput.lib
+LIBS += QtAV.lib QtAVWidgets.lib Winusb.lib Hid.lib Setupapi.lib User32.lib Xinput.lib
 }
 linux {
-LIBS += -lVLCQtCore -lVLCQtWidgets -ludev
+LIBS += -lQtAV -lQtAVWidgets -ludev
 }
 
 # The following define makes your compiler emit warnings if you use

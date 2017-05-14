@@ -6,10 +6,7 @@
 #include "inputdev/DeviceFinder.hpp"
 #include "inputdev/DualshockPad.hpp"
 #include "inputdev/XInputPad.hpp"
-#include <VLCQtCore/Media.h>
-#include <VLCQtCore/Instance.h>
-#include <VLCQtCore/MediaPlayer.h>
-#include <VLCQtCore/Common.h>
+#include <QtAV/QtAV.h>
 
 namespace Ui {
 class MainWindow;
@@ -143,11 +140,9 @@ private:
     bool m_moveDragging = false;
     int m_lastButtons = 0;
     bool m_canSend = false;
-    VlcInstance m_vlcInst;
-    VlcMedia m_cam0Media;
-    VlcMediaPlayer m_cam0;
-    VlcMedia m_cam1Media;
-    VlcMediaPlayer m_cam1;
+    QtAV::AVPlayer m_cam0;
+    QtAV::AVPlayer m_cam1;
+    QtAV::AVPlayer m_cam2;
 };
 
 #endif // MAINWINDOW_H
