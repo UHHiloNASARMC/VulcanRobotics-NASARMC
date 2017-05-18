@@ -6,16 +6,17 @@ GPIO.output(24, GPIO.HIGH)
 
 intf = talonsrx.TalonCANInterface()
 TalonSrxProtocol = talonsrx.TalonSrxProtocol
-proto = TalonSrxProtocol(intf, 3)
+proto = TalonSrxProtocol(intf, 1)
 proto.setRevFeedbackSensor(1)
 proto.setRampThrottle(10)
+proto.setFeedbackDevice(TalonSrxProtocol.kFeedbackDevice_QuadEncoder)
 
-bucket_proto = TalonSrxProtocol(intf, 4)
-bucket_proto.setPeakThrottle(512)
-bucket_proto.setNominalThrottle(512)
-bucket_proto.setP(0.03)
-bucket_proto.setRevFeedbackSensor(1)
-bucket_proto.setRampThrottle(10)
+#bucket_proto = TalonSrxProtocol(intf, 4)
+#bucket_proto.setPeakThrottle(512)
+#bucket_proto.setNominalThrottle(512)
+#bucket_proto.setP(0.03)
+#bucket_proto.setRevFeedbackSensor(1)
+#bucket_proto.setRampThrottle(10)
 
 def PotCountsToRadians(counts):
     return -(counts - 590) * math.pi / 700
@@ -104,12 +105,12 @@ class ArmControlLoop:
     def setState(self, state):
 
         # Read pot value
-        cur_point = -self._arm.getPotValue()
+        cur_point = -self._arm.getSensorPosition()
         cur_angle = PotCountsToRadians(cur_point)
 
         # Read bucket pot
-        bucket_pot = -self._bucket.getPotValue()
-
+        bucket_pot = -self._bucket.getSensorPosition()
+        
         # 0: Idle, 1: Scooping, 2: Driving, 3: Dumping, 4: Weighting
         if state == 0:
             self._arm.setDemand(0, TalonSrxProtocol.kDisabled)
@@ -140,13 +141,14 @@ class ArmControlLoop:
 
     def update(self):
         self._curTime += 0.02
-
+        self._taskList.clear()
+        
         # Read pot value
-        cur_point = -self._arm.getPotValue()
+        cur_point = -self._arm.getSensorPosition()
         cur_angle = PotCountsToRadians(cur_point)
 
         # Read bucket pot
-        bucket_pot = -self._bucket.getPotValue()
+        bucket_pot = -self._bucket.getSensorPosition()
 
         # Update current task
         if len(self._taskList):
@@ -174,22 +176,30 @@ class ArmControlLoop:
         total_throttle = (base_throttle + err_throttle) * self._rampFactor
         self._arm.setDemand(total_throttle, TalonSrxProtocol.kThrottle)
         current = self._arm.getCurrent()
-        print('Counts', cur_point, 'Bucket', bucket_pot, 'Ang', cur_angle, 'Base', base_throttle, 'Error', err_throttle, 'Total', total_throttle, 'Amps', current * 0.125)
-
+        print('Counts', cur_point, 'Bucket', bucket_pot, 'Ang', cur_angle, 'Base',
+              base_throttle, 'Error', err_throttle, 'Total', total_throttle, 'Amps', current * 0.125)
+        
 while True:
-    if proto.hasData() and bucket_proto.hasData():
+    if proto.hasData():
         break
     time.sleep(0.02)
 
-ctrl_loop = ArmControlLoop(proto, bucket_proto)
-ctrl_loop.setState(1)
+#ctrl_loop = ArmControlLoop(proto, bucket_proto)
+#ctrl_loop.setState(2)
 while True:
     # Scan pot value
-    curpoint = proto.getPotValue()
-    forward_lim = proto.getForwardLimitSwitch()
-    rev_lim = proto.getReverseLimitSwitch()
-    throttle = proto.getAppliedThrottle()
-    ctrl_loop.update()
+    curpoint = proto.getSensorPosition()
+    quadA = proto.getQuadAState()
+    quadB = proto.getQuadBState()
+
+    #if curpoint == 20:
+    #   proto.setSensorPosition(0)
+
+    print(curpoint, quadA, quadB)
+    #forward_lim = proto.getForwardLimitSwitch()
+    #rev_lim = proto.getReverseLimitSwitch()
+    #throttle = proto.getAppliedThrottle()
+    #ctrl_loop.update()
     #print('Ang', PotCountsToRadians(-curpoint))
     #print('Value', curpoint, 'Fwd', forward_lim, 'Rev', rev_lim, 'Throttle', throttle)
 
