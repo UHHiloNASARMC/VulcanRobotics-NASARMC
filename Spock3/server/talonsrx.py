@@ -18,8 +18,8 @@ def sign_extend_11(value):
 
 # Talon CAN interface class
 class TalonCANInterface:
-    def __init__(self):
-        self._bus = can.interface.Bus(bustype='socketcan_native', channel='can0')
+    def __init__(self, chan):
+        self._bus = can.interface.Bus(bustype='socketcan_native', channel=chan)
         self._t = Thread(target=self.canCommTask)
         self._running = True
         self._l = Lock()

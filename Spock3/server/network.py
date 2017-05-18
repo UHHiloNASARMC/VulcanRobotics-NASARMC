@@ -361,8 +361,9 @@ class ArmControlLoop:
             self._bucket.setDemand(0, TalonSrxProtocol.kThrottle)
 
 # Setup talon interface
-intf = talonsrx.TalonCANInterface()
-bucket = talonsrx.TalonSrxProtocol(intf, 2)
+intf = talonsrx.TalonCANInterface('can1')
+intf_bucket = talonsrx.TalonCANInterface('can0')
+bucket = talonsrx.TalonSrxProtocol(intf_bucket, 2)
 arm = talonsrx.TalonSrxProtocol(intf, 1)
 front_left = talonsrx.TalonSrxProtocol(intf, 5)
 front_right = talonsrx.TalonSrxProtocol(intf, 6)
