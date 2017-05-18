@@ -43,8 +43,8 @@ struct SpockStatusData
     SpockMotorStatusData rearRightMotorStatus;
     SpockMotorStatusData armMotorStatus;
     SpockMotorStatusData bucketMotorStatus;
-    quint16 armPot = 0;
-    quint16 bucketPot = 0;
+    qint16 armPot = 0;
+    qint16 bucketPot = 0;
     quint8 limitSwitches = 0;
     ESpockBucketState sensedBucketState = ESpockBucketState::Invalid;
 

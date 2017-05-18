@@ -80,9 +80,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->reverseVideo->setVisible(false);
 }
 
-static double PotCountsToRadians(int counts)
+static inline double PotCountsToRadians(int counts)
 {
     return (-counts + 590.0) * M_PI / 700.0;
+}
+
+static inline double EncoderCountsToRadians(int counts)
+{
+    return 0.0127 * counts;
 }
 
 void MainWindow::timerEvent(QTimerEvent*)
@@ -104,7 +109,7 @@ void MainWindow::timerEvent(QTimerEvent*)
     ui->brMotorStat->setStatusData(data.rearRightMotorStatus);
     ui->armMotorStat->setStatusData(data.armMotorStatus);
     ui->bucketMotorStat->setStatusData(data.bucketMotorStatus);
-    ui->armAngleNumber->display(PotCountsToRadians(data.armPot));
+    ui->armAngleNumber->display(EncoderCountsToRadians(data.armPot));
     ui->bucketAngleNumber->display(data.bucketPot);
 
     //resetBucketButtons();
