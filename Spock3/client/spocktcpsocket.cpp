@@ -83,7 +83,7 @@ void SpockTCPSocket::sendPacket(const SpockCommandData& data)
         s << ++m_lastPacketSent;
         data.write(s);
         bytes.append(QByteArray(29, '\0'));
-        size_t written = write(bytes);
+        /*size_t written =*/ write(bytes);
         //printf("Send %lld %lld\n", written, m_lastPacketSent);
     }
 }

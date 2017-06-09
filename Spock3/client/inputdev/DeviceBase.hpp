@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <memory>
+#include <vector>
 
 #ifndef ENABLE_BITWISE_ENUM
 #define ENABLE_BITWISE_ENUM(type)\
@@ -49,6 +50,12 @@ enum class HIDReportType
     Feature
 };
 
+enum class HIDValueType
+{
+    Axis,
+    Button
+};
+
 class DeviceBase : public std::enable_shared_from_this<DeviceBase>
 {
     friend class DeviceToken;
@@ -79,6 +86,7 @@ public:
     bool sendHIDReport(const uint8_t* data, size_t length, HIDReportType tp, uint32_t message=0);
     size_t receiveHIDReport(uint8_t* data, size_t length, HIDReportType tp, uint32_t message=0); // Prefer callback version
     virtual void receivedHIDReport(const uint8_t* /*data*/, size_t /*length*/, HIDReportType /*tp*/, uint32_t /*message*/) {}
+    virtual void receivedHIDValueChange(HIDValueType /*valType*/, unsigned /*usage*/, const char* /*name*/, int /*value*/) {}
 };
 
 }

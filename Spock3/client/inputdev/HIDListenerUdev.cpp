@@ -17,6 +17,88 @@ udev* GetUdev()
     return UDEV_INST;
 }
 
+udev_device* GetUdevJoystick(udev_device* parent)
+{
+    udev_device* ret = nullptr;
+    udev_enumerate* uenum = udev_enumerate_new(GetUdev());
+    udev_enumerate_add_match_parent(uenum, parent);
+    udev_enumerate_add_match_subsystem(uenum, "input");
+    udev_enumerate_add_match_sysname(uenum, "js[0-9]*");
+    udev_enumerate_scan_devices(uenum);
+    udev_list_entry* uenumList = udev_enumerate_get_list_entry(uenum);
+    udev_list_entry* uenumItem;
+    udev_list_entry_foreach(uenumItem, uenumList)
+    {
+        const char* devPath = udev_list_entry_get_name(uenumItem);
+        ret = udev_device_new_from_syspath(UDEV_INST, devPath);
+        if (ret)
+            break;
+    }
+    udev_enumerate_unref(uenum);
+    return ret;
+}
+
+udev_device* GetUdevHidRaw(udev_device* parent)
+{
+    udev_device* ret = nullptr;
+    udev_enumerate* uenum = udev_enumerate_new(GetUdev());
+    udev_enumerate_add_match_parent(uenum, parent);
+    udev_enumerate_add_match_subsystem(uenum, "hidraw");
+    udev_enumerate_scan_devices(uenum);
+    udev_list_entry* uenumList = udev_enumerate_get_list_entry(uenum);
+    udev_list_entry* uenumItem;
+    udev_list_entry_foreach(uenumItem, uenumList)
+    {
+        const char* devPath = udev_list_entry_get_name(uenumItem);
+        ret = udev_device_new_from_syspath(UDEV_INST, devPath);
+        if (ret)
+            break;
+    }
+    udev_enumerate_unref(uenum);
+    return ret;
+}
+
+static void UnescapeString(char* output, size_t outLen, const char* input)
+{
+    while (*input)
+    {
+        if (outLen == 1)
+        {
+            break;
+        }
+        if (*input == '\\')
+        {
+            ++input;
+            switch (*input++)
+            {
+            case 'x':
+            {
+                char num[] = {input[0], input[1], '\0'};
+                input += 2;
+                *output++ = strtol(num, nullptr, 16);
+                --outLen;
+                break;
+            }
+            case 'n':
+                *output++ = '\n';
+                --outLen;
+                break;
+            case 't':
+                *output++ = '\t';
+                --outLen;
+                break;
+            default: break;
+            }
+        }
+        else
+        {
+            *output++ = *input++;
+            --outLen;
+        }
+    }
+    *output = '\0';
+}
+
 class HIDListenerUdev final : public IHIDListener
 {
     DeviceFinder& m_finder;
@@ -34,13 +116,23 @@ class HIDListenerUdev final : public IHIDListener
 
         /* Prevent redundant registration */
         const char* devPath = udev_device_get_syspath(device);
-        if (listener->m_finder._hasToken(devPath))
+        udev_device* parent = udev_device_get_parent(device);
+        if (!parent) /* Reject virtual devices */
+            return;
+        const char* parentPath = udev_device_get_syspath(parent);
+
+        if (!strcmp("/sys/devices/pci0000:00/0000:00:1d.1/usb3/3-1/3-1:1.0/input/input13/js0", devPath))
+            printf("%s\n", devPath);
+        if (listener->m_finder._hasToken(devPath) ||
+            listener->m_finder._hasToken(parentPath))
             return;
 
         /* Filter to USB/BT */
         const char* dt = udev_device_get_devtype(device);
         DeviceType type;
         int vid = 0, pid = 0;
+        char manufUnesc[256];
+        char productUnesc[256];
         const char* manuf = nullptr;
         const char* product = nullptr;
         if (dt)
@@ -53,6 +145,7 @@ class HIDListenerUdev final : public IHIDListener
                 return;
 
             udev_list_entry* attrs = udev_device_get_properties_list_entry(device);
+
             udev_list_entry* vide = udev_list_entry_get_by_name(attrs, "ID_VENDOR_ID");
             if (vide)
                 vid = strtol(udev_list_entry_get_value(vide), nullptr, 16);
@@ -69,28 +162,44 @@ class HIDListenerUdev final : public IHIDListener
             if (producte)
                 product = udev_list_entry_get_value(producte);
         }
-        else if (!strcmp(udev_device_get_subsystem(device), "hidraw"))
+        else if (!strcmp(udev_device_get_subsystem(device), "hidraw") ||
+                 !strcmp(udev_device_get_subsystem(device), "input"))
         {
-            type = DeviceType::HID;
-            udev_device* parent = udev_device_get_parent(device);
-            udev_list_entry* attrs = udev_device_get_properties_list_entry(parent);
+            devPath = parentPath;
 
-            udev_list_entry* hidide = udev_list_entry_get_by_name(attrs, "HID_ID");
-            if (hidide)
+            if (udev_device* joystick = GetUdevJoystick(parent))
             {
-                const char* hidid = udev_list_entry_get_value(hidide);
-                const char* vids = strchr(hidid, ':') + 1;
-                const char* pids = strchr(vids, ':') + 1;
-                vid = strtol(vids, nullptr, 16);
-                pid = strtol(pids, nullptr, 16);
-            }
+                type = DeviceType::HID;
+                udev_list_entry* attrs = udev_device_get_properties_list_entry(joystick);
 
-            udev_list_entry* hidnamee = udev_list_entry_get_by_name(attrs, "HID_NAME");
-            if (hidnamee)
-            {
-                product = udev_list_entry_get_value(hidnamee);
-                manuf = product;
+                udev_list_entry* vide = udev_list_entry_get_by_name(attrs, "ID_VENDOR_ID");
+                if (vide)
+                    vid = strtol(udev_list_entry_get_value(vide), nullptr, 16);
+
+                udev_list_entry* pide = udev_list_entry_get_by_name(attrs, "ID_MODEL_ID");
+                if (pide)
+                    pid = strtol(udev_list_entry_get_value(pide), nullptr, 16);
+
+                udev_list_entry* manufe = udev_list_entry_get_by_name(attrs, "ID_VENDOR_ENC");
+                if (manufe)
+                {
+                    manuf = manufUnesc;
+                    UnescapeString(manufUnesc, sizeof(manufUnesc), udev_list_entry_get_value(manufe));
+                }
+
+                udev_list_entry* producte = udev_list_entry_get_by_name(attrs, "ID_MODEL_ENC");
+                if (producte)
+                {
+                    product = productUnesc;
+                    UnescapeString(productUnesc, sizeof(productUnesc), udev_list_entry_get_value(producte));
+                }
+
+                udev_device_unref(joystick);
             }
+        }
+        else
+        {
+            return;
         }
 
 #if 0
@@ -171,6 +280,8 @@ public:
         }
         udev_monitor_filter_add_match_subsystem_devtype(m_udevMon, "usb", "usb_device");
         udev_monitor_filter_add_match_subsystem_devtype(m_udevMon, "bluetooth", "bluetooth_device");
+        udev_monitor_filter_add_match_subsystem_devtype(m_udevMon, "hidraw", nullptr);
+        udev_monitor_filter_add_match_subsystem_devtype(m_udevMon, "input", nullptr);
         udev_monitor_filter_update(m_udevMon);
 
         /* Initial HID Device Add */
@@ -210,6 +321,7 @@ public:
         udev_enumerate_add_match_subsystem(uenum, "usb");
         udev_enumerate_add_match_subsystem(uenum, "bluetooth");
         udev_enumerate_add_match_subsystem(uenum, "hidraw");
+        udev_enumerate_add_match_subsystem(uenum, "input");
         udev_enumerate_scan_devices(uenum);
         udev_list_entry* uenumList = udev_enumerate_get_list_entry(uenum);
         udev_list_entry* uenumItem;

@@ -17,6 +17,8 @@ bool DeviceSignature::DeviceMatchToken(const DeviceToken& token, const TDeviceSi
         if (sig->m_vid == token.getVendorId() && sig->m_pid == token.getProductId() &&
             sig->m_type == token.getDeviceType())
             return true;
+        if (sig->m_typeIdx == typeid(GenericPad) && token.getDeviceType() == DeviceType::HID)
+            return true;
     }
     return false;
 }

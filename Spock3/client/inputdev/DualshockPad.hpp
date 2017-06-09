@@ -123,7 +123,7 @@ struct IDualshockPadCallback
 
 class DualshockPad final : public DeviceBase
 {
-    IDualshockPadCallback* m_callback;
+    IDualshockPadCallback* m_callback = nullptr;
     EDualshockMotor m_rumbleRequest;
     EDualshockMotor m_rumbleState;
     uint8_t m_rumbleDuration[2];

@@ -77,7 +77,8 @@ SOURCES += inputdev/HIDDeviceWinUSB.cpp \
 }
 linux {
 SOURCES += inputdev/HIDDeviceUdev.cpp \
-    inputdev/HIDListenerUdev.cpp
+    inputdev/HIDListenerUdev.cpp \
+    inputdev/UDevNames.cpp
 }
 
 FORMS    += mainwindow.ui \

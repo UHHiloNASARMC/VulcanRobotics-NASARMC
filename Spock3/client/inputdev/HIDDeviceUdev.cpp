@@ -12,6 +12,8 @@
 #include <linux/usbdevice_fs.h>
 #include <linux/input.h>
 #include <linux/hidraw.h>
+#include <linux/hiddev.h>
+#include <linux/joystick.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -20,7 +22,11 @@
 namespace boo
 {
 
+extern const char* UDevButtonNames[];
+extern const char* UDevAxisNames[];
 udev* GetUdev();
+udev_device* GetUdevJoystick(udev_device* parent);
+udev_device* GetUdevHidRaw(udev_device* parent);
 
 /*
  * Reference: http://tali.admingilde.org/linux-docbook/usb/ch07s06.html
@@ -31,7 +37,8 @@ class HIDDeviceUdev final : public IHIDDevice
     DeviceToken& m_token;
     DeviceBase& m_devImp;
 
-    int m_devFd = 0;
+    int m_rawFd = 0;
+    int m_joyFd = 0;
     unsigned m_usbIntfInPipe = 0;
     unsigned m_usbIntfOutPipe = 0;
     bool m_runningTransferLoop = false;
@@ -43,7 +50,7 @@ class HIDDeviceUdev final : public IHIDDevice
 
     bool _sendUSBInterruptTransfer(const uint8_t* data, size_t length)
     {
-        if (m_devFd)
+        if (m_rawFd)
         {
             usbdevfs_bulktransfer xfer =
             {
@@ -52,7 +59,7 @@ class HIDDeviceUdev final : public IHIDDevice
                 30,
                 (void*)data
             };
-            int ret = ioctl(m_devFd, USBDEVFS_BULK, &xfer);
+            int ret = ioctl(m_rawFd, USBDEVFS_BULK, &xfer);
             if (ret != (int)length)
                 return false;
             return true;
@@ -62,7 +69,7 @@ class HIDDeviceUdev final : public IHIDDevice
 
     size_t _receiveUSBInterruptTransfer(uint8_t* data, size_t length)
     {
-        if (m_devFd)
+        if (m_rawFd)
         {
             usbdevfs_bulktransfer xfer =
             {
@@ -71,7 +78,7 @@ class HIDDeviceUdev final : public IHIDDevice
                 30,
                 data
             };
-            return ioctl(m_devFd, USBDEVFS_BULK, &xfer);
+            return ioctl(m_rawFd, USBDEVFS_BULK, &xfer);
         }
         return 0;
     }
@@ -96,7 +103,7 @@ class HIDDeviceUdev final : public IHIDDevice
             udev_device_unref(udevDev);
             return;
         }
-        device->m_devFd = fd;
+        device->m_rawFd = fd;
         usb_device_descriptor devDesc = {};
         read(fd, &devDesc, 1);
         read(fd, &devDesc.bDescriptorType, devDesc.bLength-1);
@@ -147,7 +154,7 @@ class HIDDeviceUdev final : public IHIDDevice
 
         /* Cleanup */
         close(fd);
-        device->m_devFd = 0;
+        device->m_rawFd = 0;
         udev_device_unref(udevDev);
     }
 
@@ -176,20 +183,73 @@ class HIDDeviceUdev final : public IHIDDevice
         std::unique_lock<std::mutex> lk(device->m_initMutex);
         udev_device* udevDev = udev_device_new_from_syspath(GetUdev(), device->m_devPath.c_str());
 
-        /* Get device file */
-        const char* dp = udev_device_get_devnode(udevDev);
-        int fd = open(dp, O_RDWR | O_NONBLOCK);
-        if (fd < 0)
+        udev_device* rawDev = GetUdevHidRaw(udevDev);
+        udev_device* jsDev = GetUdevJoystick(udevDev);
+
+        /* Get raw file */
+        int rfd = 0;
+        if (rawDev)
         {
-            snprintf(errStr, 256, "Unable to open %s@%s: %s\n",
-                     device->m_token.getProductName().c_str(), dp, strerror(errno));
-            device->m_devImp.deviceError(errStr);
-            lk.unlock();
-            device->m_initCond.notify_one();
-            udev_device_unref(udevDev);
-            return;
+            const char* rp = udev_device_get_devnode(rawDev);
+            rfd = open(rp, O_RDWR | O_NONBLOCK);
+            if (rfd < 0)
+            {
+                rfd = open(rp, O_RDONLY | O_NONBLOCK);
+                if (rfd < 0)
+                {
+                    snprintf(errStr, 256, "Unable to open %s@%s: %s\n",
+                             device->m_token.getProductName().c_str(), rp, strerror(errno));
+                    device->m_devImp.deviceError(errStr);
+                    lk.unlock();
+                    device->m_initCond.notify_one();
+                    udev_device_unref(udevDev);
+                    return;
+                }
+            }
+            device->m_rawFd = rfd;
         }
-        device->m_devFd = fd;
+
+        /* Get joystick file */
+        int jfd = 0;
+        if (jsDev)
+        {
+            const char* jp = udev_device_get_devnode(jsDev);
+            jfd = open(jp, O_RDWR | O_NONBLOCK);
+            if (jfd < 0)
+            {
+                jfd = open(jp, O_RDONLY | O_NONBLOCK);
+                if (jfd < 0)
+                {
+                    snprintf(errStr, 256, "Unable to open %s@%s: %s\n",
+                             device->m_token.getProductName().c_str(), jp, strerror(errno));
+                    device->m_devImp.deviceError(errStr);
+                    lk.unlock();
+                    device->m_initCond.notify_one();
+                    udev_device_unref(udevDev);
+                    close(rfd);
+                    return;
+                }
+            }
+            device->m_joyFd = jfd;
+        }
+
+        int maxFd = std::max(rfd, jfd);
+
+        uint8_t numAxis = 0;
+        uint8_t axisMap[ABS_CNT];
+        uint8_t numButtons = 0;
+        uint16_t buttonMap[KEY_MAX - BTN_MISC + 1];
+
+        if (jfd)
+        {
+            if (ioctl(jfd, JSIOCGAXES, &numAxis) < 0 ||
+                ioctl(jfd, JSIOCGAXMAP, axisMap) < 0)
+                numAxis = 0;
+
+            if (ioctl(jfd, JSIOCGBUTTONS, &numButtons) < 0 ||
+                ioctl(jfd, JSIOCGBTNMAP, buttonMap) < 0)
+                numButtons = 0;
+        }
 
         /* Return control to main thread */
         device->m_runningTransferLoop = true;
@@ -206,17 +266,39 @@ class HIDDeviceUdev final : public IHIDDevice
         {
             fd_set readset;
             FD_ZERO(&readset);
-            FD_SET(fd, &readset);
+            FD_SET(rfd, &readset);
+            FD_SET(jfd, &readset);
             struct timeval timeout = {0, 10000};
-            if (select(fd + 1, &readset, nullptr, nullptr, &timeout) > 0)
+            if (select(maxFd + 1, &readset, nullptr, nullptr, &timeout) > 0)
             {
-                while (true)
+                while (rfd)
                 {
-                    ssize_t sz = read(fd, readBuf.get(), readSz);
+                    ssize_t sz = read(rfd, readBuf.get(), readSz);
                     if (sz < 0)
                         break;
                     device->m_devImp.receivedHIDReport(readBuf.get(), sz,
                                                        HIDReportType::Input, readBuf[0]);
+                }
+                while (jfd)
+                {
+                    js_event ev;
+                    ssize_t sz = read(jfd, &ev, sizeof(ev));
+                    if (sz < ssize_t(sizeof(ev)))
+                        break;
+                    if (ev.type == JS_EVENT_BUTTON)
+                    {
+                        uint16_t udevNum = buttonMap[ev.number];
+                        device->m_devImp.receivedHIDValueChange(HIDValueType::Button, udevNum,
+                                                                (udevNum < BTN_0 || udevNum > BTN_TRIGGER_HAPPY40) ?
+                                                                nullptr : UDevButtonNames[udevNum - BTN_0], ev.value);
+                    }
+                    else if (ev.type == JS_EVENT_AXIS)
+                    {
+                        uint16_t udevNum = axisMap[ev.number];
+                        device->m_devImp.receivedHIDValueChange(HIDValueType::Axis, udevNum,
+                                                                udevNum > ABS_TOOL_WIDTH ?
+                                                                nullptr : UDevAxisNames[udevNum], ev.value);
+                    }
                 }
             }
             device->m_devImp.transferCycle();
@@ -224,8 +306,10 @@ class HIDDeviceUdev final : public IHIDDevice
         device->m_devImp.finalCycle();
 
         /* Cleanup */
-        close(fd);
-        device->m_devFd = 0;
+        close(rfd);
+        close(jfd);
+        device->m_rawFd = 0;
+        device->m_joyFd = 0;
         udev_device_unref(udevDev);
     }
 
@@ -234,71 +318,40 @@ class HIDDeviceUdev final : public IHIDDevice
         m_runningTransferLoop = false;
     }
 
-    bool _sendHIDReport(const uint8_t* data, size_t length, HIDReportType tp, uint32_t message)
+    bool _sendHIDReport(const uint8_t* data, size_t length, HIDReportType tp, uint32_t)
     {
-        if (m_devFd)
+        if (m_rawFd)
         {
             if (tp == HIDReportType::Feature)
             {
-                int ret = ioctl(m_devFd, HIDIOCSFEATURE(length), data);
+                int ret = ioctl(m_rawFd, HIDIOCSFEATURE(length), data);
                 if (ret < 0)
                     return false;
                 return true;
             }
             else if (tp == HIDReportType::Output)
             {
-                ssize_t ret = write(m_devFd, data, length);
+                ssize_t ret = write(m_rawFd, data, length);
                 if (ret < 0)
                     return false;
                 return true;
             }
-
-            /*
-            usbdevfs_ctrltransfer xfer =
-            {
-                USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE,
-                0x09, // HID_SET_REPORT
-                message,
-                0,
-                (uint16_t)length,
-                30,
-                (void*)data
-            };
-            int ret = ioctl(m_devFd, USBDEVFS_CONTROL, &xfer);
-            if (ret != (int)length)
-                return false;
-            return true;
-            */
         }
         return false;
     }
 
     size_t _receiveHIDReport(uint8_t *data, size_t length, HIDReportType tp, uint32_t message)
     {
-        if (m_devFd)
+        if (m_rawFd)
         {
             if (tp == HIDReportType::Feature)
             {
                 data[0] = message;
-                int ret = ioctl(m_devFd, HIDIOCGFEATURE(length), data);
+                int ret = ioctl(m_rawFd, HIDIOCGFEATURE(length), data);
                 if (ret < 0)
                     return 0;
                 return length;
             }
-
-            /*
-            usbdevfs_ctrltransfer xfer =
-            {
-                USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE,
-                0x01, // HID_GET_REPORT
-                message,
-                0,
-                (uint16_t)length,
-                0,
-                (void*)data
-            };
-            return ioctl(m_devFd, USBDEVFS_CONTROL, &xfer);
-            */
         }
         return 0;
     }

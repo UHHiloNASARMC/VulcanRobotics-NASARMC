@@ -6,6 +6,7 @@
 #include "inputdev/DeviceFinder.hpp"
 #include "inputdev/DualshockPad.hpp"
 #include "inputdev/XInputPad.hpp"
+#include "inputdev/GenericPad.hpp"
 #include <QtAV/QtAV.h>
 
 namespace Ui {
@@ -20,7 +21,9 @@ class DeviceFinder : public QObject, public boo::DeviceFinder,
     std::shared_ptr<boo::DeviceBase> m_device = nullptr;
 public:
     DeviceFinder()
-        : boo::DeviceFinder({typeid(boo::DualshockPad), typeid(boo::XInputPad)})
+        : boo::DeviceFinder({typeid(boo::DualshockPad),
+                             typeid(boo::XInputPad),
+                             typeid(boo::GenericPad)})
     {
     }
 
